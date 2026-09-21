@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="created_at" content="2026-09-21T20:44:13+09:00">
+<title>docserve — Spec</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234465DB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M8 13h8M8 17h5'/%3E%3C/svg%3E">
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0B0E14;
+    --surface: #151A23;
+    --surface-2: #21252F;
+    --border: #2C313F;
+    --border-strong: #383F50;
+    --text: #C3CDDC;
+    --text-strong: #F7F9FC;
+    --muted: #7E8A9E;
+    --primary: #4465DB;
+    --primary-soft: rgba(68, 101, 219, 0.15);
+    --accent: #F08A59;
+    --accent-soft: rgba(240, 138, 89, 0.15);
+    --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-2: #F1F5F9;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #334155;
+      --text-strong: #0F172A;
+      --muted: #64748B;
+      --primary: #2563EB;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --accent: #EA580C;
+      --accent-soft: rgba(234, 88, 12, 0.1);
+      color-scheme: light;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 0 16px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h1 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  /* Sections */
+  section { margin-top: 48px; }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  h2 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    margin: 24px 0 8px;
+  }
+  h3 iconify-icon { color: var(--accent); font-size: 18px; flex-shrink: 0; }
+  p { margin-bottom: 12px; }
+  p strong { color: var(--text); }
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  /* Inline code & blocks */
+  code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.77rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 14px 0;
+  }
+  pre .c { color: var(--muted); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+    background: var(--surface);
+  }
+  td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    background: var(--surface);
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Callout */
+  .callout {
+    background: var(--primary-soft);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    margin: 16px 0;
+    line-height: 1.65;
+  }
+  .callout iconify-icon {
+    font-size: 18px;
+    margin-right: 6px;
+    vertical-align: -3px;
+    color: var(--primary);
+  }
+
+  /* Figure (theme-aware SVG) */
+  .figure {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .figure svg { width: 100%; height: auto; display: block; }
+  .figure-caption {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-family: var(--mono);
+    text-align: center;
+  }
+  .figure .fig-zone { fill: none; stroke: var(--border-strong); stroke-dasharray: 4 4; }
+  .figure .fig-label { fill: var(--muted); font-size: 9px; letter-spacing: 0.08em; font-family: var(--mono); }
+  .figure .node { fill: var(--surface-2); stroke: var(--border-strong); }
+  .figure .node-primary { stroke: var(--primary); }
+  .figure .node-accent { fill: var(--accent-soft); stroke: var(--accent); }
+  .figure .tt { fill: var(--text-strong); font-weight: 600; font-size: 11.5px; text-anchor: middle; }
+  .figure .tm { fill: var(--muted); font-size: 8.5px; text-anchor: middle; font-family: var(--mono); }
+  .figure .edge { fill: none; stroke: var(--muted); stroke-width: 1.2; marker-end: url(#arch-head-muted); }
+  .figure .edge-primary { stroke: var(--primary); stroke-width: 1.5; marker-end: url(#arch-head-primary); }
+  .figure .edge-accent { stroke: var(--accent); stroke-width: 1.4; marker-end: url(#arch-head-accent); }
+  .figure .alabel { fill: var(--muted); font-size: 8.5px; font-family: var(--mono); }
+  .figure .head-muted { fill: var(--muted); }
+  .figure .head-primary { fill: var(--primary); }
+  .figure .head-accent { fill: var(--accent); }
+
+  /* Grid & Cards */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (max-width: 620px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card .card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .card .card-head iconify-icon {
+    font-size: 22px;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  .card h4 {
+    font-size: 0.95rem;
+    color: var(--text-strong);
+    font-weight: 600;
+    margin: 0;
+  }
+  .card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .card p strong { color: var(--text); }
+
+  /* Footer */
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  footer strong { color: var(--text); }
+  footer ul { list-style: none; }
+  footer li { padding: 2px 0; }
+  footer li iconify-icon { color: var(--muted); font-size: 14px; vertical-align: -2px; margin-right: 6px; }
+  footer a { color: var(--primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .f-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .f-title iconify-icon { color: var(--primary); }
+  .colophon {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="badge-top">
+      <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
+      SPECIFICATION
+    </div>
+    <h1><iconify-icon icon="mdi:file-multiple-outline" width="30" noobserver></iconify-icon>docserve Spec</h1>
+    <p class="tagline">Serves a folder of HTML as a card gallery — every page live-reloads.</p>
+  </header>
+
+  <!-- --- OVERVIEW --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:information-outline" width="24" noobserver></iconify-icon>Overview</h2>
+    <p class="section-desc">
+      <code>docserve ~/reports</code> serves every HTML file in the folder as a card gallery.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
+          <h4>Gallery</h4>
+        </div>
+        <p>Card grid, iframe previews, copy-path button, automatic date resolution.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
+          <h4>Auto reload</h4>
+        </div>
+        <p>Add, edit, and delete are pushed to open tabs via WebSocket.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
+          <h4>Desktop &amp; CLI</h4>
+        </div>
+        <p>Control it from the menu bar or the terminal.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
+          <h4>Zero dependencies</h4>
+        </div>
+        <p>Node stdlib only (<code>http</code> / <code>fs.watch</code> / <code>crypto</code>). No <code>npm install</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- STRUCTURE --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:file-tree-outline" width="24" noobserver></iconify-icon>Directory structure</h2>
+
+    <pre>docserve/
+├── 📦 cli/                       <span class="c"># npm package: docserve</span>
+│   ├── package.json              <span class="c"># "bin": { "docserve": "./bin.mjs" }</span>
+│   ├── bin.mjs                   <span class="c"># CLI entry: args · start/stop/spawn</span>
+│   ├── index.html                <span class="c"># gallery template, served at /</span>
+│   └── server/
+│       ├── index.mjs             <span class="c"># HTTP server · WS · UpdateListener</span>
+│       ├── state.mjs             <span class="c"># state.json read/write · pid liveness</span>
+│       ├── files.mjs             <span class="c"># *.html listing · meta + git dates</span>
+│       └── inject.mjs            <span class="c"># reload client + copy button</span>
+└── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
+    ├── package.json
+    └── main.mjs</pre>
+  </section>
+
+  <!-- --- ARCHITECTURE --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:sitemap-outline" width="24" noobserver></iconify-icon>Architecture</h2>
+    <p class="section-desc">
+      A single Node process serves the gallery, the pages, and the reload socket. The desktop app only spawns and monitors it.
+    </p>
+
+    <div class="figure">
+      <svg viewBox="0 0 768 404" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="docserve architecture">
+        <defs>
+          <marker id="arch-head-muted" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="head-muted"/></marker>
+          <marker id="arch-head-primary" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="head-primary"/></marker>
+          <marker id="arch-head-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="head-accent"/></marker>
+        </defs>
+
+        <!-- Process zone -->
+        <rect class="fig-zone" x="48" y="104" width="420" height="192" rx="8"/>
+        <text class="fig-label" x="60" y="122">DOCSERVE PROCESS — node bin.mjs</text>
+
+        <!-- Edges -->
+        <path class="edge edge-primary" d="M 384,64 V 100"/>
+        <path class="edge edge-accent" d="M 448,168 H 548"/>
+        <path class="edge" d="M 158,196 V 216 H 644 V 200"/>
+        <path class="edge" d="M 358,238 V 200"/>
+        <path class="edge edge-primary" d="M 148,340 V 300"/>
+        <path class="edge" d="M 420,296 V 336"/>
+        <path class="edge" d="M 248,366 H 292"/>
+        <text class="alabel" x="498" y="158">WS /__reload</text>
+        <text class="alabel" x="400" y="210">GET / · /api/files</text>
+        <text class="alabel" x="366" y="224">changes</text>
+        <text class="alabel" x="156" y="324">spawn · stop</text>
+        <text class="alabel" x="428" y="322">writes</text>
+        <text class="alabel" x="270" y="358">reads</text>
+
+        <!-- Entry -->
+        <rect class="node node-primary" x="268" y="20" width="232" height="44" rx="6"/>
+        <text class="tt" x="384" y="38">docserve &lt;dir&gt; --open</text>
+        <text class="tm" x="384" y="54">CLI entry · bin.mjs</text>
+
+        <!-- Inside the process -->
+        <rect class="node" x="68" y="140" width="180" height="56" rx="6"/>
+        <text class="tt" x="158" y="162">HTTP server</text>
+        <text class="tm" x="158" y="178">static · /api/files</text>
+
+        <rect class="node" x="268" y="140" width="180" height="56" rx="6"/>
+        <text class="tt" x="358" y="162">WebSocket server</text>
+        <text class="tm" x="358" y="178">/__reload broadcast</text>
+
+        <rect class="node" x="68" y="238" width="380" height="44" rx="6"/>
+        <text class="tt" x="258" y="258">UpdateListener</text>
+        <text class="tm" x="258" y="272">fs.watch(docsDir) · debounce 50 ms</text>
+
+        <!-- Browser -->
+        <rect class="node node-accent" x="552" y="140" width="184" height="56" rx="6"/>
+        <text class="tt" x="644" y="162">Browser</text>
+        <text class="tm" x="644" y="178">gallery · pages</text>
+
+        <!-- Desktop -->
+        <rect class="node" x="48" y="340" width="200" height="52" rx="6"/>
+        <text class="tt" x="148" y="362">Desktop app (Electron)</text>
+        <text class="tm" x="148" y="378">tray · start/stop · change folder</text>
+
+        <!-- State file -->
+        <rect class="node" x="296" y="340" width="220" height="52" rx="6"/>
+        <text class="tt" x="406" y="362" style="font-family: var(--mono); font-size: 11px;">state.json</text>
+        <text class="tm" x="406" y="378">{pid, port, url, docsDir}</text>
+      </svg>
+    </div>
+
+    <h3><iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>Runtime state</h3>
+    <p class="section-desc">
+      The server writes <code>~/.cache/docserve/state.json</code> once the port is bound and removes it on clean shutdown.
+      Readers verify the PID is alive (<code>kill(pid, 0)</code>) and treat dead-PID state as stale.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>pid</code></td><td>number</td><td>Server process. <code>stop</code> sends SIGTERM to it; liveness-checked before use</td></tr>
+          <tr><td><code>port</code></td><td>number</td><td>Actually bound port (starts at <code>4321</code>, falls back +1 on conflict)</td></tr>
+          <tr><td><code>url</code></td><td>string</td><td><code>http://localhost:&lt;port&gt;/</code></td></tr>
+          <tr><td><code>docsDir</code></td><td>string</td><td>Absolute path of the serving folder</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <iconify-icon icon="mdi:information-outline" noobserver></iconify-icon>
+      <strong>Single instance:</strong> starting with the same <code>docsDir</code> while a server runs just opens its URL.
+      A different <code>docsDir</code> requires <code>docserve stop</code> first.
+    </div>
+  </section>
+
+  <!-- --- CLI --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:console" width="24" noobserver></iconify-icon>CLI</h2>
+    <p class="section-desc">Syntax: <code>docserve [dir] [command] [options]</code></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Argument / Command</th><th>Behavior</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>[dir]</code></td><td>Folder to serve (default: <code>.</code>). Errors with exit 1 if it does not exist</td></tr>
+          <tr><td><code>(none)</code></td><td>Foreground start. <code>Ctrl+C</code> stops the server and removes <code>state.json</code></td></tr>
+          <tr><td><code>stop</code></td><td>SIGTERM to the <code>pid</code> in <code>state.json</code>, then clears it. Stale state (dead pid) is removed silently</td></tr>
+          <tr><td><code>status</code></td><td>Print <code>url</code> and <code>docsDir</code> if a live server is found; exit 1 otherwise</td></tr>
+          <tr><td><code>--open</code></td><td>Open the gallery in the browser once the port is bound</td></tr>
+          <tr><td><code>--port &lt;n&gt;</code></td><td>Port to bind (default <code>4321</code>). On conflict, falls back +1 up to 20 tries and records the bound port in <code>state.json</code></td></tr>
+          <tr><td><code>--background</code></td><td>Start detached; state is written to <code>state.json</code></td></tr>
+          <tr><td><code>-h</code> / <code>-v</code></td><td>Show help / version</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- --- SERVING --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:file-send-outline" width="24" noobserver></iconify-icon>Serving</h2>
+    <p class="section-desc">
+      The gallery is an embedded template served at <code>/</code>; every other file is served raw from <code>docsDir</code>.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>URL</th><th>Response</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched from <code>/api/files</code>; <code>docsDir/index.html</code> is excluded</td></tr>
+          <tr><td><code>/api/files</code></td><td>JSON list: title, path, created, modified per <code>*.html</code></td></tr>
+          <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
+          <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-desc">
+      Malformed paths respond <code>400</code>, paths escaping <code>docsDir</code> respond <code>403</code>, missing files respond <code>404</code>.
+      <code>text/html</code> responses get the reload client injected (see Injection). The server binds <code>127.0.0.1</code> only.
+    </p>
+  </section>
+
+  <!-- --- GALLERY --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:view-grid-outline" width="24" noobserver></iconify-icon>Gallery</h2>
+    <p class="section-desc">
+      The gallery lists every <code>*.html</code> under <code>docsDir</code> (recursive, excluding <code>index.html</code>), sorted by created date, newest first. The card list is fetched from <code>/api/files</code> on load.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Card</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Title</td><td>Page <code>&lt;title&gt;</code>, falling back to the file name</td></tr>
+          <tr><td>Preview</td><td><code>&lt;iframe&gt;</code> of the page, lazy-loaded</td></tr>
+          <tr><td>Created / Modified</td><td>Date resolution below</td></tr>
+          <tr><td>Copy path</td><td>Absolute file path to the clipboard</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-desc">
+      <strong>Dates:</strong> <code>&lt;meta name="created_at"&gt;</code> &gt; oldest git commit date &gt; file birthtime.
+      <strong>Lazy previews:</strong> <code>IntersectionObserver</code> with <code>rootMargin: 400px</code>, at most 3 iframes loading at once.
+    </p>
+  </section>
+
+  <!-- --- RELOAD --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:refresh-circle" width="24" noobserver></iconify-icon>Reload protocol</h2>
+    <p class="section-desc">
+      Open tabs stay current through a WebSocket at <code>/__reload</code>. File events are batched for 50 ms and broadcast as one message.
+    </p>
+
+    <pre>{ "type": "change", "pages": ["foo.html", "sub/bar.html"], "contentSetChanged": false }</pre>
+
+    <p class="section-desc">
+      <code>pages</code> holds the docsDir-relative paths touched in the batch; <code>contentSetChanged</code> is true when a file was added or removed.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Client</th><th>Reloads when</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Page tab</td><td>Its own path appears in <code>pages</code></td></tr>
+          <tr><td>Gallery tab</td><td><code>contentSetChanged</code> is <code>true</code></td></tr>
+          <tr><td>iframe preview</td><td>Never connects — the <code>window.self !== window.top</code> guard keeps edits from reloading previews</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-desc">
+      Detection is a single <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code>. On socket close, page tabs reload after 1 s and recover once the server is back.
+    </p>
+  </section>
+
+  <!-- --- INJECTION --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:needle" width="24" noobserver></iconify-icon>Injection</h2>
+    <p class="section-desc">
+      Every <code>text/html</code> response gets one client script before the last <code>&lt;/body&gt;</code> (appended at the end if the tag is missing). The script exits immediately inside iframes, so previews get neither part; the gallery template ships its own client.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Injected</th><th>Behavior</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Reload client</td><td>Connects to <code>/__reload</code> and follows the Reload protocol</td></tr>
+          <tr><td>Copy path button</td><td>Fixed at the bottom-right; copies the file's absolute path and shows a check for 1.2 s</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-desc">
+      <code>pageId</code> and the absolute path are embedded JSON-encoded, with <code>&lt;</code> escaped to <code>\u003c</code> so page content cannot break out of the client.
+    </p>
+  </section>
+
+  <!-- --- DESKTOP --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:apple" width="24" noobserver></iconify-icon>Desktop app</h2>
+    <p class="section-desc">
+      A macOS menu bar client with zero windows — the Electron main process only spawns the CLI and watches <code>state.json</code> (<code>fs.watch</code> + 2 s polling, pid liveness check).
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Behavior</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tray icon</td><td>Outline when stopped, filled when running</td></tr>
+          <tr><td>Start / Stop</td><td>Toggles <code>docserve &lt;dir&gt; --background --open</code> and <code>docserve stop</code></td></tr>
+          <tr><td>Change Folder…</td><td><code>dialog.showOpenDialog</code>; stops the running server and restarts with the new folder</td></tr>
+          <tr><td>Quit</td><td>Stops the server, then <code>app.quit()</code></td></tr>
+          <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre>● Running                     <span class="c"># status item (disabled)</span>
+Open (http://localhost:4321)
+Stop Server
+─────────────────────────────
+Serving: ~/reports            <span class="c"># current folder (disabled)</span>
+Change Folder…
+─────────────────────────────
+Quit docserve
+
+<span class="c"># stopped:</span>
+○ Stopped
+Start Server                  <span class="c"># docserve &lt;dir&gt; --background --open</span>
+Stop Server                   <span class="c"># disabled</span></pre>
+  </section>
+
+  <footer>
+    <div class="f-title">
+      <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+      Related
+    </div>
+    <ul>
+      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/microsoft/vscode-livepreview" target="_blank" rel="noopener">microsoft/vscode-livepreview</a> — VS Code's local preview server with live reload</li>
+    </ul>
+    <div class="colophon">docserve SPEC · cli / desktop · 2026-09-21</div>
+  </footer>
+
+</div>
+</body>
+</html>
