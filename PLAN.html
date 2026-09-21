@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="created_at" content="2026-09-21T23:37:37+09:00">
+<title>docserve — Plan</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234465DB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z'/%3E%3Cpath d='m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z'/%3E%3C/svg%3E">
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0B0E14;
+    --surface: #151A23;
+    --surface-2: #21252F;
+    --border: #2C313F;
+    --border-strong: #383F50;
+    --text: #C3CDDC;
+    --text-strong: #F7F9FC;
+    --muted: #7E8A9E;
+    --primary: #4465DB;
+    --primary-soft: rgba(68, 101, 219, 0.15);
+    --accent: #F08A59;
+    --accent-soft: rgba(240, 138, 89, 0.15);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.15);
+    --cyan: #38BDF8;
+    --purple: #A78BFA;
+    --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-2: #F1F5F9;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #334155;
+      --text-strong: #0F172A;
+      --muted: #64748B;
+      --primary: #2563EB;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --accent: #EA580C;
+      --accent-soft: rgba(234, 88, 12, 0.1);
+      --green: #16A34A;
+      --green-soft: rgba(22, 163, 74, 0.1);
+      --cyan: #0284C7;
+      --purple: #7C3AED;
+      color-scheme: light;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 0 16px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h1 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  /* Sections */
+  section { margin-top: 48px; }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  h2 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  p { margin-bottom: 12px; }
+  p strong { color: var(--text); }
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  /* Inline code & blocks */
+  code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.77rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 14px 0;
+  }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+    background: var(--surface);
+  }
+  td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    background: var(--surface);
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Callout */
+  .callout {
+    background: var(--primary-soft);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    margin: 16px 0;
+    line-height: 1.65;
+  }
+  .callout iconify-icon {
+    font-size: 18px;
+    margin-right: 6px;
+    vertical-align: -3px;
+    color: var(--primary);
+  }
+
+  /* Timeline (phase cards) */
+  .timeline { position: relative; padding-left: 28px; margin: 20px 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: 2px;
+    background: var(--border-strong);
+  }
+  .timeline-step { position: relative; margin-bottom: 20px; }
+  .timeline-step:last-child { margin-bottom: 0; }
+  .step-dot {
+    position: absolute;
+    left: -28px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 2px solid var(--primary);
+  }
+  .step-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .step-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .step-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-title iconify-icon { font-size: 22px; }
+  .step-meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .step-body {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .step-tasks {
+    list-style: none;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .step-tasks li {
+    font-size: 0.8rem;
+    color: var(--text);
+    padding: 1px 0;
+  }
+  .step-tasks iconify-icon { font-size: 16px; vertical-align: -3px; margin-right: 6px; }
+  .verify {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 12px 0 0;
+  }
+  .verify iconify-icon {
+    font-size: 15px;
+    color: var(--green);
+    vertical-align: -2px;
+    margin-right: 6px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  footer ul { list-style: none; }
+  footer li { padding: 2px 0; }
+  footer li iconify-icon { color: var(--muted); font-size: 14px; vertical-align: -2px; margin-right: 6px; }
+  footer a { color: var(--primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .f-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .f-title iconify-icon { color: var(--primary); }
+  .colophon {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="badge-top">
+      <iconify-icon icon="mdi:rocket-launch-outline" noobserver></iconify-icon>
+      IMPLEMENTATION PLAN
+    </div>
+    <h1><iconify-icon icon="mdi:flag-checkered" width="30" noobserver></iconify-icon>docserve Plan</h1>
+    <p class="tagline">Implementation roadmap to build docserve.</p>
+  </header>
+
+  <!-- --- PHASES --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:format-list-numbered" width="24" noobserver></iconify-icon>Roadmap</h2>
+
+    <div class="timeline">
+
+      <div class="timeline-step">
+        <div class="step-dot"></div>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-1-circle" style="color:var(--primary)" noobserver></iconify-icon>
+              Phase 1 — Server core
+            </span>
+            <span class="step-meta">P0</span>
+          </div>
+          <div class="step-body">
+            The HTTP layer: <code>docsDir</code> validation, URL mapping, MIME, status codes, and the state file.
+          </div>
+          <ul class="step-tasks">
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Scaffold <code>cli/</code>: <code>package.json</code> (name, bin, type, files, engines), <code>bin.mjs</code> stub, <code>server/index.mjs</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon><code>docsDir</code> resolution + validation (missing → exit 1)</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>URL mapping: <code>/</code>, <code>/index.html</code> → gallery template; raw static files; MIME map; <code>400</code> / <code>403</code> / <code>404</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon><code>server/state.mjs</code>: write <code>state.json</code> on bind, remove on SIGINT/SIGTERM, pid liveness + stale self-repair</li>
+          </ul>
+          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: <code>node cli/bin.mjs ~/reports</code> — <code>curl /</code>, raw page, traversal <code>403</code>, bad escape <code>400</code></p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot" style="border-color: var(--accent);"></div>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-2-circle" style="color:var(--accent)" noobserver></iconify-icon>
+              Phase 2 — /api/files + gallery
+            </span>
+            <span class="step-meta">P0</span>
+          </div>
+          <div class="step-body">
+            File metadata for <code>/api/files</code> and the gallery UI ported from docview.
+          </div>
+          <ul class="step-tasks">
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--accent)" noobserver></iconify-icon><code>server/files.mjs</code>: recursive <code>*.html</code> listing (exclude <code>index.html</code>), <code>&lt;title&gt;</code> / <code>created_at</code> extraction (4 KB head → 1 MB fallback), git date maps (cached per repo root), sort by created desc</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--accent)" noobserver></iconify-icon><code>index.html</code>: port the docview gallery — card grid, lazy iframes (<code>rootMargin: 400px</code>, max 3 concurrent), copy path</li>
+          </ul>
+          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: cards render with resolved dates; nested assets load</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot" style="border-color: var(--cyan);"></div>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-3-circle" style="color:var(--cyan)" noobserver></iconify-icon>
+              Phase 3 — Live reload
+            </span>
+            <span class="step-meta">P0</span>
+          </div>
+          <div class="step-body">
+            WebSocket broadcast, <code>fs.watch</code> detection, and page injection.
+          </div>
+          <ul class="step-tasks">
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--cyan)" noobserver></iconify-icon><code>server/inject.mjs</code>: reload client + copy button before the last <code>&lt;/body&gt;</code>, <code>&lt;</code> → <code>\u003c</code> escaping, iframe early-return</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--cyan)" noobserver></iconify-icon>WS server <code>/__reload</code>: handshake, text frames, ping → pong (RFC 6455 subset)</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--cyan)" noobserver></iconify-icon>UpdateListener: <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code>, 50 ms debounce batch, known-files tracking → <code>contentSetChanged</code></li>
+          </ul>
+          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: edit reloads its own tab only; add/delete reloads the gallery; previews never reload</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot" style="border-color: var(--purple);"></div>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-4-circle" style="color:var(--purple)" noobserver></iconify-icon>
+              Phase 4 — CLI
+            </span>
+            <span class="step-meta">P1</span>
+          </div>
+          <div class="step-body">
+            Lifecycle commands: stop/status, background spawn, single-instance guard.
+          </div>
+          <ul class="step-tasks">
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon><code>stop</code> (SIGTERM + clear state; stale state removed silently) / <code>status</code> (exit 1 when none)</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon><code>--background</code> (detached spawn), <code>--open</code>, <code>--port</code> fallback +1 (≤ 20 tries)</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon>Single-instance rule: same <code>docsDir</code> → open its URL; different → error prompting <code>docserve stop</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon><code>-h</code> / <code>-v</code></li>
+          </ul>
+          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: start → status → stop cycle; background + open; stale <code>state.json</code></p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot" style="border-color: var(--green);"></div>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-5-circle" style="color:var(--green)" noobserver></iconify-icon>
+              Phase 5 — Tests
+            </span>
+            <span class="step-meta">P1</span>
+          </div>
+          <div class="step-body">
+            Port the docview test suite to the new modules.
+          </div>
+          <ul class="step-tasks">
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Port <code>docview/serve.test.mjs</code> → <code>cli/server.test.mjs</code>, run with <code>node --test</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Update pageId assertions: <code>content:foo.html</code> → <code>foo.html</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Drop the <code>root:index.html</code> gallery-edit case — the gallery is a package template now, not a watched file</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Isolation: <code>DOCSERVE_STATE</code> env override for the state path + a random <code>--port</code> per run (parallel-safe)</li>
+          </ul>
+          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: <code>node --test cli/</code> green</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-dot"></div>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-6-circle" style="color:var(--primary)" noobserver></iconify-icon>
+              Phase 6 — Desktop app
+            </span>
+            <span class="step-meta">P2</span>
+          </div>
+          <div class="step-body">
+            macOS tray client controlling the CLI.
+          </div>
+          <ul class="step-tasks">
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Electron zero-window main process; tray icon (outline when stopped / filled when running)</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Start/stop toggle spawning the CLI; Open reads the URL from <code>state.json</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>State watch: <code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Change Folder… → stop → restart; remember the last folder in <code>desktop.json</code></li>
+            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Quit → stop → <code>app.quit()</code>; first launch: symlink the CLI to <code>~/.local/bin/docserve</code></li>
+          </ul>
+          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: all menu flows, including a folder switch while running</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- --- PORT MAP --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:swap-horizontal" width="24" noobserver></iconify-icon>Port map</h2>
+    <p class="section-desc">
+      Two sources: <code>docview/serve.mjs</code> (579 lines, single file) and the Astro prototype at <code>research/docserve</code> (CLI + menubar, proven in production use).
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>docview</th><th>docserve</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>serve.mjs</code></td><td><code>bin.mjs</code> + <code>server/</code></td><td>Split by concern (CLI vs server)</td></tr>
+          <tr><td><code>parseArgs</code> / <code>main()</code></td><td><code>bin.mjs</code></td><td><code>--daemon</code> → <code>--background</code>; <code>start</code> (SwiftBar wait) dropped</td></tr>
+          <tr><td><code>handler()</code> + MIME</td><td><code>server/index.mjs</code></td><td>ROOT + CONTENT_DIR dual root → single <code>docsDir</code></td></tr>
+          <tr><td><code>metaOf</code> / <code>extractMeta</code></td><td><code>server/files.mjs</code></td><td>Head 4 KB → 1 MB fallback preserved</td></tr>
+          <tr><td><code>gitDateMaps</code></td><td><code>server/files.mjs</code></td><td>cwd = <code>docsDir</code></td></tr>
+          <tr><td><code>listContentFiles</code></td><td><code>server/files.mjs</code></td><td><code>index.html</code> excluded</td></tr>
+          <tr><td><code>clientJs</code> / <code>injectIntoHtml</code></td><td><code>server/inject.mjs</code></td><td>pageId: <code>content:</code> prefix → plain docsDir-relative path</td></tr>
+          <tr><td><code>WebSocketServer</code> / frame encode</td><td><code>server/index.mjs</code></td><td><code>/__reload</code> unchanged</td></tr>
+          <tr><td><code>UpdateListener</code> / <code>debounceBatch</code></td><td><code>server/index.mjs</code></td><td>50 ms batch unchanged</td></tr>
+          <tr><td><code>.server-port</code></td><td><code>server/state.mjs</code></td><td><code>state.json</code> <code>{pid, port, url, docsDir}</code> + pid liveness</td></tr>
+          <tr><td><code>index.html</code></td><td><code>index.html</code></td><td>+ <code>contentSetChanged</code> reload rule</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="display:flex;align-items:center;gap:8px;font-size:1.02rem;font-weight:700;color:var(--text-strong);margin:24px 0 8px;">
+      <iconify-icon icon="mdi:import" noobserver></iconify-icon>
+      Astro prototype (research/docserve)
+    </h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Prototype</th><th>docserve</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>cli/lib/detect.mjs</code></td><td><code>server/state.mjs</code></td><td><code>state.json</code> read/write/clear, pid liveness (<code>kill(pid, 0)</code>), stale self-repair — port as-is</td></tr>
+          <tr><td><code>template/src/lib/doc-date.ts</code></td><td><code>server/files.mjs</code></td><td>meta → git creation map (cached per repo root, <code>/var</code> realpath) → mtime</td></tr>
+          <tr><td><code>template/src/lib/copy-button.ts</code></td><td><code>server/inject.mjs</code></td><td>Button UI</td></tr>
+          <tr><td><code>template/src/pages/index.astro</code></td><td><code>index.html</code></td><td>Card grid + lazy iframes; merge with the docview port</td></tr>
+          <tr><td><code>desktop/src/</code> + tray PNGs</td><td><code>desktop/</code> (Phase 6)</td><td>ServerManager / StateWatcher / TrayController port as-is; retarget <code>.astro/dev.json</code> → <code>state.json</code></td></tr>
+          <tr><td><code>cli/lib/cache.mjs</code>, <code>template/</code> scaffold, loader, HMR client</td><td>—</td><td>Dropped — no Astro template to scaffold; docview covers serving, watch, and WS</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <iconify-icon icon="mdi:alert-outline" noobserver></iconify-icon>
+      <strong>Keep as-is:</strong> the WebSocket subset (handshake + text frames + ping/pong), the 50 ms debounce, the date priority (<code>created_at</code> meta &gt; git &gt; birthtime), and the <code>\u003c</code> escaping are all proven in docview — port them without redesign.
+    </div>
+  </section>
+
+  <footer>
+    <div class="f-title">
+      <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+      Related
+    </div>
+    <ul>
+      <li><iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon><a href="./SPEC.html" target="_blank" rel="noopener">SPEC.html</a> — design &amp; implementation specification</li>
+      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/microsoft/vscode-livepreview" target="_blank" rel="noopener">microsoft/vscode-livepreview</a> — VS Code's local preview server with live reload</li>
+      <li><iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>Astro prototype: <code>research/docserve</code> (cli + desktop, proven implementation)</li>
+      <li><iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>Zero-dep predecessor: <code>research/docview</code> (serve.mjs + tests)</li>
+    </ul>
+    <div class="colophon">docserve PLAN · 2026-09-21</div>
+  </footer>
+
+</div>
+</body>
+</html>
