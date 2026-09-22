@@ -14,6 +14,7 @@
     --muted: #9aa0b0;
     --accent: #6c8cff;
     --green: #4ade80;
+    --btn-bg: rgba(15, 17, 23, 0.82);
   }
   @media (prefers-color-scheme: light) {
     :root {
@@ -24,7 +25,8 @@
       --muted: #64748b;
       --accent: #2563eb;
       --green: #16a34a;
-    }
+      --btn-bg: rgba(255, 255, 255, 0.85);
+  }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,12 +38,19 @@
     padding: 40px 24px;
   }
 
-  h1 { font-size: 1.6rem; margin-bottom: 8px; }
-  .sub { color: var(--muted); margin-bottom: 24px; font-size: 0.9rem; }
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+  h1 svg { width: 26px; height: 26px; color: var(--accent); flex-shrink: 0; }
+  .sub { color: var(--muted); margin-bottom: 32px; font-size: 0.9rem; }
   .sub b { color: var(--green); }
 
   .sub code {
-    font-family: ui-monospace, monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 0.78rem;
     background: var(--card);
     border: 1px solid var(--border);
@@ -101,7 +110,7 @@
     padding: 0;
     border: 1px solid var(--border);
     border-radius: 7px;
-    background: rgba(15, 17, 23, 0.82);
+    background: var(--btn-bg);
     color: var(--text);
     cursor: pointer;
     opacity: 0;
@@ -112,7 +121,7 @@
   .copy-btn .ic-check { display: none; }
   .card:hover .copy-btn { opacity: 1; }
   .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .copy-btn.copied { color: #4ade80; border-color: #4ade80; }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
   .copy-btn.copied .ic-copy { display: none; }
   .copy-btn.copied .ic-check { display: block; }
 
@@ -148,9 +157,12 @@
 </head>
 
 <body>
-  <h1>docserve</h1>
+  <h1>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+    docserve
+  </h1>
   <p class="sub">
-    <code id="docs-dir">__DOCSERVE_DIR__</code> <b id="total">0</b> files
+    <code id="docs-dir">__DOCSERVE_DIR__</code> - <b id="total">0</b> files
   </p>
 
   <div class="grid" id="grid" hidden></div>
