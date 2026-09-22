@@ -8,10 +8,22 @@ import path from "node:path"
 import { spawn, spawnSync } from "node:child_process"
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..")
-const CLI_ENTRY = path.join(ROOT, "cli", "bin.mjs")
 const CACHE_ROOT = path.join(os.homedir(), ".cache", "docserve")
 const STATE_FILE = path.join(CACHE_ROOT, "state.json")
 const DESKTOP_FILE = path.join(CACHE_ROOT, "desktop.json")
+
+// CLI candidates: dev layout, then the packaged asarUnpack / extraResources
+// locations. Falls back to a docserve binary on PATH when none resolve.
+function resolveCliEntry() {
+  const candidates = [
+    path.join(ROOT, "cli", "bin.mjs"),
+    process.resourcesPath && path.join(process.resourcesPath, "app.asar.unpacked", "cli", "bin.mjs"),
+    process.resourcesPath && path.join(process.resourcesPath, "cli", "bin.mjs"),
+  ].filter(Boolean)
+  return candidates.find((p) => fs.existsSync(p) && !p.includes("app.asar/")) ?? null
+}
+
+const CLI_ENTRY = resolveCliEntry()
 
 const START_TIMEOUT_MS = 60000
 
@@ -84,7 +96,7 @@ export class ServerManager {
     const binDir = path.join(os.homedir(), ".local", "bin")
     const link = path.join(binDir, "docserve")
     try {
-      if (!fs.existsSync(CLI_ENTRY)) return
+      if (!CLI_ENTRY) return
       fs.chmodSync(CLI_ENTRY, 0o755)
       const target = fs.realpathSync(CLI_ENTRY)
       let current = null
@@ -132,7 +144,7 @@ export class ServerManager {
   }
 
   #cliCommand(args) {
-    if (fs.existsSync(CLI_ENTRY)) {
+    if (CLI_ENTRY) {
       return {
         command: process.execPath,
         args: [CLI_ENTRY, ...args],

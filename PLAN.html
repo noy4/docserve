@@ -307,6 +307,60 @@
     <div class="timeline">
 
       <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:circle-outline" style="color:var(--muted)" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-7-circle" style="color:var(--primary)" noobserver></iconify-icon>
+              Phase 7 — Distribution
+            </span>
+            <span class="step-meta">P2</span>
+          </div>
+          <div class="step-body">
+            Unsigned macOS distribution: an electron-builder DMG published on GitHub Releases. No auto-update (electron-updater requires code signing), so the tray shows a "new version" notice instead. npm publish of the CLI is a separate future phase.
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:file-link-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Packaging-ready CLI resolution</div>
+                <div class="task-desc"><code>server.mjs</code> — resolve the CLI from the dev layout / <code>app.asar.unpacked</code> / <code>process.resourcesPath</code> · keeps the <code>docserve</code> PATH fallback</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">electron-builder config</div>
+                <div class="task-desc">appId · <code>files</code> + <code>asarUnpack</code> for <code>cli/</code> + <code>extraResources</code> from <code>../cli</code> · <code>LSUIElement</code> · dmg (arm64 + x64) · <code>identity: null</code> + hardened runtime off</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:image-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">App icon</div>
+                <div class="task-desc"><code>build/icon.icns</code> from a 1024 px source · replaces the default Electron icon in Finder / installer</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:github" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">GitHub Release</div>
+                <div class="task-desc">DMG + sha256 per arch · README: install via <em>System Settings → Privacy &amp; Security → Open Anyway</em> (macOS 15 removed right-click open)</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:bell-badge-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Update notice</div>
+                <div class="task-desc">tray checks the latest GitHub Release tag → "New version available" menu item opens the release page (no in-app update)</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>npm run dist</code> DMG launches via Open Anyway · tray start/stop from the installed app · Open opens the gallery</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
         <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
@@ -572,7 +626,7 @@
       <li><iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon><a href="./SPEC.html" target="_blank" rel="noopener">SPEC.html</a> — design &amp; implementation specification</li>
       <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/microsoft/vscode-livepreview" target="_blank" rel="noopener">microsoft/vscode-livepreview</a> — VS Code's local preview server with live reload</li>
     </ul>
-    <div class="colophon">docserve PLAN · 2026-09-21</div>
+    <div class="colophon">docserve PLAN · 2026-09-23</div>
   </footer>
 
 </div>
