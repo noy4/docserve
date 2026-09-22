@@ -461,7 +461,7 @@
 
     <div class="callout">
       <iconify-icon icon="mdi:information-outline" noobserver></iconify-icon>
-      <strong>Single instance:</strong> starting with the same <code>docsDir</code> while a server runs just opens its URL.
+      <strong>Single instance:</strong> starting with the same <code>docsDir</code> while a server runs just points at its URL (opens the browser with <code>--open</code>, prints it otherwise).
       A different <code>docsDir</code> requires <code>docserve stop</code> first.
     </div>
   </section>
@@ -504,7 +504,7 @@
         </thead>
         <tbody>
           <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched from <code>/api/files</code>; <code>docsDir/index.html</code> is excluded</td></tr>
-          <tr><td><code>/api/files</code></td><td>JSON list: title, path, created, modified per <code>*.html</code></td></tr>
+          <tr><td><code>/api/files</code></td><td>JSON list: <code>title</code>, <code>url</code> (docsDir-relative link), <code>path</code> (absolute), <code>created</code>, <code>modified</code> per <code>*.html</code></td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
         </tbody>

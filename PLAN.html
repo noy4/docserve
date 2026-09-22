@@ -215,6 +215,17 @@
     background: var(--surface-2);
     border: 2px solid var(--primary);
   }
+  .step-check {
+    position: absolute;
+    left: -30px;
+    top: 2px;
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
+    color: var(--green);
+    background: var(--bg);
+    border-radius: 50%;
+  }
   .step-content {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -224,7 +235,7 @@
   .step-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-bottom: 6px;
     flex-wrap: wrap;
     gap: 8px;
@@ -246,25 +257,50 @@
     padding: 2px 8px;
     border-radius: 4px;
     border: 1px solid var(--border);
+    margin-left: auto;
   }
   .step-body {
     font-size: 0.82rem;
     color: var(--muted);
     line-height: 1.7;
   }
-  .step-tasks {
-    list-style: none;
+  .tasks {
     margin-top: 10px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
-  .step-tasks li {
-    font-size: 0.8rem;
-    color: var(--text);
-    padding: 1px 0;
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
   }
-  .step-tasks iconify-icon { font-size: 16px; vertical-align: -3px; margin-right: 6px; }
+  .task.pending { border-style: dashed; }
+  .task > iconify-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--muted);
+  }
+  .task.done > iconify-icon { color: var(--green); }
+  .task-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-strong);
+    line-height: 1.4;
+  }
+  .task-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  @media (max-width: 620px) {
+    .tasks { grid-template-columns: 1fr; }
+  }
   .verify {
     color: var(--muted);
     font-size: 0.8rem;
@@ -272,9 +308,37 @@
   }
   .verify iconify-icon {
     font-size: 15px;
-    color: var(--green);
+    color: var(--muted);
     vertical-align: -2px;
     margin-right: 6px;
+  }
+
+  /* Progress */
+  .progress {
+    height: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 14px 0 6px;
+  }
+  .progress-fill { height: 100%; background: var(--green); }
+  .progress-note {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .step-status {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .step-status.pending {
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
   }
 
   /* Footer */
@@ -322,11 +386,13 @@
   <!-- --- PHASES --- -->
   <section>
     <h2><iconify-icon icon="mdi:format-list-numbered" width="24" noobserver></iconify-icon>Roadmap</h2>
+    <div class="progress"><div class="progress-fill" style="width:83%"></div></div>
+    <p class="progress-note">5 / 6 phases done · next: Phase 6 — Desktop app</p>
 
     <div class="timeline">
 
       <div class="timeline-step">
-        <div class="step-dot"></div>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -338,18 +404,42 @@
           <div class="step-body">
             The HTTP layer: <code>docsDir</code> validation, URL mapping, MIME, status codes, and the state file.
           </div>
-          <ul class="step-tasks">
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Scaffold <code>cli/</code>: <code>package.json</code> (name, bin, type, files, engines), <code>bin.mjs</code> stub, <code>server/index.mjs</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon><code>docsDir</code> resolution + validation (missing → exit 1)</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>URL mapping: <code>/</code>, <code>/index.html</code> → gallery template; raw static files; MIME map; <code>400</code> / <code>403</code> / <code>404</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon><code>server/state.mjs</code>: write <code>state.json</code> on bind, remove on SIGINT/SIGTERM, pid liveness + stale self-repair</li>
-          </ul>
-          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: <code>node cli/bin.mjs ~/reports</code> — <code>curl /</code>, raw page, traversal <code>403</code>, bad escape <code>400</code></p>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Scaffold <code>cli/</code></div>
+                <div class="task-desc"><code>package.json</code> (name, bin, type, files, engines) · <code>bin.mjs</code> stub · <code>server/index.mjs</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title"><code>docsDir</code> resolution + validation</div>
+                <div class="task-desc">missing → exit 1</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:file-send-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">URL mapping</div>
+                <div class="task-desc"><code>/</code>, <code>/index.html</code> → gallery template · raw static files · MIME map · <code>400</code> / <code>403</code> / <code>404</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Runtime state</div>
+                <div class="task-desc"><code>server/state.mjs</code> — write <code>state.json</code> on bind · remove on SIGINT/SIGTERM · pid liveness + stale self-repair</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node cli/bin.mjs ~/reports</code> — <code>curl /</code>, raw page, traversal <code>403</code>, bad escape <code>400</code></p>
         </div>
       </div>
 
       <div class="timeline-step">
-        <div class="step-dot" style="border-color: var(--accent);"></div>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -359,18 +449,30 @@
             <span class="step-meta">P0</span>
           </div>
           <div class="step-body">
-            File metadata for <code>/api/files</code> and the gallery UI ported from docview.
+            File metadata for <code>/api/files</code> and the gallery UI.
           </div>
-          <ul class="step-tasks">
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--accent)" noobserver></iconify-icon><code>server/files.mjs</code>: recursive <code>*.html</code> listing (exclude <code>index.html</code>), <code>&lt;title&gt;</code> / <code>created_at</code> extraction (4 KB head → 1 MB fallback), git date maps (cached per repo root), sort by created desc</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--accent)" noobserver></iconify-icon><code>index.html</code>: port the docview gallery — card grid, lazy iframes (<code>rootMargin: 400px</code>, max 3 concurrent), copy path</li>
-          </ul>
-          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: cards render with resolved dates; nested assets load</p>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:file-multiple-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">File metadata</div>
+                <div class="task-desc"><code>server/files.mjs</code> — recursive <code>*.html</code> listing (exclude <code>index.html</code>) · <code>&lt;title&gt;</code> / <code>created_at</code> extraction (4 KB head → 1 MB fallback) · git date maps cached per repo root · sort by created desc</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Gallery template</div>
+                <div class="task-desc"><code>cli/index.html</code> — card grid · lazy iframes (<code>rootMargin: 400px</code>, max 3 concurrent) · copy path</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: cards render with resolved dates; nested assets load</p>
         </div>
       </div>
 
       <div class="timeline-step">
-        <div class="step-dot" style="border-color: var(--cyan);"></div>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -382,17 +484,35 @@
           <div class="step-body">
             WebSocket broadcast, <code>fs.watch</code> detection, and page injection.
           </div>
-          <ul class="step-tasks">
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--cyan)" noobserver></iconify-icon><code>server/inject.mjs</code>: reload client + copy button before the last <code>&lt;/body&gt;</code>, <code>&lt;</code> → <code>\u003c</code> escaping, iframe early-return</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--cyan)" noobserver></iconify-icon>WS server <code>/__reload</code>: handshake, text frames, ping → pong (RFC 6455 subset)</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--cyan)" noobserver></iconify-icon>UpdateListener: <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code>, 50 ms debounce batch, known-files tracking → <code>contentSetChanged</code></li>
-          </ul>
-          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: edit reloads its own tab only; add/delete reloads the gallery; previews never reload</p>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:needle" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Page injection</div>
+                <div class="task-desc"><code>server/inject.mjs</code> — reload client + copy button before the last <code>&lt;/body&gt;</code> · <code>&lt;</code> → <code>\u003c</code> escaping · iframe early-return</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:connection" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">WS server <code>/__reload</code></div>
+                <div class="task-desc"><code>server/websocket.mjs</code> — handshake · text frames · ping → pong (RFC 6455 subset)</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">UpdateListener</div>
+                <div class="task-desc"><code>server/watch.mjs</code> — <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code> · 50 ms debounce batch · known-files tracking → <code>contentSetChanged</code></div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: edit reloads its own tab only; add/delete reloads the gallery; previews never reload</p>
         </div>
       </div>
 
       <div class="timeline-step">
-        <div class="step-dot" style="border-color: var(--purple);"></div>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -404,18 +524,42 @@
           <div class="step-body">
             Lifecycle commands: stop/status, background spawn, single-instance guard.
           </div>
-          <ul class="step-tasks">
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon><code>stop</code> (SIGTERM + clear state; stale state removed silently) / <code>status</code> (exit 1 when none)</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon><code>--background</code> (detached spawn), <code>--open</code>, <code>--port</code> fallback +1 (≤ 20 tries)</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon>Single-instance rule: same <code>docsDir</code> → open its URL; different → error prompting <code>docserve stop</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--purple)" noobserver></iconify-icon><code>-h</code> / <code>-v</code></li>
-          </ul>
-          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: start → status → stop cycle; background + open; stale <code>state.json</code></p>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:console" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title"><code>stop</code> / <code>status</code></div>
+                <div class="task-desc">SIGTERM + clear state; stale state removed silently · <code>status</code> exits 1 when none</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:cog" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title"><code>--background</code> · <code>--open</code> · <code>--port</code></div>
+                <div class="task-desc">detached spawn · open the browser · fallback +1 (≤ 20 tries)</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Single-instance rule</div>
+                <div class="task-desc">same <code>docsDir</code> → point at its URL · different → error prompting <code>docserve stop</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:help-circle-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title"><code>-h</code> / <code>-v</code></div>
+                <div class="task-desc">show help / version</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: start → status → stop cycle; background + open; stale <code>state.json</code></p>
         </div>
       </div>
 
       <div class="timeline-step">
-        <div class="step-dot" style="border-color: var(--green);"></div>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -425,15 +569,25 @@
             <span class="step-meta">P1</span>
           </div>
           <div class="step-body">
-            Port the docview test suite to the new modules.
+            End-to-end tests for injection, the reload broadcast, and the CLI lifecycle.
           </div>
-          <ul class="step-tasks">
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Port <code>docview/serve.test.mjs</code> → <code>cli/server.test.mjs</code>, run with <code>node --test</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Update pageId assertions: <code>content:foo.html</code> → <code>foo.html</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Drop the <code>root:index.html</code> gallery-edit case — the gallery is a package template now, not a watched file</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--green)" noobserver></iconify-icon>Isolation: <code>DOCSERVE_STATE</code> env override for the state path + a random <code>--port</code> per run (parallel-safe)</li>
-          </ul>
-          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: <code>node --test cli/</code> green</p>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Test suite</div>
+                <div class="task-desc"><code>cli/server.test.mjs</code> — injection · <code>/__reload</code> broadcast · status codes · CLI lifecycle, run with <code>node --test</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:tune" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Isolation</div>
+                <div class="task-desc"><code>DOCSERVE_STATE</code> env override for the state path · random <code>--port</code> per run (parallel-safe)</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node --test cli/</code> green</p>
         </div>
       </div>
 
@@ -446,18 +600,49 @@
               Phase 6 — Desktop app
             </span>
             <span class="step-meta">P2</span>
+            <span class="step-status pending">pending</span>
           </div>
           <div class="step-body">
             macOS tray client controlling the CLI.
           </div>
-          <ul class="step-tasks">
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Electron zero-window main process; tray icon (outline when stopped / filled when running)</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Start/stop toggle spawning the CLI; Open reads the URL from <code>state.json</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>State watch: <code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Change Folder… → stop → restart; remember the last folder in <code>desktop.json</code></li>
-            <li><iconify-icon icon="mdi:checkbox-blank-circle-outline" style="color:var(--primary)" noobserver></iconify-icon>Quit → stop → <code>app.quit()</code>; first launch: symlink the CLI to <code>~/.local/bin/docserve</code></li>
-          </ul>
-          <p class="verify"><iconify-icon icon="mdi:check-circle" noobserver></iconify-icon>Verify: all menu flows, including a folder switch while running</p>
+          <div class="tasks">
+            <div class="task pending">
+              <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Electron zero-window main process</div>
+                <div class="task-desc">tray icon (outline when stopped / filled when running)</div>
+              </div>
+            </div>
+            <div class="task pending">
+              <iconify-icon icon="mdi:power" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Start / Stop toggle</div>
+                <div class="task-desc">spawn the CLI · Open reads the URL from <code>state.json</code></div>
+              </div>
+            </div>
+            <div class="task pending">
+              <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">State watch</div>
+                <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</div>
+              </div>
+            </div>
+            <div class="task pending">
+              <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Change Folder…</div>
+                <div class="task-desc">stop → restart · remember the last folder in <code>desktop.json</code></div>
+              </div>
+            </div>
+            <div class="task pending">
+              <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Quit &amp; first launch</div>
+                <div class="task-desc">stop → <code>app.quit()</code> · symlink the CLI to <code>~/.local/bin/docserve</code></div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: all menu flows, including a folder switch while running</p>
         </div>
       </div>
 
