@@ -1,6 +1,6 @@
 # docserve
 
-Serves a folder of HTML as a card gallery — every page live-reloads.
+Serves a folder of HTML as a card gallery with live reload.
 
 ## Features
 

@@ -308,7 +308,7 @@
       SPECIFICATION
     </div>
     <h1><iconify-icon icon="mdi:file-multiple-outline" width="30" noobserver></iconify-icon>docserve Spec</h1>
-    <p class="tagline">Serves a folder of HTML as a card gallery — every page live-reloads.</p>
+    <p class="tagline">Serves a folder of HTML as a card gallery with live reload.</p>
   </header>
 
   <!-- --- OVERVIEW --- -->
@@ -450,7 +450,7 @@
         </thead>
         <tbody>
           <tr><td><code>pid</code></td><td>number</td><td>Server process. <code>stop</code> sends SIGTERM to it; liveness-checked before use</td></tr>
-          <tr><td><code>port</code></td><td>number</td><td>Actually bound port (starts at <code>4321</code>, falls back +1 on conflict)</td></tr>
+          <tr><td><code>port</code></td><td>number</td><td>Actually bound port (starts at <code>4242</code>, falls back +1 on conflict)</td></tr>
           <tr><td><code>url</code></td><td>string</td><td><code>http://localhost:&lt;port&gt;/</code></td></tr>
           <tr><td><code>docsDir</code></td><td>string</td><td>Absolute path of the serving folder</td></tr>
         </tbody>
@@ -480,7 +480,7 @@
           <tr><td><code>stop</code></td><td>SIGTERM to the <code>pid</code> in <code>state.json</code>, then clears it. Stale state (dead pid) is removed silently</td></tr>
           <tr><td><code>status</code></td><td>Print <code>url</code> and <code>docsDir</code> if a live server is found; exit 1 otherwise</td></tr>
           <tr><td><code>--open</code></td><td>Open the gallery in the browser once the port is bound</td></tr>
-          <tr><td><code>--port &lt;n&gt;</code></td><td>Port to bind (default <code>4321</code>). On conflict, falls back +1 up to 20 tries and records the bound port in <code>state.json</code></td></tr>
+          <tr><td><code>--port &lt;n&gt;</code></td><td>Port to bind (default <code>4242</code>). On conflict, falls back +1 up to 20 tries and records the bound port in <code>state.json</code></td></tr>
           <tr><td><code>--background</code></td><td>Start detached; state is written to <code>state.json</code></td></tr>
           <tr><td><code>-h</code> / <code>-v</code></td><td>Show help / version</td></tr>
         </tbody>
@@ -620,7 +620,7 @@
     </div>
 
     <pre>● Running                     <span class="c"># status item (disabled)</span>
-Open (http://localhost:4321)
+Open (http://localhost:4242)
 Stop Server
 ─────────────────────────────
 Serving: ~/reports            <span class="c"># current folder (disabled)</span>

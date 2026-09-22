@@ -1,0 +1,24 @@
+{
+  "name": "docserve",
+  "version": "0.1.0",
+  "description": "Serves a folder of HTML as a card gallery with live reload.",
+  "type": "module",
+  "bin": {
+    "docserve": "./bin.mjs"
+  },
+  "files": [
+    "bin.mjs",
+    "index.html",
+    "server/"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "keywords": [
+    "static-server",
+    "live-reload",
+    "gallery",
+    "html"
+  ],
+  "license": "MIT"
+}
