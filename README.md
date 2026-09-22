@@ -10,8 +10,8 @@ Serves a folder of HTML as a card gallery with live reload.
 
 ## Desktop app
 
-1. Download `docserve.dmg` from [Releases](../../releases)
-2. Launch — docserve appears in the menu bar
+1. Download the DMG for your Mac (`arm64` for Apple Silicon, x64 otherwise) from [Releases](../../releases)
+2. Launch
 
 Click the menu bar icon to start/stop the server.
 

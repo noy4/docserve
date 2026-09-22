@@ -2,6 +2,7 @@
 import os from "node:os"
 import path from "node:path"
 import { Tray, Menu, nativeImage, dialog, shell, app } from "electron"
+import { latestRelease, isNewer } from "./update.mjs"
 
 export class TrayController {
   constructor(server) {
@@ -9,6 +10,7 @@ export class TrayController {
     this.tray = null
     this.icons = null
     this.lastStatus = null
+    this.updateAvailable = null
   }
 
   boot() {
@@ -20,6 +22,19 @@ export class TrayController {
     }
     this.tray = new Tray(this.icons.stopped)
     this.update()
+    this.#checkForUpdate()
+  }
+
+  #checkForUpdate() {
+    const check = async () => {
+      const rel = await latestRelease()
+      if (rel && isNewer(rel.version, app.getVersion()) && this.tray) {
+        this.updateAvailable = rel
+        this.update()
+      }
+    }
+    check()
+    setInterval(check, 12 * 60 * 60 * 1000).unref()
   }
 
   update() {
@@ -65,6 +80,15 @@ export class TrayController {
       },
       { label: "Change Folder...", click: () => this.#changeFolder(true) },
       { type: "separator" },
+      ...(this.updateAvailable
+        ? [
+            {
+              label: `New version available — v${this.updateAvailable.version}`,
+              click: () => shell.openExternal(this.updateAvailable.url),
+            },
+            { type: "separator" },
+          ]
+        : []),
       { label: "Quit docserve", click: () => this.#quit() },
     ])
   }
