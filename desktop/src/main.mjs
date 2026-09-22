@@ -28,7 +28,7 @@ class App {
     this.watcher = new StateWatcher(this.server, () => this.tray.update())
 
     this.server.onChange = () => this.tray.update()
-    this.server.onStartError = (message) => dialog.showErrorBox("docserve", message)
+    this.server.onStartError = (message) => dialog.showErrorBox("Docserve", message)
   }
 
   start() {

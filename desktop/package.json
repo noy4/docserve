@@ -12,7 +12,7 @@
   },
   "build": {
     "appId": "dev.docserve.desktop",
-    "productName": "docserve",
+    "productName": "Docserve",
     "directories": {
       "output": "dist"
     },
