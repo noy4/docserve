@@ -148,50 +148,6 @@
     margin: 14px 0;
   }
 
-  /* Tables */
-  .table-wrap { overflow-x: auto; margin: 14px 0; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
-  }
-  th {
-    text-align: left;
-    padding: 8px 10px;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border-strong);
-    white-space: nowrap;
-    background: var(--surface);
-  }
-  td {
-    padding: 9px 10px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-    background: var(--surface);
-  }
-  tr:last-child td { border-bottom: none; }
-
-  /* Callout */
-  .callout {
-    background: var(--primary-soft);
-    border: 1px solid var(--primary);
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 0.84rem;
-    margin: 16px 0;
-    line-height: 1.65;
-  }
-  .callout iconify-icon {
-    font-size: 18px;
-    margin-right: 6px;
-    vertical-align: -3px;
-    color: var(--primary);
-  }
-
   /* Timeline (phase cards) */
   .timeline { position: relative; padding-left: 28px; margin: 20px 0; }
   .timeline::before {
@@ -649,60 +605,6 @@
     </div>
   </section>
 
-  <!-- --- PORT MAP --- -->
-  <section>
-    <h2><iconify-icon icon="mdi:swap-horizontal" width="24" noobserver></iconify-icon>Port map</h2>
-    <p class="section-desc">
-      Two sources: <code>docview/serve.mjs</code> (579 lines, single file) and the Astro prototype at <code>research/docserve</code> (CLI + menubar, proven in production use).
-    </p>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>docview</th><th>docserve</th><th>Note</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>serve.mjs</code></td><td><code>bin.mjs</code> + <code>server/</code></td><td>Split by concern (CLI vs server)</td></tr>
-          <tr><td><code>parseArgs</code> / <code>main()</code></td><td><code>bin.mjs</code></td><td><code>--daemon</code> → <code>--background</code>; <code>start</code> (SwiftBar wait) dropped</td></tr>
-          <tr><td><code>handler()</code> + MIME</td><td><code>server/index.mjs</code></td><td>ROOT + CONTENT_DIR dual root → single <code>docsDir</code></td></tr>
-          <tr><td><code>metaOf</code> / <code>extractMeta</code></td><td><code>server/files.mjs</code></td><td>Head 4 KB → 1 MB fallback preserved</td></tr>
-          <tr><td><code>gitDateMaps</code></td><td><code>server/files.mjs</code></td><td>cwd = <code>docsDir</code></td></tr>
-          <tr><td><code>listContentFiles</code></td><td><code>server/files.mjs</code></td><td><code>index.html</code> excluded</td></tr>
-          <tr><td><code>clientJs</code> / <code>injectIntoHtml</code></td><td><code>server/inject.mjs</code></td><td>pageId: <code>content:</code> prefix → plain docsDir-relative path</td></tr>
-          <tr><td><code>WebSocketServer</code> / frame encode</td><td><code>server/websocket.mjs</code></td><td><code>/__reload</code> unchanged</td></tr>
-          <tr><td><code>UpdateListener</code> / <code>debounceBatch</code></td><td><code>server/watch.mjs</code></td><td>50 ms batch unchanged</td></tr>
-          <tr><td><code>.server-port</code></td><td><code>server/state.mjs</code></td><td><code>state.json</code> <code>{pid, port, url, docsDir}</code> + pid liveness</td></tr>
-          <tr><td><code>index.html</code></td><td><code>index.html</code></td><td>+ <code>contentSetChanged</code> reload rule</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3 style="display:flex;align-items:center;gap:8px;font-size:1.02rem;font-weight:700;color:var(--text-strong);margin:24px 0 8px;">
-      <iconify-icon icon="mdi:import" noobserver></iconify-icon>
-      Astro prototype (research/docserve)
-    </h3>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Prototype</th><th>docserve</th><th>Note</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>cli/lib/detect.mjs</code></td><td><code>server/state.mjs</code></td><td><code>state.json</code> read/write/clear, pid liveness (<code>kill(pid, 0)</code>), stale self-repair — port as-is</td></tr>
-          <tr><td><code>template/src/lib/doc-date.ts</code></td><td><code>server/files.mjs</code></td><td>meta → git creation map (cached per repo root, <code>/var</code> realpath) → mtime</td></tr>
-          <tr><td><code>template/src/lib/copy-button.ts</code></td><td><code>server/inject.mjs</code></td><td>Button UI</td></tr>
-          <tr><td><code>template/src/pages/index.astro</code></td><td><code>index.html</code></td><td>Card grid + lazy iframes; merge with the docview port</td></tr>
-          <tr><td><code>desktop/src/</code> + tray PNGs</td><td><code>desktop/</code> (Phase 6)</td><td>ServerManager / StateWatcher / TrayController port as-is; retarget <code>.astro/dev.json</code> → <code>state.json</code></td></tr>
-          <tr><td><code>cli/lib/cache.mjs</code>, <code>template/</code> scaffold, loader, HMR client</td><td>—</td><td>Dropped — no Astro template to scaffold; docview covers serving, watch, and WS</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout">
-      <iconify-icon icon="mdi:alert-outline" noobserver></iconify-icon>
-      <strong>Keep as-is:</strong> the WebSocket subset (handshake + text frames + ping/pong), the 50 ms debounce, the date priority (<code>created_at</code> meta &gt; git &gt; birthtime), and the <code>\u003c</code> escaping are all proven in docview — port them without redesign.
-    </div>
-  </section>
-
   <footer>
     <div class="f-title">
       <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
@@ -711,8 +613,6 @@
     <ul>
       <li><iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon><a href="./SPEC.html" target="_blank" rel="noopener">SPEC.html</a> — design &amp; implementation specification</li>
       <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/microsoft/vscode-livepreview" target="_blank" rel="noopener">microsoft/vscode-livepreview</a> — VS Code's local preview server with live reload</li>
-      <li><iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>Astro prototype: <code>research/docserve</code> (cli + desktop, proven implementation)</li>
-      <li><iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>Zero-dep predecessor: <code>research/docview</code> (serve.mjs + tests)</li>
     </ul>
     <div class="colophon">docserve PLAN · 2026-09-21</div>
   </footer>
