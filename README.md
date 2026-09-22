@@ -1,3 +1,5 @@
+<img src="desktop/build/icon.svg" width="200" alt="docserve icon">
+
 # docserve
 
 Serves a folder of HTML as a card gallery with live reload.
@@ -10,10 +12,10 @@ Serves a folder of HTML as a card gallery with live reload.
 
 ## Desktop app
 
-1. Download the DMG for your Mac (`arm64` for Apple Silicon, x64 otherwise) from [Releases](../../releases)
-2. Launch
+1. **Download** — the DMG for your Mac from [Releases](../../releases) (`arm64` for Apple Silicon, x64 otherwise)
+2. **Launch** — pick a folder and the gallery opens in your browser
 
-Click the menu bar icon to start/stop the server.
+Click the menu bar icon to manage the server.
 
 ## CLI
 
