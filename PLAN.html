@@ -258,22 +258,6 @@
     margin-right: 6px;
   }
 
-  /* Progress */
-  .progress {
-    height: 6px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    overflow: hidden;
-    margin: 14px 0 6px;
-  }
-  .progress-fill { height: 100%; background: var(--green); }
-  .progress-note {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-  }
-
   /* Footer */
   footer {
     margin-top: 56px;
@@ -319,8 +303,6 @@
   <!-- --- PHASES --- -->
   <section>
     <h2><iconify-icon icon="mdi:format-list-numbered" width="24" noobserver></iconify-icon>Roadmap</h2>
-    <div class="progress"><div class="progress-fill" style="width:100%"></div></div>
-    <p class="progress-note">6 / 6 phases done</p>
 
     <div class="timeline">
 
@@ -329,118 +311,85 @@
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
-              <iconify-icon icon="mdi:numeric-1-circle" style="color:var(--primary)" noobserver></iconify-icon>
-              Phase 1 — Server core
+              <iconify-icon icon="mdi:numeric-6-circle" style="color:var(--primary)" noobserver></iconify-icon>
+              Phase 6 — Desktop app
             </span>
-            <span class="step-meta">P0</span>
+            <span class="step-meta">P2</span>
           </div>
           <div class="step-body">
-            The HTTP layer: <code>docsDir</code> validation, URL mapping, MIME, status codes, and the state file.
+            macOS tray client controlling the CLI.
           </div>
           <div class="tasks">
             <div class="task done">
-              <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">Scaffold <code>cli/</code></div>
-                <div class="task-desc"><code>package.json</code> (name, bin, type, files, engines) · <code>bin.mjs</code> stub · <code>server/index.mjs</code></div>
+                <div class="task-title">Electron zero-window main process</div>
+                <div class="task-desc">tray icon (outline when stopped / filled when running)</div>
               </div>
             </div>
             <div class="task done">
-              <iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:power" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title"><code>docsDir</code> resolution + validation</div>
-                <div class="task-desc">missing → exit 1</div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:file-send-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">URL mapping</div>
-                <div class="task-desc"><code>/</code>, <code>/index.html</code> → gallery template · raw static files · MIME map · <code>400</code> / <code>403</code> / <code>404</code></div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Runtime state</div>
-                <div class="task-desc"><code>server/state.mjs</code> — write <code>state.json</code> on bind · remove on SIGINT/SIGTERM · pid liveness + stale self-repair</div>
-              </div>
-            </div>
-          </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node cli/bin.mjs ~/reports</code> — <code>curl /</code>, raw page, traversal <code>403</code>, bad escape <code>400</code></p>
-        </div>
-      </div>
-
-      <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
-        <div class="step-content">
-          <div class="step-head">
-            <span class="step-title">
-              <iconify-icon icon="mdi:numeric-2-circle" style="color:var(--accent)" noobserver></iconify-icon>
-              Phase 2 — /api/files + gallery
-            </span>
-            <span class="step-meta">P0</span>
-          </div>
-          <div class="step-body">
-            File metadata for <code>/api/files</code> and the gallery UI.
-          </div>
-          <div class="tasks">
-            <div class="task done">
-              <iconify-icon icon="mdi:file-multiple-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">File metadata</div>
-                <div class="task-desc"><code>server/files.mjs</code> — recursive <code>*.html</code> listing (exclude <code>index.html</code>) · <code>&lt;title&gt;</code> / <code>created_at</code> extraction (4 KB head → 1 MB fallback) · git date maps cached per repo root · sort by created desc</div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Gallery template</div>
-                <div class="task-desc"><code>cli/index.html</code> — card grid · lazy iframes (<code>rootMargin: 400px</code>, max 3 concurrent) · copy path</div>
-              </div>
-            </div>
-          </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: cards render with resolved dates; nested assets load</p>
-        </div>
-      </div>
-
-      <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
-        <div class="step-content">
-          <div class="step-head">
-            <span class="step-title">
-              <iconify-icon icon="mdi:numeric-3-circle" style="color:var(--cyan)" noobserver></iconify-icon>
-              Phase 3 — Live reload
-            </span>
-            <span class="step-meta">P0</span>
-          </div>
-          <div class="step-body">
-            WebSocket broadcast, <code>fs.watch</code> detection, and page injection.
-          </div>
-          <div class="tasks">
-            <div class="task done">
-              <iconify-icon icon="mdi:needle" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Page injection</div>
-                <div class="task-desc"><code>server/inject.mjs</code> — reload client + copy button before the last <code>&lt;/body&gt;</code> · <code>&lt;</code> → <code>\u003c</code> escaping · iframe early-return</div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:connection" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">WS server <code>/__reload</code></div>
-                <div class="task-desc"><code>server/websocket.mjs</code> — handshake · text frames · ping → pong (RFC 6455 subset)</div>
+                <div class="task-title">Start / Stop toggle</div>
+                <div class="task-desc">spawn the CLI · Open reads the URL from <code>state.json</code></div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">UpdateListener</div>
-                <div class="task-desc"><code>server/watch.mjs</code> — <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code> · 50 ms debounce batch · known-files tracking → <code>contentSetChanged</code></div>
+                <div class="task-title">State watch</div>
+                <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Change Folder…</div>
+                <div class="task-desc">stop → restart · remember the last folder in <code>desktop.json</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Quit &amp; first launch</div>
+                <div class="task-desc">stop → <code>app.quit()</code> · symlink the CLI to <code>~/.local/bin/docserve</code></div>
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: edit reloads its own tab only; add/delete reloads the gallery; previews never reload</p>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: all menu flows, including a folder switch while running</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-5-circle" style="color:var(--green)" noobserver></iconify-icon>
+              Phase 5 — Tests
+            </span>
+            <span class="step-meta">P1</span>
+          </div>
+          <div class="step-body">
+            End-to-end tests for injection, the reload broadcast, and the CLI lifecycle.
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Test suite</div>
+                <div class="task-desc"><code>cli/server.test.mjs</code> — injection · <code>/__reload</code> broadcast · status codes · CLI lifecycle, run with <code>node --test</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:tune" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Isolation</div>
+                <div class="task-desc"><code>DOCSERVE_STATE</code> env override for the state path · random <code>--port</code> per run (parallel-safe)</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node --test cli/</code> green</p>
         </div>
       </div>
 
@@ -496,31 +445,38 @@
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
-              <iconify-icon icon="mdi:numeric-5-circle" style="color:var(--green)" noobserver></iconify-icon>
-              Phase 5 — Tests
+              <iconify-icon icon="mdi:numeric-3-circle" style="color:var(--cyan)" noobserver></iconify-icon>
+              Phase 3 — Live reload
             </span>
-            <span class="step-meta">P1</span>
+            <span class="step-meta">P0</span>
           </div>
           <div class="step-body">
-            End-to-end tests for injection, the reload broadcast, and the CLI lifecycle.
+            WebSocket broadcast, <code>fs.watch</code> detection, and page injection.
           </div>
           <div class="tasks">
             <div class="task done">
-              <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:needle" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">Test suite</div>
-                <div class="task-desc"><code>cli/server.test.mjs</code> — injection · <code>/__reload</code> broadcast · status codes · CLI lifecycle, run with <code>node --test</code></div>
+                <div class="task-title">Page injection</div>
+                <div class="task-desc"><code>server/inject.mjs</code> — reload client + copy button before the last <code>&lt;/body&gt;</code> · <code>&lt;</code> → <code>\u003c</code> escaping · iframe early-return</div>
               </div>
             </div>
             <div class="task done">
-              <iconify-icon icon="mdi:tune" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:connection" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">Isolation</div>
-                <div class="task-desc"><code>DOCSERVE_STATE</code> env override for the state path · random <code>--port</code> per run (parallel-safe)</div>
+                <div class="task-title">WS server <code>/__reload</code></div>
+                <div class="task-desc"><code>server/websocket.mjs</code> — handshake · text frames · ping → pong (RFC 6455 subset)</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">UpdateListener</div>
+                <div class="task-desc"><code>server/watch.mjs</code> — <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code> · 50 ms debounce batch · known-files tracking → <code>contentSetChanged</code></div>
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node --test cli/</code> green</p>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: edit reloads its own tab only; add/delete reloads the gallery; previews never reload</p>
         </div>
       </div>
 
@@ -529,52 +485,78 @@
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
-              <iconify-icon icon="mdi:numeric-6-circle" style="color:var(--primary)" noobserver></iconify-icon>
-              Phase 6 — Desktop app
+              <iconify-icon icon="mdi:numeric-2-circle" style="color:var(--accent)" noobserver></iconify-icon>
+              Phase 2 — /api/files + gallery
             </span>
-            <span class="step-meta">P2</span>
+            <span class="step-meta">P0</span>
           </div>
           <div class="step-body">
-            macOS tray client controlling the CLI.
+            File metadata for <code>/api/files</code> and the gallery UI.
           </div>
           <div class="tasks">
             <div class="task done">
-              <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:file-multiple-outline" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">Electron zero-window main process</div>
-                <div class="task-desc">tray icon (outline when stopped / filled when running)</div>
+                <div class="task-title">File metadata</div>
+                <div class="task-desc"><code>server/files.mjs</code> — recursive <code>*.html</code> listing (exclude <code>index.html</code>) · <code>&lt;title&gt;</code> / <code>created_at</code> extraction (4 KB head → 1 MB fallback) · git date maps cached per repo root · sort by created desc</div>
               </div>
             </div>
             <div class="task done">
-              <iconify-icon icon="mdi:power" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">Start / Stop toggle</div>
-                <div class="task-desc">spawn the CLI · Open reads the URL from <code>state.json</code></div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">State watch</div>
-                <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Change Folder…</div>
-                <div class="task-desc">stop → restart · remember the last folder in <code>desktop.json</code></div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Quit &amp; first launch</div>
-                <div class="task-desc">stop → <code>app.quit()</code> · symlink the CLI to <code>~/.local/bin/docserve</code></div>
+                <div class="task-title">Gallery template</div>
+                <div class="task-desc"><code>cli/index.html</code> — card grid · lazy iframes (<code>rootMargin: 400px</code>, max 3 concurrent) · copy path</div>
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: all menu flows, including a folder switch while running</p>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: cards render with resolved dates; nested assets load</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-1-circle" style="color:var(--primary)" noobserver></iconify-icon>
+              Phase 1 — Server core
+            </span>
+            <span class="step-meta">P0</span>
+          </div>
+          <div class="step-body">
+            The HTTP layer: <code>docsDir</code> validation, URL mapping, MIME, status codes, and the state file.
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Scaffold <code>cli/</code></div>
+                <div class="task-desc"><code>package.json</code> (name, bin, type, files, engines) · <code>bin.mjs</code> stub · <code>server/index.mjs</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title"><code>docsDir</code> resolution + validation</div>
+                <div class="task-desc">missing → exit 1</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:file-send-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">URL mapping</div>
+                <div class="task-desc"><code>/</code>, <code>/index.html</code> → gallery template · raw static files · MIME map · <code>400</code> / <code>403</code> / <code>404</code></div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Runtime state</div>
+                <div class="task-desc"><code>server/state.mjs</code> — write <code>state.json</code> on bind · remove on SIGINT/SIGTERM · pid liveness + stale self-repair</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node cli/bin.mjs ~/reports</code> — <code>curl /</code>, raw page, traversal <code>403</code>, bad escape <code>400</code></p>
         </div>
       </div>
 
