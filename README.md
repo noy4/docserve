@@ -19,14 +19,14 @@ Click the menu bar icon to manage the server.
 
 ## CLI
 
-**npx (no install)**
+**Run without installing**
 
 ```bash
 npx docserve ~/reports --open   # serve a folder
 npx docserve stop               # stop the running server
 ```
 
-**npm install -g**
+**Install globally**
 
 ```bash
 npm install -g docserve
