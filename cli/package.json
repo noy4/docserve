@@ -6,6 +6,9 @@
   "bin": {
     "docserve": "./bin.mjs"
   },
+  "scripts": {
+    "test": "node --test"
+  },
   "files": [
     "bin.mjs",
     "index.html",
