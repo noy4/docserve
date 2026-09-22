@@ -323,9 +323,19 @@
     new ResizeObserver(fitPreviews).observe(grid);
   }
 
-  window.addEventListener("resize", fitPreviews);
-  document.fonts?.ready.then(fitPreviews);
-  load();
-</script>
+    window.addEventListener("resize", fitPreviews);
+    document.fonts?.ready.then(fitPreviews);
+    load();
+
+    // Live reload: the gallery re-fetches /api/files via a full reload when the
+    // set of HTML files changes; socket loss recovers once the server is back.
+    const ws = new WebSocket(`${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/__reload`);
+    ws.addEventListener("message", (e) => {
+      let change;
+      try { change = JSON.parse(e.data); } catch { return; }
+      if (change?.type === "change" && change.contentSetChanged) location.reload();
+    });
+    ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000));
+  </script>
 </body>
 </html>
