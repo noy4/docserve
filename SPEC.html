@@ -368,7 +368,12 @@
 │       └── watch.mjs             <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
 └── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
     ├── package.json
-    └── main.mjs</pre>
+    └── src/
+        ├── main.mjs              <span class="c"># App · single instance lock · wiring</span>
+        ├── server-manager.mjs    <span class="c"># spawn/stop CLI · state.json liveness</span>
+        ├── state-watcher.mjs     <span class="c"># fs.watch + 2 s polling → menu rebuild</span>
+        ├── tray-controller.mjs   <span class="c"># tray menu · icons · Change Folder…</span>
+        └── assets/               <span class="c"># tray icons (running / stopped)</span></pre>
   </section>
 
   <!-- --- ARCHITECTURE --- -->
