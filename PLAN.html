@@ -161,16 +161,6 @@
   }
   .timeline-step { position: relative; margin-bottom: 20px; }
   .timeline-step:last-child { margin-bottom: 0; }
-  .step-dot {
-    position: absolute;
-    left: -28px;
-    top: 4px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--surface-2);
-    border: 2px solid var(--primary);
-  }
   .step-check {
     position: absolute;
     left: -30px;
@@ -235,7 +225,6 @@
     border-radius: 8px;
     padding: 8px 12px;
   }
-  .task.pending { border-style: dashed; }
   .task > iconify-icon {
     font-size: 20px;
     flex-shrink: 0;
@@ -284,18 +273,6 @@
     font-size: 0.72rem;
     color: var(--muted);
   }
-  .step-status {
-    font-family: var(--mono);
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 999px;
-  }
-  .step-status.pending {
-    color: var(--muted);
-    background: var(--surface-2);
-    border: 1px solid var(--border-strong);
-  }
 
   /* Footer */
   footer {
@@ -342,8 +319,8 @@
   <!-- --- PHASES --- -->
   <section>
     <h2><iconify-icon icon="mdi:format-list-numbered" width="24" noobserver></iconify-icon>Roadmap</h2>
-    <div class="progress"><div class="progress-fill" style="width:83%"></div></div>
-    <p class="progress-note">5 / 6 phases done · next: Phase 6 — Desktop app</p>
+    <div class="progress"><div class="progress-fill" style="width:100%"></div></div>
+    <p class="progress-note">6 / 6 phases done</p>
 
     <div class="timeline">
 
@@ -548,7 +525,7 @@
       </div>
 
       <div class="timeline-step">
-        <div class="step-dot"></div>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -556,41 +533,40 @@
               Phase 6 — Desktop app
             </span>
             <span class="step-meta">P2</span>
-            <span class="step-status pending">pending</span>
           </div>
           <div class="step-body">
             macOS tray client controlling the CLI.
           </div>
           <div class="tasks">
-            <div class="task pending">
+            <div class="task done">
               <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Electron zero-window main process</div>
                 <div class="task-desc">tray icon (outline when stopped / filled when running)</div>
               </div>
             </div>
-            <div class="task pending">
+            <div class="task done">
               <iconify-icon icon="mdi:power" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Start / Stop toggle</div>
                 <div class="task-desc">spawn the CLI · Open reads the URL from <code>state.json</code></div>
               </div>
             </div>
-            <div class="task pending">
+            <div class="task done">
               <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">State watch</div>
                 <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</div>
               </div>
             </div>
-            <div class="task pending">
+            <div class="task done">
               <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Change Folder…</div>
                 <div class="task-desc">stop → restart · remember the last folder in <code>desktop.json</code></div>
               </div>
             </div>
-            <div class="task pending">
+            <div class="task done">
               <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Quit &amp; first launch</div>
