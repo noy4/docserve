@@ -63,7 +63,7 @@ export class TrayController {
         label: `Serving: ${state.docsDir ?? this.server.readLastDir() ?? "—"}`,
         enabled: false,
       },
-      { label: "Change Folder...", click: () => this.#changeFolder() },
+      { label: "Change Folder...", click: () => this.#changeFolder(true) },
       { type: "separator" },
       { label: "Quit docserve", click: () => this.#quit() },
     ])
