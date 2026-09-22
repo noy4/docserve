@@ -620,6 +620,7 @@
           <tr><td>Tray icon</td><td>Outline when stopped, filled when running</td></tr>
           <tr><td>Start / Stop</td><td>Toggles <code>docserve &lt;dir&gt; --background --open</code> and <code>docserve stop</code></td></tr>
           <tr><td>Change Folder…</td><td><code>dialog.showOpenDialog</code>; stops the running server, restarts with the new folder, and opens the gallery</td></tr>
+          <tr><td>Last folder</td><td>Remembers the chosen folder in <code>~/.cache/docserve/desktop.json</code> (<code>{lastDir}</code>), kept across restarts unlike the ephemeral <code>state.json</code>; shown in <em>Serving</em> while stopped and used as the default for <strong>Start</strong> and <strong>Change Folder…</strong></td></tr>
           <tr><td>Quit</td><td>Stops the server, then <code>app.quit()</code></td></tr>
           <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
         </tbody>
