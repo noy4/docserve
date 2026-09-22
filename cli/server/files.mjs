@@ -5,7 +5,7 @@
 // Created-date priority: meta created_at > oldest git add commit > birthtime.
 import { open, readdir, stat } from "node:fs/promises"
 import { realpathSync } from "node:fs"
-import { basename, join, relative, sep } from "node:path"
+import { basename, isAbsolute, join, relative, sep } from "node:path"
 import { execFile } from "node:child_process"
 import { promisify } from "node:util"
 
@@ -50,7 +50,7 @@ export async function apiFiles(docsDir) {
     } catch {
       continue
     }
-    const rel = relative(docsDir, full).split(sep).join("/")
+    const rel = normalizedRelative(docsDir, full)
     files.push({
       title: title ?? basename(full),
       url: `/${rel}`,
@@ -175,4 +175,15 @@ function realpath(p) {
   } catch {
     return p
   }
+}
+
+// --- Path utilities (shared by the HTTP handler and the watcher) ---
+
+export function isWithin(base, path) {
+  const rel = relative(base, path)
+  return rel === "" || (rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel))
+}
+
+export function normalizedRelative(base, path) {
+  return relative(base, path).split(sep).join("/")
 }

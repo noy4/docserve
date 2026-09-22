@@ -360,10 +360,12 @@
 │   ├── bin.mjs                   <span class="c"># CLI entry: args · start/stop/spawn</span>
 │   ├── index.html                <span class="c"># gallery template, served at /</span>
 │   └── server/
-│       ├── index.mjs             <span class="c"># HTTP server · WS · UpdateListener</span>
+│       ├── index.mjs             <span class="c"># HTTP server + lifecycle</span>
 │       ├── state.mjs             <span class="c"># state.json read/write · pid liveness</span>
-│       ├── files.mjs             <span class="c"># *.html listing · meta + git dates</span>
-│       └── inject.mjs            <span class="c"># reload client + copy button</span>
+│       ├── files.mjs             <span class="c"># *.html listing · meta + git dates · path utils</span>
+│       ├── inject.mjs            <span class="c"># reload client + copy button</span>
+│       ├── websocket.mjs         <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
+│       └── watch.mjs             <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
 └── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
     ├── package.json
     └── main.mjs</pre>

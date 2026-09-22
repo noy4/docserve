@@ -1,25 +1,24 @@
-// docserve server core: HTTP + WebSocket + UpdateListener.
+// docserve server core: HTTP layer + server lifecycle.
 //
 // ┌────────────────────────────────────────────────────────┐
 // │ runServer()                                            │
 // │ ├─ createServer ──▶ handler()                          │ # HTTP
 // │ │   ├─ /api/files ──▶ apiFiles()                       │
 // │ │   ├─ /, /index.html ──▶ gallery template             │
-// │ │   └─ other paths ──▶ raw files ──▶ injectIntoHtml()   │
-// │ ├─ WebSocketServer("/__reload") ◀─ listener broadcast   │
-// │ └─ listen ──▶ UpdateListener.start() + writeState()    │
+// │ │   └─ other paths ──▶ raw files ──▶ injectIntoHtml()  │
+// │ ├─ WebSocketServer("/__reload") ◀─ UpdateListener      │
+// │ └─ listen ──▶ listener.start() + writeState()          │
 // └────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
 import { readFile } from "node:fs/promises"
-import { existsSync, watch } from "node:fs"
-import { basename, extname, isAbsolute, relative, resolve, sep } from "node:path"
+import { extname, resolve } from "node:path"
 import { exec } from "node:child_process"
-import { createHash } from "node:crypto"
 import { clearState, writeState } from "./state.mjs"
-import { apiFiles, listHtmlFiles } from "./files.mjs"
+import { apiFiles, isWithin, normalizedRelative } from "./files.mjs"
 import { injectIntoHtml, WS_PATH } from "./inject.mjs"
+import { WebSocketServer } from "./websocket.mjs"
+import { UpdateListener } from "./watch.mjs"
 
-const DEBOUNCE_MS = 50 // like livePreview.previewDebounceDelay
 const MAX_PORT_TRIES = 20 // on conflict, try the next port up to 20 times
 const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "index.html")
 
@@ -56,14 +55,8 @@ export async function runServer({ docsDir, port: initialPort, open = false }) {
     updateListener.close()
     clearState()
   }
-  process.on("SIGINT", () => {
-    cleanup()
-    process.exit(0)
-  })
-  process.on("SIGTERM", () => {
-    cleanup()
-    process.exit(0)
-  })
+  process.on("SIGINT", () => { cleanup(); process.exit(0) })
+  process.on("SIGTERM", () => { cleanup(); process.exit(0) })
 
   const server = createServer(createNodeServerAdapter(createHandler({ docsDir })))
   wss.attach(server)
@@ -170,175 +163,6 @@ async function galleryResponse(docsDir) {
   }
 }
 
-// --- Watching ---
-
-class UpdateListener {
-  constructor(options = {}) {
-    this.wss = options.wss
-    this.docsDir = options.docsDir
-    this.debounceMs = options.debounceMs ?? DEBOUNCE_MS
-    this.knownFiles = new Set()
-    this.broadcastQueue = Promise.resolve()
-    this.watchers = []
-
-    this.queueBroadcast = debounceBatch((touched) => {
-      this.broadcastQueue = this.broadcastQueue
-        .then(() => this.broadcastChanges(touched))
-        .catch((error) => console.error(error))
-    }, this.debounceMs)
-  }
-
-  async start() {
-    try {
-      this.knownFiles = new Set(
-        (await listHtmlFiles(this.docsDir)).map((p) => normalizedRelative(this.docsDir, p)),
-      )
-    } catch {
-      this.knownFiles = new Set()
-    }
-
-    this.watchers.push(
-      watch(this.docsDir, { recursive: true }, (event, filename) => {
-        if (!filename?.endsWith(".html")) return
-        const full = resolve(this.docsDir, filename)
-        if (!isWithin(this.docsDir, full)) return
-        this.queueBroadcast(normalizedRelative(this.docsDir, full))
-      }).on("error", () => { }),
-    )
-  }
-
-  async broadcastChanges(touched) {
-    let contentSetChanged = false
-
-    for (const rel of touched) {
-      if (basename(rel) === "index.html") continue // never a gallery card
-      const full = resolve(this.docsDir, rel)
-      const exists = existsSync(full)
-      const wasKnown = this.knownFiles.has(rel)
-
-      if (exists && !wasKnown) {
-        this.knownFiles.add(rel)
-        contentSetChanged = true
-      } else if (!exists && wasKnown) {
-        this.knownFiles.delete(rel)
-        contentSetChanged = true
-      }
-    }
-
-    this.wss.broadcast({ type: "change", pages: touched, contentSetChanged })
-  }
-
-  close() {
-    this.watchers.forEach((w) => w.close())
-  }
-}
-
-// Accumulate items during the debounce window and deliver them as one batch.
-function debounceBatch(fn, ms) {
-  let timer = null
-  const pending = new Set()
-  return (item) => {
-    pending.add(item)
-    clearTimeout(timer)
-    timer = setTimeout(() => {
-      const items = [...pending]
-      pending.clear()
-      fn(items)
-    }, ms)
-  }
-}
-
-// --- Path utilities ---
-
-function isWithin(base, path) {
-  const rel = relative(base, path)
-  return rel === "" || (rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel))
-}
-
-function normalizedRelative(base, path) {
-  return relative(base, path).split(sep).join("/")
-}
-
 function escapeHtml(s) {
   return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
-}
-
-// --- WebSocketServer (RFC 6455 ws-compatible subset) ---
-
-class WebSocketServer {
-  constructor(options = {}) {
-    this.path = options.path
-    this.clients = new Set()
-    if (options.server) {
-      this.attach(options.server)
-    }
-  }
-
-  attach(server) {
-    server.on("upgrade", (req, socket) => this.handleUpgrade(req, socket))
-  }
-
-  handleUpgrade(req, socket) {
-    const url = new URL(req.url, "http://localhost")
-    if (this.path && url.pathname !== this.path) {
-      socket.destroy()
-      return
-    }
-    const key = req.headers["sec-websocket-key"]
-    if (!key) {
-      socket.destroy()
-      return
-    }
-    socket.write(
-      "HTTP/1.1 101 Switching Protocols\r\n" +
-      "Upgrade: websocket\r\n" +
-      "Connection: Upgrade\r\n" +
-      `Sec-WebSocket-Accept: ${acceptKey(key)}\r\n\r\n`,
-    )
-    socket.setNoDelay(true)
-    this.clients.add(socket)
-    socket.on("close", () => this.clients.delete(socket))
-    socket.on("error", () => this.clients.delete(socket))
-    // Answer pings to keep the connection alive
-    socket.on("data", (buf) => {
-      if (buf.length > 0 && (buf[0] & 0x0f) === 0x9) {
-        socket.write(Buffer.from([0x8a, 0x00])) // pong
-      }
-    })
-  }
-
-  broadcast(payload) {
-    const frame = encodeFrame(typeof payload === "string" ? payload : JSON.stringify(payload))
-    for (const socket of this.clients) {
-      try {
-        socket.write(frame)
-      } catch {
-        this.clients.delete(socket)
-      }
-    }
-  }
-}
-
-function acceptKey(key) {
-  return createHash("sha1").update(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").digest("base64")
-}
-
-function encodeFrame(text) {
-  const payload = Buffer.from(text)
-  const len = payload.length
-  let header
-  if (len < 126) {
-    header = Buffer.from([0x81, len])
-  } else if (len < 65536) {
-    header = Buffer.alloc(4)
-    header[0] = 0x81
-    header[1] = 126
-    header.writeUInt16BE(len, 2)
-  } else {
-    header = Buffer.alloc(10)
-    header[0] = 0x81
-    header[1] = 127
-    header.writeBigUInt64BE(BigInt(len), 2)
-  }
-  return Buffer.concat([header, payload])
 }

@@ -484,8 +484,8 @@
           <tr><td><code>gitDateMaps</code></td><td><code>server/files.mjs</code></td><td>cwd = <code>docsDir</code></td></tr>
           <tr><td><code>listContentFiles</code></td><td><code>server/files.mjs</code></td><td><code>index.html</code> excluded</td></tr>
           <tr><td><code>clientJs</code> / <code>injectIntoHtml</code></td><td><code>server/inject.mjs</code></td><td>pageId: <code>content:</code> prefix → plain docsDir-relative path</td></tr>
-          <tr><td><code>WebSocketServer</code> / frame encode</td><td><code>server/index.mjs</code></td><td><code>/__reload</code> unchanged</td></tr>
-          <tr><td><code>UpdateListener</code> / <code>debounceBatch</code></td><td><code>server/index.mjs</code></td><td>50 ms batch unchanged</td></tr>
+          <tr><td><code>WebSocketServer</code> / frame encode</td><td><code>server/websocket.mjs</code></td><td><code>/__reload</code> unchanged</td></tr>
+          <tr><td><code>UpdateListener</code> / <code>debounceBatch</code></td><td><code>server/watch.mjs</code></td><td>50 ms batch unchanged</td></tr>
           <tr><td><code>.server-port</code></td><td><code>server/state.mjs</code></td><td><code>state.json</code> <code>{pid, port, url, docsDir}</code> + pid liveness</td></tr>
           <tr><td><code>index.html</code></td><td><code>index.html</code></td><td>+ <code>contentSetChanged</code> reload rule</td></tr>
         </tbody>
