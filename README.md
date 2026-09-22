@@ -38,3 +38,7 @@ docserve stop               # stop the running server
 ## Documentation
 
 - [SPEC.html](./SPEC.html) — design & implementation specification
+
+## License
+
+[MIT](./LICENSE)
