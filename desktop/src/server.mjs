@@ -50,12 +50,12 @@ export class ServerManager {
     return this.getState().running
   }
 
-  start(dir, { open = false } = {}) {
+  start(dir, { open = false, silent = false } = {}) {
     if (!dir || this.isRunning() || this.starting) return
     this.starting = { dir, timer: setTimeout(() => this.#clearStarting(), START_TIMEOUT_MS) }
     this.writeLastDir(dir)
     this.#changed()
-    console.log(`[docserve-desktop] start: ${dir}${open ? " (open)" : ""}`)
+    console.log(`[docserve-desktop] start: ${dir}${open ? " (open)" : ""}${silent ? " (silent)" : ""}`)
 
     const { command, args, env } = this.#cliCommand([dir, "--background", ...(open ? ["--open"] : [])])
     const child = spawn(command, args, { env, stdio: ["ignore", "ignore", "pipe"] })
@@ -67,6 +67,10 @@ export class ServerManager {
       if (code !== 0 && this.starting) {
         this.#clearStarting()
         this.#changed()
+        if (silent) {
+          console.warn(`[docserve-desktop] start failed: ${dir}: ${stderr.trim() || `exit code ${code}`}`)
+          return
+        }
         this.onStartError?.(`Failed to start the server for:\n${dir}\n\n${stderr.trim() || `exit code ${code}`}`)
       }
     })

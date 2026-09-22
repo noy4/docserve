@@ -78,7 +78,7 @@ export class TrayController {
         label: `Serving: ${state.docsDir ?? this.server.readLastDir() ?? "—"}`,
         enabled: false,
       },
-      { label: "Change Folder...", click: () => this.#changeFolder(true) },
+      { label: "Change Folder...", click: () => this.changeFolder(true) },
       { type: "separator" },
       ...(this.updateAvailable
         ? [
@@ -98,11 +98,16 @@ export class TrayController {
     if (dir) {
       this.server.start(dir, { open: true })
     } else {
-      this.#changeFolder(true)
+      this.changeFolder(true)
     }
   }
 
-  async #changeFolder(open = false) {
+  async changeFolder(open = false) {
+    // LSUIElement app: without stealing focus the dialog opens behind Finder.
+    if (process.platform === "darwin") {
+      app.focus({ steal: true })
+      await sleep(100)
+    }
     const result = await dialog.showOpenDialog({
       title: "docserve — Choose a folder to serve",
       defaultPath: this.server.readLastDir() || os.homedir(),
@@ -124,6 +129,10 @@ function loadIcon(name, template = true) {
   const image = nativeImage.createFromPath(path.join(import.meta.dirname, "assets", `${name}@2x.png`))
   image.setTemplateImage(template)
   return image
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function safePort(url) {

@@ -44,6 +44,17 @@ class App {
     this.server.ensureCliSymlink()
     this.tray.boot()
     this.watcher.start()
-    console.log("[docserve-desktop] tray ready")
+    this.#resume()
+  }
+
+  // Auto-resume: restart the last folder silently; without one, ask for a
+  // folder and open the gallery. A running server is never disturbed.
+  #resume() {
+    const dir = this.server.readLastDir()
+    if (dir) {
+      this.server.start(dir, { silent: true })
+    } else {
+      this.tray.changeFolder(true)
+    }
   }
 }
