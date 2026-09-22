@@ -14,7 +14,7 @@ export function injectIntoHtml(html, pageId, absPath) {
 function clientJs(pageId, absPath) {
   return `<script>
 (() => {
-  // iframes: no reload loop from dropped sockets
+  // iframes: no reload loop from dropped sockets, no copy button
   if (window.self !== window.top) return
   const pageId = ${JSON.stringify(pageId).replaceAll("<", "\\u003c")}
   const proto = location.protocol === "https:" ? "wss:" : "ws:"
@@ -29,26 +29,71 @@ function clientJs(pageId, absPath) {
   ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000))
 
   const absPath = ${JSON.stringify(absPath).replaceAll("<", "\\u003c")}
-  const COPY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
-  const CHECK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+  const style = document.createElement("style")
+  style.textContent = \`#docserve-copy {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2147483647;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px 0 9px;
+  border: 1px solid rgba(127, 127, 138, 0.35);
+  border-radius: 8px;
+  background: rgba(127, 127, 138, 0.14);
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+#docserve-copy svg {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+#docserve-copy .label {
+  font: 500 11.5px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+#docserve-copy:hover {
+  opacity: 1;
+  border-color: #6c8cff;
+  color: #6c8cff;
+}
+#docserve-copy.copied {
+  opacity: 1;
+  color: #4ade80;
+  border-color: #4ade80;
+}
+@media (prefers-color-scheme: light) {
+  #docserve-copy:hover { border-color: #2563eb; color: #2563eb; }
+  #docserve-copy.copied { color: #16a34a; border-color: #16a34a; }
+}
+#docserve-copy .ic-check { display: none; }
+#docserve-copy.copied .ic-copy { display: none; }
+#docserve-copy.copied .ic-check { display: block; }\`
+  const COPY = '<svg class="ic-copy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
+  const CHECK = '<svg class="ic-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
   const btn = document.createElement("button")
+  btn.id = "docserve-copy"
   btn.type = "button"
   btn.title = absPath
-  btn.style.cssText = "all:initial;position:fixed;right:14px;bottom:14px;z-index:2147483647;width:28px;height:28px;display:grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:rgba(15,17,23,.82);color:#e6e8ee;cursor:pointer;opacity:.55;transition:opacity .15s ease,color .15s ease"
-  btn.innerHTML = COPY
-  btn.addEventListener("mouseenter", () => { btn.style.opacity = "1" })
-  btn.addEventListener("mouseleave", () => { btn.style.opacity = ".55" })
+  btn.innerHTML = COPY + CHECK + '<span class="label">Copy file path</span>'
   btn.addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(absPath)
-      btn.innerHTML = CHECK
-      btn.style.color = "#4ade80"
+      btn.classList.add("copied")
+      btn.querySelector(".label").textContent = "Copied"
       setTimeout(() => {
-        btn.innerHTML = COPY
-        btn.style.color = "#e6e8ee"
+        btn.classList.remove("copied")
+        btn.querySelector(".label").textContent = "Copy file path"
       }, 1200)
     } catch {}
   })
+  document.head.appendChild(style)
   document.body.appendChild(btn)
 })()
 </script>`
