@@ -173,97 +173,97 @@
   </div>
 
 <script type="module">
-  const VIEWPORT_W = 960;
-  const VIEWPORT_H = 900;
+  const VIEWPORT_W = 960
+  const VIEWPORT_H = 900
 
   function el(tag, props = {}, children = []) {
-    const node = document.createElement(tag);
+    const node = document.createElement(tag)
     for (const [key, value] of Object.entries(props)) {
-      if (value == null || value === false) continue;
-      if (key === "class") node.className = value;
-      else if (key === "text") node.textContent = value;
-      else if (key === "html") node.innerHTML = value;
-      else if (key === "style" && typeof value === "object") Object.assign(node.style, value);
-      else if (key.startsWith("on") && typeof value === "function") node.addEventListener(key.slice(2).toLowerCase(), value);
-      else node.setAttribute(key, value === true ? "" : String(value));
+      if (value == null || value === false) continue
+      if (key === "class") node.className = value
+      else if (key === "text") node.textContent = value
+      else if (key === "html") node.innerHTML = value
+      else if (key === "style" && typeof value === "object") Object.assign(node.style, value)
+      else if (key.startsWith("on") && typeof value === "function") node.addEventListener(key.slice(2).toLowerCase(), value)
+      else node.setAttribute(key, value === true ? "" : String(value))
     }
     for (const child of Array.isArray(children) ? children : [children]) {
-      if (child == null || child === false) continue;
-      node.append(child);
+      if (child == null || child === false) continue
+      node.append(child)
     }
-    return node;
+    return node
   }
 
   function icon(paths, { width = 2, class: name = "" } = {}) {
-    return `<svg${name ? ` class="${name}"` : ""} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+    return `<svg${name ? ` class="${name}"` : ""} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`
   }
 
-  const COPY_SVG = icon('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>', { class: "ic-copy" });
-  const CHECK_SVG = icon('<polyline points="20 6 9 17 4 12"/>', { class: "ic-check", width: 2.5 });
+  const COPY_SVG = icon('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>', { class: "ic-copy" })
+  const CHECK_SVG = icon('<polyline points="20 6 9 17 4 12"/>', { class: "ic-check", width: 2.5 })
 
   class PreviewLoader {
-    queue = [];
-    active = 0;
-    max = 3;
-    observer;
+    queue = []
+    active = 0
+    max = 3
+    observer
 
     constructor({ max = 3, rootMargin = "400px" } = {}) {
-      this.max = max;
+      this.max = max
       this.observer = new IntersectionObserver((entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          this.observer.unobserve(entry.target);
-          const preview = entry.target;
-          const iframe = preview.querySelector("iframe");
-          const src = iframe?.dataset.src;
-          if (iframe && src) this.enqueue(iframe, src);
+          if (!entry.isIntersecting) continue
+          this.observer.unobserve(entry.target)
+          const preview = entry.target
+          const iframe = preview.querySelector("iframe")
+          const src = iframe?.dataset.src
+          if (iframe && src) this.enqueue(iframe, src)
         }
-      }, { rootMargin });
+      }, { rootMargin })
     }
 
     watch(preview) {
-      this.observer.observe(preview);
+      this.observer.observe(preview)
     }
 
     enqueue(iframe, src) {
-      this.queue.push({ iframe, src });
-      this.pump();
+      this.queue.push({ iframe, src })
+      this.pump()
     }
 
     pump() {
       while (this.active < this.max && this.queue.length) {
-        const item = this.queue.shift();
-        if (!item) return;
-        this.active++;
+        const item = this.queue.shift()
+        if (!item) return
+        this.active++
         item.iframe.addEventListener(
           "load",
           () => {
-            this.active--;
-            this.pump();
+            this.active--
+            this.pump()
           },
           { once: true },
-        );
-        item.iframe.src = item.src;
+        )
+        item.iframe.src = item.src
       }
     }
   }
 
-  const previews = new PreviewLoader();
+  const previews = new PreviewLoader()
 
   function fitPreviews() {
     for (const el of document.querySelectorAll(".preview")) {
-      const iframe = el.querySelector("iframe");
-      if (!iframe) continue;
-      iframe.style.width = `${VIEWPORT_W}px`;
-      iframe.style.height = `${VIEWPORT_H}px`;
-      iframe.style.transform = `scale(${el.clientWidth / VIEWPORT_W})`;
+      const iframe = el.querySelector("iframe")
+      if (!iframe) continue
+      iframe.style.width = `${VIEWPORT_W}px`
+      iframe.style.height = `${VIEWPORT_H}px`
+      iframe.style.transform = `scale(${el.clientWidth / VIEWPORT_W})`
     }
   }
 
   function displayDate(value) {
-    const date = new Date(typeof value === "number" ? value * 1000 : value);
-    if (Number.isNaN(date.getTime())) return "";
-    return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
+    const date = new Date(typeof value === "number" ? value * 1000 : value)
+    if (Number.isNaN(date.getTime())) return ""
+    return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`
   }
 
   function card(file) {
@@ -277,13 +277,13 @@
           "aria-label": "Copy file path",
           html: COPY_SVG + CHECK_SVG,
           onclick: async (e) => {
-            const btn = e.currentTarget;
-            e.preventDefault();
-            e.stopPropagation();
+            const btn = e.currentTarget
+            e.preventDefault()
+            e.stopPropagation()
             try {
-              await navigator.clipboard.writeText(btn.title);
-              btn.classList.add("copied");
-              setTimeout(() => btn.classList.remove("copied"), 1200);
+              await navigator.clipboard.writeText(btn.title)
+              btn.classList.add("copied")
+              setTimeout(() => btn.classList.remove("copied"), 1200)
             } catch {}
           },
         }),
@@ -292,52 +292,52 @@
         el("div", { class: "title", text: file.title }),
         el("div", { class: "date", text: displayDate(file.created) }),
       ]),
-    ]);
+    ])
   }
 
   async function load() {
-    const docsDir = document.getElementById("docs-dir").textContent;
-    document.getElementById("empty-dir").textContent = docsDir;
+    const docsDir = document.getElementById("docs-dir").textContent
+    document.getElementById("empty-dir").textContent = docsDir
 
-    let files = [];
+    let files = []
     try {
-      const res = await fetch("/api/files");
-      files = await res.json();
+      const res = await fetch("/api/files")
+      files = await res.json()
     } catch {}
-    if (!Array.isArray(files)) files = [];
+    if (!Array.isArray(files)) files = []
 
-    document.getElementById("total").textContent = String(files.length);
+    document.getElementById("total").textContent = String(files.length)
     if (files.length === 0) {
-      document.getElementById("empty").hidden = false;
-      return;
+      document.getElementById("empty").hidden = false
+      return
     }
 
-    const grid = document.getElementById("grid");
-    for (const f of files) grid.appendChild(card(f));
-    grid.hidden = false;
+    const grid = document.getElementById("grid")
+    for (const f of files) grid.appendChild(card(f))
+    grid.hidden = false
 
     for (const preview of grid.querySelectorAll(".preview")) {
-      previews.watch(preview);
+      previews.watch(preview)
     }
-    fitPreviews();
-    new ResizeObserver(fitPreviews).observe(grid);
+    fitPreviews()
+    new ResizeObserver(fitPreviews).observe(grid)
   }
 
   function connectLiveReload() {
     // Reload when the set of files changes; a dropped socket recovers after restart.
-    const ws = new WebSocket(`${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/__reload`);
+    const ws = new WebSocket(`${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/__reload`)
     ws.addEventListener("message", (e) => {
-      let change;
-      try { change = JSON.parse(e.data); } catch { return; }
-      if (change?.type === "change" && change.contentSetChanged) location.reload();
-    });
-    ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000));
+      let change
+      try { change = JSON.parse(e.data) } catch { return }
+      if (change?.type === "change" && change.contentSetChanged) location.reload()
+    })
+    ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000))
   }
 
-  window.addEventListener("resize", fitPreviews);
-  document.fonts?.ready.then(fitPreviews);
-  load();
-  connectLiveReload();
+  window.addEventListener("resize", fitPreviews)
+  document.fonts?.ready.then(fitPreviews)
+  load()
+  connectLiveReload()
 </script>
 </body>
 </html>
