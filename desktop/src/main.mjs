@@ -10,9 +10,9 @@
 // │ └─ TrayController menu · icons · Change Folder…        │
 // └────────────────────────────────────────────────────────┘
 import { app, dialog } from "electron"
-import { ServerManager } from "./server-manager.mjs"
-import { TrayController } from "./tray-controller.mjs"
-import { StateWatcher } from "./state-watcher.mjs"
+import { ServerManager } from "./server.mjs"
+import { TrayController } from "./tray.mjs"
+import { StateWatcher } from "./state.mjs"
 
 const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) {

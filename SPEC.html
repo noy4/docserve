@@ -370,9 +370,9 @@
     ├── package.json
     └── src/
         ├── main.mjs              <span class="c"># App · single instance lock · wiring</span>
-        ├── server-manager.mjs    <span class="c"># spawn/stop CLI · state.json liveness</span>
-        ├── state-watcher.mjs     <span class="c"># fs.watch + 2 s polling → menu rebuild</span>
-        ├── tray-controller.mjs   <span class="c"># tray menu · icons · Change Folder…</span>
+        ├── server.mjs            <span class="c"># spawn/stop CLI · state.json liveness</span>
+        ├── state.mjs             <span class="c"># fs.watch + 2 s polling → menu rebuild</span>
+        ├── tray.mjs              <span class="c"># tray menu · icons · Change Folder…</span>
         └── assets/               <span class="c"># tray icons (running / stopped)</span></pre>
   </section>
 
