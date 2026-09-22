@@ -3,6 +3,7 @@
 // ┌────────────────────────────────────────────────────────┐
 // │ runServer()                                            │
 // │ ├─ createServer ──▶ handler()                          │ # HTTP
+// │ │   ├─ /api/files ──▶ apiFiles()                       │
 // │ │   ├─ /, /index.html ──▶ gallery template             │
 // │ │   └─ other paths ──▶ raw files from docsDir          │
 // │ └─ listen ──▶ writeState({pid, port, url, docsDir})    │
@@ -12,6 +13,7 @@ import { readFile } from "node:fs/promises";
 import { exec } from "node:child_process";
 import { extname, isAbsolute, relative, resolve, sep } from "node:path";
 import { clearState, writeState } from "./state.mjs";
+import { apiFiles } from "./files.mjs";
 
 const MAX_PORT_TRIES = 20; // on conflict, try the next port up to 20 times
 const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "index.html");
@@ -92,6 +94,15 @@ function toWebRequest(req) {
 function createHandler({ docsDir }) {
   return async function handler(request) {
     const url = new URL(request.url);
+
+    if (url.pathname === "/api/files") {
+      try {
+        return Response.json(await apiFiles(docsDir));
+      } catch (err) {
+        console.error(err);
+        return Response.json([]);
+      }
+    }
 
     let pathname;
     try {

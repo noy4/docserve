@@ -1,28 +1,319 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>docserve</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c8cff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M8 13h8M8 17h5'/%3E%3C/svg%3E">
 <style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2e3d;
+    --text: #e6e8ee;
+    --muted: #9aa0b0;
+    --accent: #6c8cff;
+    --green: #4ade80;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #334155;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --green: #16a34a;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: #0f1117;
-    color: #e6e8ee;
+    background: var(--bg);
+    color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
     padding: 40px 24px;
   }
-  code {
+
+  h1 { font-size: 1.6rem; margin-bottom: 8px; }
+  .sub { color: var(--muted); margin-bottom: 24px; font-size: 0.9rem; }
+  .sub b { color: var(--green); }
+
+  .sub code {
     font-family: ui-monospace, monospace;
-    font-size: 0.85rem;
-    background: #1a1d27;
-    border: 1px solid #2a2e3d;
+    font-size: 0.78rem;
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: 6px;
     padding: 2px 8px;
+    word-break: break-all;
   }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .card:hover { border-color: var(--accent); }
+
+  .preview {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .preview iframe {
+    border: 0;
+    transform-origin: top left;
+    pointer-events: none;
+  }
+
+  .preview::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: rgba(15, 17, 23, 0.82);
+    color: var(--text);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .copy-btn svg { width: 13px; height: 13px; }
+  .copy-btn .ic-check { display: none; }
+  .card:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { color: #4ade80; border-color: #4ade80; }
+  .copy-btn.copied .ic-copy { display: none; }
+  .copy-btn.copied .ic-check { display: block; }
+
+  @media (hover: none) {
+    .copy-btn { opacity: 0.7; }
+  }
+
+  .meta {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .meta .title { font-size: 0.85rem; font-weight: 600; line-height: 1.4; }
+  .date { font-size: 0.7rem; color: var(--muted); }
+
+  .empty {
+    max-width: 480px;
+    margin: 48px auto;
+    padding: 32px 24px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .empty b { color: var(--text); }
 </style>
 </head>
+
 <body>
   <h1>docserve</h1>
-  <p><code>__DOCSERVE_DIR__</code></p>
+  <p class="sub">
+    <code id="docs-dir">__DOCSERVE_DIR__</code> <b id="total">0</b> files
+  </p>
+
+  <div class="grid" id="grid" hidden></div>
+
+  <div class="empty" id="empty" hidden>
+    <b>No HTML files found</b>
+    <p>Place .html files in <code id="empty-dir"></code> and they will appear here automatically</p>
+  </div>
+
+<script type="module">
+  const VIEWPORT_W = 960;
+  const VIEWPORT_H = 900;
+
+  function el(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    for (const [key, value] of Object.entries(props)) {
+      if (value == null || value === false) continue;
+      if (key === "class") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "html") node.innerHTML = value;
+      else if (key === "style" && typeof value === "object") Object.assign(node.style, value);
+      else if (key.startsWith("on") && typeof value === "function") node.addEventListener(key.slice(2).toLowerCase(), value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    }
+    for (const child of Array.isArray(children) ? children : [children]) {
+      if (child == null || child === false) continue;
+      node.append(child);
+    }
+    return node;
+  }
+
+  function icon(paths, { width = 2, class: name = "" } = {}) {
+    return `<svg${name ? ` class="${name}"` : ""} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  }
+
+  const COPY_SVG = icon('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>', { class: "ic-copy" });
+  const CHECK_SVG = icon('<polyline points="20 6 9 17 4 12"/>', { class: "ic-check", width: 2.5 });
+
+  class PreviewLoader {
+    queue = [];
+    active = 0;
+    max = 3;
+    observer;
+
+    constructor({ max = 3, rootMargin = "400px" } = {}) {
+      this.max = max;
+      this.observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          this.observer.unobserve(entry.target);
+          const preview = entry.target;
+          const iframe = preview.querySelector("iframe");
+          const src = iframe?.dataset.src;
+          if (iframe && src) this.enqueue(iframe, src);
+        }
+      }, { rootMargin });
+    }
+
+    watch(preview) {
+      this.observer.observe(preview);
+    }
+
+    enqueue(iframe, src) {
+      this.queue.push({ iframe, src });
+      this.pump();
+    }
+
+    pump() {
+      while (this.active < this.max && this.queue.length) {
+        const item = this.queue.shift();
+        if (!item) return;
+        this.active++;
+        item.iframe.addEventListener(
+          "load",
+          () => {
+            this.active--;
+            this.pump();
+          },
+          { once: true },
+        );
+        item.iframe.src = item.src;
+      }
+    }
+  }
+
+  const previews = new PreviewLoader();
+
+  function fitPreviews() {
+    for (const el of document.querySelectorAll(".preview")) {
+      const iframe = el.querySelector("iframe");
+      if (!iframe) continue;
+      iframe.style.width = `${VIEWPORT_W}px`;
+      iframe.style.height = `${VIEWPORT_H}px`;
+      iframe.style.transform = `scale(${el.clientWidth / VIEWPORT_W})`;
+    }
+  }
+
+  function displayDate(value) {
+    const date = new Date(typeof value === "number" ? value * 1000 : value);
+    if (Number.isNaN(date.getTime())) return "";
+    return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
+  }
+
+  function card(file) {
+    return el("a", { class: "card", href: file.url, target: "_blank", rel: "noopener" }, [
+      el("div", { class: "preview" }, [
+        el("iframe", { tabindex: -1, title: file.title ?? "", "data-src": file.url }),
+        el("button", {
+          type: "button",
+          class: "copy-btn",
+          title: file.path,
+          "aria-label": "Copy file path",
+          html: COPY_SVG + CHECK_SVG,
+          onclick: async (e) => {
+            const btn = e.currentTarget;
+            e.preventDefault();
+            e.stopPropagation();
+            try {
+              await navigator.clipboard.writeText(btn.title);
+              btn.classList.add("copied");
+              setTimeout(() => btn.classList.remove("copied"), 1200);
+            } catch {}
+          },
+        }),
+      ]),
+      el("div", { class: "meta" }, [
+        el("div", { class: "title", text: file.title }),
+        el("div", { class: "date", text: displayDate(file.created) }),
+      ]),
+    ]);
+  }
+
+  async function load() {
+    const docsDir = document.getElementById("docs-dir").textContent;
+    document.getElementById("empty-dir").textContent = docsDir;
+
+    let files = [];
+    try {
+      const res = await fetch("/api/files");
+      files = await res.json();
+    } catch {}
+    if (!Array.isArray(files)) files = [];
+
+    document.getElementById("total").textContent = String(files.length);
+    if (files.length === 0) {
+      document.getElementById("empty").hidden = false;
+      return;
+    }
+
+    const grid = document.getElementById("grid");
+    for (const f of files) grid.appendChild(card(f));
+    grid.hidden = false;
+
+    for (const preview of grid.querySelectorAll(".preview")) {
+      previews.watch(preview);
+    }
+    fitPreviews();
+    new ResizeObserver(fitPreviews).observe(grid);
+  }
+
+  window.addEventListener("resize", fitPreviews);
+  document.fonts?.ready.then(fitPreviews);
+  load();
+</script>
 </body>
 </html>
