@@ -1,5 +1,5 @@
 {
-  "name": "docserve",
+  "name": "@noy4/docserve",
   "version": "0.1.0",
   "description": "Serves a folder of HTML as a card gallery with live reload.",
   "type": "module",
@@ -23,5 +23,15 @@
     "gallery",
     "html"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noy4/docserve.git"
+  },
+  "homepage": "https://github.com/noy4/docserve#readme",
+  "bugs": "https://github.com/noy4/docserve/issues",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
 }

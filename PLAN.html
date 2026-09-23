@@ -308,6 +308,53 @@
     <div class="timeline">
 
       <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:circle-outline" style="color:var(--muted)" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-8-circle" style="color:var(--green)" noobserver></iconify-icon>
+              Phase 8 — npm publish
+            </span>
+            <span class="step-meta">P2</span>
+          </div>
+          <div class="step-body">
+            Publish the CLI as the scoped <code>@noy4/docserve</code> — the unscoped <code>docserve</code> name is taken by an unrelated, dormant 2019 package. First release is manual; later releases run on GitHub Actions trusted publishing (OIDC, no tokens, provenance).
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Package metadata</div>
+                <div class="task-desc"><code>repository</code> / <code>homepage</code> / <code>bugs</code> · <code>publishConfig</code> (<code>access: public</code> — scoped defaults to restricted — + <code>provenance</code>) · <code>bin</code> stays <code>docserve</code></div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:tray-arrow-up" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">First manual publish</div>
+                <div class="task-desc">npm account + 2FA · <code>npm pack --dry-run</code> (13.1 kB, 9 files) · <code>npm login</code> → <code>npm publish</code> · verify <code>npx @noy4/docserve</code></div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:shield-key-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Trusted publishing</div>
+                <div class="task-desc">npmjs.com Trusted Publisher (noy4 / docserve / <code>publish-cli.yml</code>) · workflow with <code>id-token: write</code> · <code>cli-v*</code> tags → OIDC publish without <code>NPM_TOKEN</code></div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:pencil-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">README commands</div>
+                <div class="task-desc">switch <code>npx docserve</code> / <code>npm install -g docserve</code> to the scoped name</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>npx @noy4/docserve ~/reports --open</code> serves a gallery in a clean environment · provenance badge visible on the npmjs.com package page</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
         <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
