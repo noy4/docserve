@@ -4,9 +4,9 @@
 // Info.plist rewrite below invalidates Electron's prebuilt ad-hoc signature —
 // unsigned/broken bundles are reported as "damaged" by macOS. Re-signing the
 // whole bundle with the ad-hoc identity fixes both.
-const { execSync } = require("node:child_process")
+import { execSync } from "node:child_process"
 
-module.exports = async function afterPack(context) {
+export async function afterPack(context) {
   if (context.electronPlatformName !== "darwin") return
   const appPath = `${context.appOutDir}/${context.packager.appInfo.productFilename}.app`
   execSync(`codesign --force --deep --sign - "${appPath}"`, { stdio: "inherit" })
