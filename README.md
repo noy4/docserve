@@ -13,7 +13,11 @@ Serves a folder of HTML as a card gallery with live reload.
 ## 🖥️ Desktop app
 
 1. **Download** — the DMG for your Mac from [Releases](../../releases) (`arm64` for Apple Silicon, x64 otherwise)
-2. **Launch** — pick a folder and the gallery opens in your browser
+2. **Launch** — on the security warning, click **Done** (not **Move to Trash**), then approve via **Open Anyway** in System Settings → Privacy & Security
+3. **Pick a folder** — the gallery opens in your browser
+
+> [!NOTE]
+> The warning appears because the app isn't verified by Apple (that requires joining the Apple Developer Program, $99/year).
 
 Click the menu bar icon to manage the server.
 
