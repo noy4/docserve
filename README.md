@@ -23,14 +23,14 @@ Click the menu bar icon to manage the server.
 **Run without installing**
 
 ```bash
-npx docserve ~/reports --open   # serve a folder (npx docserve <folder>)
-npx docserve stop               # stop the running server
+npx @noy4/docserve ~/reports --open   # serve a folder (npx @noy4/docserve <folder>)
+npx @noy4/docserve stop               # stop the running server
 ```
 
 **Install globally**
 
 ```bash
-npm install -g docserve
+npm install -g @noy4/docserve
 
 docserve ~/reports --open   # serve a folder (docserve <folder>)
 docserve stop               # stop the running server
