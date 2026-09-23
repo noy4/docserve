@@ -73,23 +73,9 @@
     padding: 72px 0 56px;
   }
   .logo {
-    width: 72px;
-    height: 72px;
-    margin-bottom: 20px;
-  }
-  .badge-top {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    background: var(--primary-soft);
-    color: var(--primary);
-    border: 1px solid var(--primary);
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-family: var(--mono);
-    font-weight: 600;
-    margin-bottom: 18px;
+    width: 128px;
+    height: 128px;
+    margin-bottom: 12px;
   }
   h1 {
     font-size: clamp(2.1rem, 6vw, 2.7rem);
@@ -105,6 +91,11 @@
     line-height: 1.65;
     margin-bottom: 28px;
   }
+  .cli-lead {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin: 24px 0 10px;
+  }
   .install {
     display: inline-flex;
     align-items: center;
@@ -113,7 +104,6 @@
     border: 1px solid var(--border-strong);
     border-radius: 12px;
     padding: 12px 16px;
-    margin-bottom: 24px;
   }
   .install code {
     font-family: var(--mono);
@@ -123,14 +113,16 @@
     padding: 0;
   }
   .copy-btn {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
     color: var(--primary);
     background: var(--primary-soft);
     border: 1px solid var(--primary);
     border-radius: 6px;
-    padding: 4px 10px;
     cursor: pointer;
   }
   .cta-row {
@@ -330,20 +322,10 @@
 
   <header class="hero">
     <img class="logo" src="./icon.svg" alt="docserve icon">
-    <div>
-      <span class="badge-top">
-        <iconify-icon icon="mdi:github" noobserver></iconify-icon>
-        OPEN SOURCE · MIT
-      </span>
-    </div>
     <h1>docserve</h1>
     <p class="tagline">Serves a folder of HTML as a card gallery with live reload.</p>
-    <div class="install">
-      <code>npx @noy4/docserve ~/reports --open</code>
-      <button class="copy-btn" id="copy-btn" type="button">Copy</button>
-    </div>
     <div class="cta-row">
-      <a class="btn btn-primary" href="https://github.com/noy4/docserve/releases" target="_blank" rel="noopener">
+      <a class="btn btn-primary" id="download-btn" href="https://github.com/noy4/docserve/releases/latest" rel="noopener">
         <iconify-icon icon="mdi:tray-arrow-down" noobserver></iconify-icon>
         Download for macOS
       </a>
@@ -351,10 +333,13 @@
         <iconify-icon icon="mdi:github" noobserver></iconify-icon>
         GitHub
       </a>
-      <a class="btn" href="https://www.npmjs.com/package/@noy4/docserve" target="_blank" rel="noopener">
-        <iconify-icon icon="mdi:npm" noobserver></iconify-icon>
-        npm
-      </a>
+    </div>
+    <p class="cli-lead">Or use the CLI:</p>
+    <div class="install">
+      <code>npx @noy4/docserve ~/reports --open</code>
+      <button class="copy-btn" id="copy-btn" type="button" aria-label="Copy install command">
+        <iconify-icon icon="mdi:content-copy" noobserver></iconify-icon>
+      </button>
     </div>
   </header>
 
@@ -461,8 +446,39 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop th
 <script>
   document.getElementById('copy-btn').addEventListener('click', async function () {
     try { await navigator.clipboard.writeText('npx @noy4/docserve ~/reports --open'); } catch (e) {}
-    this.textContent = 'Copied';
-    setTimeout(() => { this.textContent = 'Copy'; }, 1200);
+    const icon = this.querySelector('iconify-icon');
+    icon.setAttribute('icon', 'mdi:check');
+    setTimeout(() => { icon.setAttribute('icon', 'mdi:content-copy'); }, 1200);
+  });
+
+  async function detectArch() {
+    try {
+      if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+        const userAgent = await navigator.userAgentData.getHighEntropyValues(['architecture']);
+        if (userAgent.architecture === 'x86') return 'x64';
+      }
+    } catch (e) {}
+    return 'arm64';
+  }
+
+  document.getElementById('download-btn').addEventListener('click', async (e) => {
+    const fallback = e.currentTarget.href;
+    e.preventDefault();
+    try {
+      const res = await fetch('https://api.github.com/repos/noy4/docserve/releases/latest', {
+        headers: { Accept: 'application/vnd.github+json' }
+      });
+      if (!res.ok) throw new Error(res.status);
+      const release = await res.json();
+      const dmgs = release.assets.filter(a => a.name.endsWith('.dmg'));
+      const arch = await detectArch();
+      const asset = arch === 'arm64'
+        ? dmgs.find(a => a.name.includes('arm64'))
+        : dmgs.find(a => !a.name.includes('arm64'));
+      window.location.href = asset ? asset.browser_download_url : fallback;
+    } catch (err) {
+      window.location.href = fallback;
+    }
   });
 </script>
 </body>

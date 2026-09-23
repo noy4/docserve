@@ -349,7 +349,7 @@
   <section>
     <h2><iconify-icon icon="mdi:information-outline" width="24" noobserver></iconify-icon>Overview</h2>
     <p class="section-desc">
-      Publish the product homepage on GitHub Pages. The site serves under the <code>/docserve/</code> subpath — every link must be relative.
+      Publish the product homepage on GitHub Pages.
     </p>
 
     <div class="table-wrap">
@@ -360,7 +360,7 @@
         <tbody>
           <tr><td>URL</td><td><code>https://noy4.github.io/docserve/</code> — repo is public, so free Pages works</td></tr>
           <tr><td>Pages source</td><td>Deploy from branch: <code>main</code> / <code>/docs</code>. No Actions, no <code>gh-pages</code> branch, zero build</td></tr>
-          <tr><td>Files</td><td><code>docs/index.html</code> (new homepage) + <code>SPEC.html</code> / <code>PLAN.html</code> moved into <code>docs/</code>; <code>local.*</code> scratch stays at root, unpublished</td></tr>
+          <tr><td>Files</td><td><code>docs/index.html</code> (new homepage) + <code>SPEC.html</code> / <code>PLAN.html</code> moved into <code>docs/</code></td></tr>
           <tr><td>Design</td><td>Reuse the SPEC.html tokens — CSS variables, Geist Mono, iconify MDI, auto light/dark, single static file</td></tr>
         </tbody>
       </table>
@@ -368,8 +368,7 @@
 
     <div class="callout">
       <iconify-icon icon="mdi:information-outline" noobserver></iconify-icon>
-      <strong>Deploys:</strong> first publish takes 1–2 minutes; every push to <code>main</code> redeploys automatically.
-      Jekyll processes the folder but plain HTML passes through untouched — no <code>.nojekyll</code> needed.
+      <strong>Deploys:</strong> every push to <code>main</code> redeploys automatically.
     </div>
   </section>
 
@@ -397,18 +396,22 @@
               <iconify-icon icon="mdi:card-text-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">OG / SNS card</div>
-                <div class="task-desc"><code>og:title</code> / <code>og:description</code> / <code>og:url</code> / <code>og:image</code> = <code>icon.png</code> (1024×1024 — SVG は SNS クローラ非対応のため PNG) · <code>twitter:card</code> summary</div>
+                <div class="task-desc"><code>og:title</code> / <code>og:description</code> / <code>og:url</code> / <code>og:image</code> = <code>icon.png</code> · <code>twitter:card</code> summary</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
-              <div class="task-title">README banner</div>
-              <div class="task-desc">homepage URL added under the tagline · Documentation lists SPEC / PLAN</div>
+              <div class="task-text">
+                <div class="task-title">README banner</div>
+                <div class="task-desc">homepage URL added under the tagline · Documentation lists SPEC / PLAN</div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:arrow-u-left-top" noobserver></iconify-icon>
-              <div class="task-title">Cross-links</div>
-              <div class="task-desc">SPEC / PLAN / PLAN-SITE footers link back to <code>./index.html</code>; GitHub repo <em>About</em> → homepage URL set via <code>gh api</code></div>
+              <div class="task-text">
+                <div class="task-title">Cross-links</div>
+                <div class="task-desc">SPEC / PLAN / PLAN-SITE footers link back to <code>./index.html</code>; GitHub repo <em>About</em> → homepage URL set via <code>gh api</code></div>
+              </div>
             </div>
           </div>
           <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: SNS card preview on the live URL · all cross-links resolve</p>
@@ -431,13 +434,17 @@
           <div class="tasks">
             <div class="task done">
               <iconify-icon icon="mdi:cloud-upload-outline" noobserver></iconify-icon>
-              <div class="task-title">Enable Pages</div>
-              <div class="task-desc">enabled via <code>gh api repos/noy4/docserve/pages -X POST</code> — <em>Deploy from a branch</em>: <code>main</code> + <code>/docs</code></div>
+              <div class="task-text">
+                <div class="task-title">Enable Pages</div>
+                <div class="task-desc">enabled via <code>gh api repos/noy4/docserve/pages -X POST</code> — <em>Deploy from a branch</em>: <code>main</code> + <code>/docs</code></div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:check-network-outline" noobserver></iconify-icon>
-              <div class="task-title">First deploy check</div>
-              <div class="task-desc">built in ~45 s · index / SPEC / PLAN / icon all 200 · <code>local.*</code> scratch correctly 404s</div>
+              <div class="task-text">
+                <div class="task-title">First deploy check</div>
+                <div class="task-desc">built in ~45 s · index / SPEC / PLAN / icon all 200</div>
+              </div>
             </div>
           </div>
           <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>https://noy4.github.io/docserve/</code> renders on desktop + mobile widths</p>
@@ -460,28 +467,38 @@
           <div class="tasks">
             <div class="task done">
               <iconify-icon icon="mdi:home-outline" noobserver></iconify-icon>
-              <div class="task-title">Hero</div>
-              <div class="task-desc">app icon (<code>icon.svg</code> copied into <code>docs/</code>) + <code>docserve</code> + tagline · install command <code>npx @noy4/docserve ~/reports --open</code> with a copy button · CTAs: Download (Releases) / GitHub / npm</div>
+              <div class="task-text">
+                <div class="task-title">Hero</div>
+                <div class="task-desc">app icon (<code>icon.svg</code> copied into <code>docs/</code>) + <code>docserve</code> + tagline · install command <code>npx @noy4/docserve ~/reports --open</code> with a copy button · CTAs: Download (Releases) / GitHub / npm</div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
-              <div class="task-title">Features grid</div>
-              <div class="task-desc">4 cards from the SPEC overview — Gallery / Auto reload / Desktop &amp; CLI / Zero dependencies</div>
+              <div class="task-text">
+                <div class="task-title">Features grid</div>
+                <div class="task-desc">4 cards from the SPEC overview — Gallery / Auto reload / Desktop &amp; CLI / Zero dependencies</div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
-              <div class="task-title">Usage — desktop-first</div>
-              <div class="task-desc">macOS app steps (Download / Open Anyway / pick a folder) leading, with CLI as a sub-section ("For CLI users")</div>
+              <div class="task-text">
+                <div class="task-title">Usage — desktop-first</div>
+                <div class="task-desc">macOS app steps (Download / Open Anyway / pick a folder) leading, with CLI as a sub-section ("For CLI users")</div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
-              <div class="task-title">Docs &amp; footer</div>
-              <div class="task-desc">relative card links to <code>SPEC.html</code> / <code>PLAN.html</code> · GitHub / npm / MIT · colophon</div>
+              <div class="task-text">
+                <div class="task-title">Docs &amp; footer</div>
+                <div class="task-desc">relative card links to <code>SPEC.html</code> / <code>PLAN.html</code> · GitHub / npm / MIT · colophon</div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:tag-outline" noobserver></iconify-icon>
-              <div class="task-title">Head meta</div>
-              <div class="task-desc"><code>description</code> · favicon (document SVG data URI) · viewport · theme-color (dark / light)</div>
+              <div class="task-text">
+                <div class="task-title">Head meta</div>
+                <div class="task-desc"><code>description</code> · favicon (document SVG data URI) · viewport · theme-color (dark / light)</div>
+              </div>
             </div>
           </div>
           <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: local preview — every link resolves relative to <code>/docserve/</code> · single-column layout at 400 px</p>
@@ -504,18 +521,24 @@
           <div class="tasks">
             <div class="task done">
               <iconify-icon icon="mdi:folder-plus-outline" noobserver></iconify-icon>
-              <div class="task-title">Create <code>docs/</code></div>
-              <div class="task-desc">branch-based deploy from <code>/docs</code> — no workflow to maintain; workflow-copy alternative rejected</div>
+              <div class="task-text">
+                <div class="task-title">Create <code>docs/</code></div>
+                <div class="task-desc">branch-based deploy from <code>/docs</code></div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:file-move-outline" noobserver></iconify-icon>
-              <div class="task-title">Move SPEC / PLAN</div>
-              <div class="task-desc">single source, published as-is · PLAN's <code>./SPEC.html</code> relative link survives the move</div>
+              <div class="task-text">
+                <div class="task-title">Move SPEC / PLAN</div>
+                <div class="task-desc">single source, published as-is · PLAN's <code>./SPEC.html</code> relative link survives the move</div>
+              </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
-              <div class="task-title">Fix README links</div>
-              <div class="task-desc"><code>./SPEC.html</code> → <code>./docs/SPEC.html</code> · add <code>PLAN.html</code> entry</div>
+              <div class="task-text">
+                <div class="task-title">Fix README links</div>
+                <div class="task-desc"><code>./SPEC.html</code> → <code>./docs/SPEC.html</code> · add <code>PLAN.html</code> entry</div>
+              </div>
             </div>
           </div>
           <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>docs/</code> holds 3 HTML files · README links resolve locally</p>
