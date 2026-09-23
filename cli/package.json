@@ -1,6 +1,6 @@
 {
   "name": "@noy4/docserve",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Serves a folder of HTML as a card gallery with live reload.",
   "type": "module",
   "bin": {
