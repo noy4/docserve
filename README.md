@@ -20,21 +20,12 @@ Click the menu bar icon to manage the server.
 
 ## ⌨️ CLI
 
-**Run without installing**
-
 ```bash
-npx @noy4/docserve ~/reports --open   # serve a folder (npx @noy4/docserve <folder>)
+npx @noy4/docserve ~/reports --open   # serve a folder (@noy4/docserve <folder>)
 npx @noy4/docserve stop               # stop the running server
 ```
 
-**Install globally**
-
-```bash
-npm install -g @noy4/docserve
-
-docserve ~/reports --open   # serve a folder (docserve <folder>)
-docserve stop               # stop the running server
-```
+Or install globally: `npm install -g @noy4/docserve` — then run `docserve <folder>`.
 
 ## 📚 Documentation
 
