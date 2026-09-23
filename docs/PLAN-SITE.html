@@ -416,11 +416,11 @@
       </div>
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:check-circle" style="color:var(--green)" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
-              <iconify-icon icon="mdi:cloud-upload-outline" style="color:var(--cyan)" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:cloud-upload-outline" style="color:var(--green)" noobserver></iconify-icon>
               Phase 3 — Publish
             </span>
             <span class="step-meta">P1</span>
@@ -429,15 +429,15 @@
             Turn on GitHub Pages and verify the first deploy.
           </div>
           <div class="tasks">
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:cloud-upload-outline" noobserver></iconify-icon>
               <div class="task-title">Enable Pages</div>
-              <div class="task-desc">Settings → Pages → <em>Deploy from a branch</em>: <code>main</code> + <code>/docs</code> (or <code>gh api repos/noy4/docserve/pages -X POST</code>)</div>
+              <div class="task-desc">enabled via <code>gh api repos/noy4/docserve/pages -X POST</code> — <em>Deploy from a branch</em>: <code>main</code> + <code>/docs</code></div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:check-network-outline" noobserver></iconify-icon>
               <div class="task-title">First deploy check</div>
-              <div class="task-desc">URL responds 200 · Geist Mono / iconify CDN load · SPEC and PLAN reachable from the landing</div>
+              <div class="task-desc">built in ~45 s · index / SPEC / PLAN / icon all 200 · <code>local.*</code> scratch correctly 404s</div>
             </div>
           </div>
           <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>https://noy4.github.io/docserve/</code> renders on desktop + mobile widths</p>
