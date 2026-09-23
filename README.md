@@ -38,7 +38,8 @@ docserve stop               # stop the running server
 
 ## 📚 Documentation
 
-- [SPEC.html](./SPEC.html) — design & implementation specification
+- [SPEC.html](./docs/SPEC.html) — design & implementation specification
+- [PLAN.html](./docs/PLAN.html) — implementation roadmap
 
 ## ⚖️ License
 

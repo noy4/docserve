@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="created_at" content="2026-09-23T18:05:00+09:00">
+<title>docserve | Site Plan</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234465DB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M8 13h8M8 17h5'/%3E%3C/svg%3E">
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0B0E14;
+    --surface: #151A23;
+    --surface-2: #21252F;
+    --border: #2C313F;
+    --border-strong: #383F50;
+    --text: #C3CDDC;
+    --text-strong: #F7F9FC;
+    --muted: #7E8A9E;
+    --primary: #4465DB;
+    --primary-soft: rgba(68, 101, 219, 0.15);
+    --accent: #F08A59;
+    --accent-soft: rgba(240, 138, 89, 0.15);
+    --green: #4ADE80;
+    --green-soft: rgba(74, 222, 128, 0.15);
+    --cyan: #38BDF8;
+    --purple: #A78BFA;
+    --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-2: #F1F5F9;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #334155;
+      --text-strong: #0F172A;
+      --muted: #64748B;
+      --primary: #2563EB;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --accent: #EA580C;
+      --accent-soft: rgba(234, 88, 12, 0.1);
+      --green: #16A34A;
+      --green-soft: rgba(22, 163, 74, 0.1);
+      --cyan: #0284C7;
+      --purple: #7C3AED;
+      color-scheme: light;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 0 16px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h1 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  /* Sections */
+  section { margin-top: 48px; }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  h2 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  p { margin-bottom: 12px; }
+  p strong { color: var(--text); }
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  /* Inline code & blocks */
+  code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.77rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 14px 0;
+  }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+    background: var(--surface);
+  }
+  td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    background: var(--surface);
+  }
+  tr:last-child td { border-bottom: none; }
+
+  /* Callout */
+  .callout {
+    background: var(--primary-soft);
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.84rem;
+    margin: 16px 0;
+    line-height: 1.65;
+  }
+  .callout iconify-icon {
+    font-size: 18px;
+    margin-right: 6px;
+    vertical-align: -3px;
+    color: var(--primary);
+  }
+
+  /* Timeline (phase cards) */
+  .timeline { position: relative; padding-left: 28px; margin: 20px 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: 2px;
+    background: var(--border-strong);
+  }
+  .timeline-step { position: relative; margin-bottom: 20px; }
+  .timeline-step:last-child { margin-bottom: 0; }
+  .step-check {
+    position: absolute;
+    left: -30px;
+    top: 2px;
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
+    color: var(--muted);
+    background: var(--bg);
+    border-radius: 50%;
+  }
+  .step-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .step-head {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .step-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-title iconify-icon { font-size: 22px; }
+  .step-meta {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    margin-left: auto;
+  }
+  .step-body {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .tasks {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .task > iconify-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--muted);
+  }
+  .task.done { background: transparent; }
+  .task.done > iconify-icon { color: var(--green); }
+  .task-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-strong);
+    line-height: 1.4;
+  }
+  .task-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  @media (max-width: 620px) {
+    .tasks { grid-template-columns: 1fr; }
+  }
+  .verify {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 12px 0 0;
+  }
+  .verify iconify-icon {
+    font-size: 15px;
+    color: var(--muted);
+    vertical-align: -2px;
+    margin-right: 6px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  footer ul { list-style: none; }
+  footer li { padding: 2px 0; }
+  footer li iconify-icon { color: var(--muted); font-size: 14px; vertical-align: -2px; margin-right: 6px; }
+  footer a { color: var(--primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .f-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .f-title iconify-icon { color: var(--primary); }
+  .colophon {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="badge-top">
+      <iconify-icon icon="mdi:web" noobserver></iconify-icon>
+      LANDING PAGE PLAN
+    </div>
+    <h1><iconify-icon icon="mdi:home-plus-outline" width="30" noobserver></iconify-icon>docserve Site Plan</h1>
+    <p class="tagline">Landing page &amp; GitHub Pages publishing roadmap.</p>
+  </header>
+
+  <!-- --- OVERVIEW --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:information-outline" width="24" noobserver></iconify-icon>Overview</h2>
+    <p class="section-desc">
+      Publish the product landing page on GitHub Pages. The site serves under the <code>/docserve/</code> subpath — every link must be relative.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Decision</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>URL</td><td><code>https://noy4.github.io/docserve/</code> — repo is public, so free Pages works</td></tr>
+          <tr><td>Pages source</td><td>Deploy from branch: <code>main</code> / <code>/docs</code>. No Actions, no <code>gh-pages</code> branch, zero build</td></tr>
+          <tr><td>Files</td><td><code>docs/index.html</code> (new landing) + <code>SPEC.html</code> / <code>PLAN.html</code> moved into <code>docs/</code>; <code>local.*</code> scratch stays at root, unpublished</td></tr>
+          <tr><td>Design</td><td>Reuse the SPEC.html tokens — CSS variables, Geist Mono, iconify MDI, auto light/dark, single static file</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <iconify-icon icon="mdi:information-outline" noobserver></iconify-icon>
+      <strong>Deploys:</strong> first publish takes 1–2 minutes; every push to <code>main</code> redeploys automatically.
+      Jekyll processes the folder but plain HTML passes through untouched — no <code>.nojekyll</code> needed.
+    </div>
+  </section>
+
+  <!-- --- PHASES --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:format-list-numbered" width="24" noobserver></iconify-icon>Roadmap</h2>
+
+    <div class="timeline">
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:star-four-points-outline" style="color:var(--purple)" noobserver></iconify-icon>
+              Phase 4 — Polish
+            </span>
+            <span class="step-meta">P2</span>
+          </div>
+          <div class="step-body">
+            Social preview and cross-links after the site is live.
+          </div>
+          <div class="tasks">
+            <div class="task">
+              <iconify-icon icon="mdi:card-text-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">OG / SNS card</div>
+                <div class="task-desc"><code>og:title</code> / <code>og:description</code> / <code>og:image</code> (gallery screenshot) · <code>twitter:card</code></div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
+              <div class="task-title">README banner</div>
+              <div class="task-desc">live site URL at the top · Documentation section gains <code>PLAN.html</code> and the landing link</div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:arrow-u-left-top" noobserver></iconify-icon>
+              <div class="task-title">Cross-links</div>
+              <div class="task-desc">SPEC / PLAN footers link back to the landing page; GitHub repo <em>About</em> → homepage URL</div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: SNS card preview on the live URL · all cross-links resolve</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:cloud-upload-outline" style="color:var(--cyan)" noobserver></iconify-icon>
+              Phase 3 — Publish
+            </span>
+            <span class="step-meta">P1</span>
+          </div>
+          <div class="step-body">
+            Turn on GitHub Pages and verify the first deploy.
+          </div>
+          <div class="tasks">
+            <div class="task">
+              <iconify-icon icon="mdi:cloud-upload-outline" noobserver></iconify-icon>
+              <div class="task-title">Enable Pages</div>
+              <div class="task-desc">Settings → Pages → <em>Deploy from a branch</em>: <code>main</code> + <code>/docs</code> (or <code>gh api repos/noy4/docserve/pages -X POST</code>)</div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:check-network-outline" noobserver></iconify-icon>
+              <div class="task-title">First deploy check</div>
+              <div class="task-desc">URL responds 200 · Geist Mono / iconify CDN load · SPEC and PLAN reachable from the landing</div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>https://noy4.github.io/docserve/</code> renders on desktop + mobile widths</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:check-circle" style="color:var(--green)" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:palette-outline" style="color:var(--green)" noobserver></iconify-icon>
+              Phase 2 — Landing page
+            </span>
+            <span class="step-meta">P0</span>
+          </div>
+          <div class="step-body">
+            One static <code>docs/index.html</code> in the SPEC.html design language. Served under the subpath, so all internal links are relative. English; no how-it-works section (decided: screenshot / architecture figure both dropped).
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:home-outline" noobserver></iconify-icon>
+              <div class="task-title">Hero</div>
+              <div class="task-desc">app icon (<code>icon.svg</code> copied into <code>docs/</code>) + <code>docserve</code> + tagline · install command <code>npx @noy4/docserve ~/reports --open</code> with a copy button · CTAs: Download (Releases) / GitHub / npm</div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
+              <div class="task-title">Features grid</div>
+              <div class="task-desc">4 cards from the SPEC overview — Gallery / Auto reload / Desktop &amp; CLI / Zero dependencies</div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
+              <div class="task-title">Usage — desktop-first</div>
+              <div class="task-desc">macOS app steps (Download / Open Anyway / pick a folder) leading, with CLI as a sub-section ("For CLI users")</div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+              <div class="task-title">Docs &amp; footer</div>
+              <div class="task-desc">relative card links to <code>SPEC.html</code> / <code>PLAN.html</code> · GitHub / npm / MIT · colophon</div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:tag-outline" noobserver></iconify-icon>
+              <div class="task-title">Head meta</div>
+              <div class="task-desc"><code>description</code> · favicon (document SVG data URI) · viewport · theme-color (dark / light)</div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: local preview — every link resolves relative to <code>/docserve/</code> · single-column layout at 400 px</p>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:check-circle" style="color:var(--green)" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:folder-multiple-outline" style="color:var(--green)" noobserver></iconify-icon>
+              Phase 1 — Scaffold
+            </span>
+            <span class="step-meta">P0</span>
+          </div>
+          <div class="step-body">
+            Create the Pages source folder and consolidate the doc files into it.
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:folder-plus-outline" noobserver></iconify-icon>
+              <div class="task-title">Create <code>docs/</code></div>
+              <div class="task-desc">branch-based deploy from <code>/docs</code> — no workflow to maintain; workflow-copy alternative rejected</div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:file-move-outline" noobserver></iconify-icon>
+              <div class="task-title">Move SPEC / PLAN</div>
+              <div class="task-desc">single source, published as-is · PLAN's <code>./SPEC.html</code> relative link survives the move</div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+              <div class="task-title">Fix README links</div>
+              <div class="task-desc"><code>./SPEC.html</code> → <code>./docs/SPEC.html</code> · add <code>PLAN.html</code> entry</div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>docs/</code> holds 3 HTML files · README links resolve locally</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="f-title">
+      <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+      Related
+    </div>
+    <ul>
+      <li><iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon><a href="./SPEC.html" target="_blank" rel="noopener">SPEC.html</a> — design &amp; implementation specification</li>
+      <li><iconify-icon icon="mdi:flag-checkered" noobserver></iconify-icon><a href="./PLAN.html" target="_blank" rel="noopener">PLAN.html</a> — docserve implementation roadmap</li>
+      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://docs.github.com/en/pages/quickstart" target="_blank" rel="noopener">GitHub Pages quickstart</a> — branch-based publishing</li>
+    </ul>
+    <div class="colophon">docserve SITE PLAN · 2026-09-23</div>
+  </footer>
+
+</div>
+</body>
+</html>

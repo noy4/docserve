@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="docserve serves a folder of HTML as a card gallery with live reload. Zero dependencies — a macOS menubar app and a Node CLI.">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0E14">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F8FAFC">
+<title>docserve — serve a folder of HTML as a card gallery</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234465DB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M8 13h8M8 17h5'/%3E%3C/svg%3E">
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0B0E14;
+    --surface: #151A23;
+    --surface-2: #21252F;
+    --border: #2C313F;
+    --border-strong: #383F50;
+    --text: #C3CDDC;
+    --text-strong: #F7F9FC;
+    --muted: #7E8A9E;
+    --primary: #4465DB;
+    --primary-soft: rgba(68, 101, 219, 0.15);
+    --accent: #F08A59;
+    --accent-soft: rgba(240, 138, 89, 0.15);
+    --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-2: #F1F5F9;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #334155;
+      --text-strong: #0F172A;
+      --muted: #64748B;
+      --primary: #2563EB;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --accent: #EA580C;
+      --accent-soft: rgba(234, 88, 12, 0.1);
+      color-scheme: light;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 0 16px;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 72px 0 56px;
+  }
+  .logo {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 20px;
+  }
+  .badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(2.1rem, 6vw, 2.7rem);
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .tagline {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.65;
+    margin-bottom: 28px;
+  }
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+  }
+  .install code {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text-strong);
+    background: none;
+    padding: 0;
+  }
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+  .cta-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+  }
+  .btn:hover { border-color: var(--muted); }
+  .btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { filter: brightness(1.1); border-color: var(--primary); }
+  .btn iconify-icon { font-size: 17px; }
+
+  /* Sections */
+  section { margin-top: 56px; }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  h2 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    margin: 28px 0 10px;
+  }
+  h3 iconify-icon { color: var(--accent); font-size: 18px; flex-shrink: 0; }
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.77rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 12px 0;
+  }
+
+  /* Cards */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (max-width: 620px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card .card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .card .card-head iconify-icon {
+    font-size: 22px;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  .card h4 {
+    font-size: 0.95rem;
+    color: var(--text-strong);
+    font-weight: 600;
+    margin: 0;
+  }
+  .card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .card p strong { color: var(--text); }
+
+  /* Desktop steps */
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border: 1px solid var(--primary);
+    border-radius: 999px;
+    margin-top: 3px;
+  }
+  .step p { font-size: 0.86rem; color: var(--muted); line-height: 1.65; }
+  .step p strong { color: var(--text); }
+  .step a { color: var(--primary); text-decoration: none; font-weight: 600; }
+  .step a:hover { text-decoration: underline; }
+  .step-note {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 8px 0 0;
+  }
+  .step-note iconify-icon {
+    font-size: 15px;
+    vertical-align: -2px;
+    margin-right: 6px;
+    color: var(--accent);
+  }
+  .cli-note {
+    color: var(--muted);
+    font-size: 0.82rem;
+    margin-top: 10px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  footer ul { list-style: none; }
+  footer li { padding: 2px 0; }
+  footer li iconify-icon { color: var(--muted); font-size: 14px; vertical-align: -2px; margin-right: 6px; }
+  footer a { color: var(--primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .f-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .f-title iconify-icon { color: var(--primary); }
+  .colophon {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <img class="logo" src="./icon.svg" alt="docserve icon">
+    <div>
+      <span class="badge-top">
+        <iconify-icon icon="mdi:github" noobserver></iconify-icon>
+        OPEN SOURCE · MIT
+      </span>
+    </div>
+    <h1>docserve</h1>
+    <p class="tagline">Serves a folder of HTML as a card gallery with live reload.</p>
+    <div class="install">
+      <code>npx @noy4/docserve ~/reports --open</code>
+      <button class="copy-btn" id="copy-btn" type="button">Copy</button>
+    </div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/noy4/docserve/releases" target="_blank" rel="noopener">
+        <iconify-icon icon="mdi:tray-arrow-down" noobserver></iconify-icon>
+        Download for macOS
+      </a>
+      <a class="btn" href="https://github.com/noy4/docserve" target="_blank" rel="noopener">
+        <iconify-icon icon="mdi:github" noobserver></iconify-icon>
+        GitHub
+      </a>
+      <a class="btn" href="https://www.npmjs.com/package/@noy4/docserve" target="_blank" rel="noopener">
+        <iconify-icon icon="mdi:npm" noobserver></iconify-icon>
+        npm
+      </a>
+    </div>
+  </header>
+
+  <!-- --- FEATURES --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:view-grid-outline" width="24" noobserver></iconify-icon>Features</h2>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
+          <h4>Gallery</h4>
+        </div>
+        <p>Card grid, iframe previews, copy-path button, automatic date resolution.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
+          <h4>Auto reload</h4>
+        </div>
+        <p>Add, edit, and delete are pushed to open tabs via WebSocket.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
+          <h4>Desktop &amp; CLI</h4>
+        </div>
+        <p>Control it from the menu bar or the terminal.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
+          <h4>Zero dependencies</h4>
+        </div>
+        <p>Node stdlib only (<code>http</code> / <code>fs.watch</code> / <code>crypto</code>). No <code>npm install</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- --- GETTING STARTED --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:download-outline" width="24" noobserver></iconify-icon>Getting started</h2>
+
+    <h3><iconify-icon icon="mdi:apple" noobserver></iconify-icon>macOS app</h3>
+    <div class="step">
+      <span class="step-num">1</span>
+      <p><strong>Download</strong> — the DMG for your Mac from the <a href="https://github.com/noy4/docserve/releases" target="_blank" rel="noopener">Releases</a> page (<code>arm64</code> for Apple Silicon)</p>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong>, then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <p><strong>Pick a folder</strong> — the gallery opens in your browser</p>
+    </div>
+    <p class="step-note">
+      <iconify-icon icon="mdi:menu" noobserver></iconify-icon>
+      Click the menu bar icon to start, stop, or switch the served folder.
+    </p>
+
+    <h3><iconify-icon icon="mdi:console" noobserver></iconify-icon>For CLI users</h3>
+    <pre>npx @noy4/docserve ~/reports --open   <span style="color:var(--muted)"># serve a folder</span>
+npx @noy4/docserve stop               <span style="color:var(--muted)"># stop the running server</span></pre>
+    <p class="cli-note">Or install globally: <code>npm install -g @noy4/docserve</code> — then run <code>docserve &lt;folder&gt;</code>.</p>
+  </section>
+
+  <!-- --- DOCUMENTATION --- -->
+  <section>
+    <h2><iconify-icon icon="mdi:book-open-variant" width="24" noobserver></iconify-icon>Documentation</h2>
+
+    <div class="grid-2">
+      <a class="card" href="./SPEC.html" style="text-decoration:none">
+        <div class="card-head">
+          <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
+          <h4>SPEC.html</h4>
+        </div>
+        <p>Design &amp; implementation specification — serving, gallery, reload protocol, injection.</p>
+      </a>
+      <a class="card" href="./PLAN.html" style="text-decoration:none">
+        <div class="card-head">
+          <iconify-icon icon="mdi:flag-checkered" noobserver></iconify-icon>
+          <h4>PLAN.html</h4>
+        </div>
+        <p>The implementation roadmap — server core, live reload, CLI, tests, distribution, npm.</p>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="f-title">
+      <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+      Links
+    </div>
+    <ul>
+      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/noy4/docserve" target="_blank" rel="noopener">noy4/docserve</a> — source &amp; issue tracker</li>
+      <li><iconify-icon icon="mdi:npm" noobserver></iconify-icon><a href="https://www.npmjs.com/package/@noy4/docserve" target="_blank" rel="noopener">@noy4/docserve</a> — npm package</li>
+      <li><iconify-icon icon="mdi:scale-balance" noobserver></iconify-icon><a href="https://github.com/noy4/docserve/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
+    </ul>
+    <div class="colophon">docserve · published with GitHub Pages · 2026</div>
+  </footer>
+
+</div>
+<script>
+  document.getElementById('copy-btn').addEventListener('click', async function () {
+    try { await navigator.clipboard.writeText('npx @noy4/docserve ~/reports --open'); } catch (e) {}
+    this.textContent = 'Copied';
+    setTimeout(() => { this.textContent = 'Copy'; }, 1200);
+  });
+</script>
+</body>
+</html>
