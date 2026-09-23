@@ -12,12 +12,9 @@ Serves a folder of HTML as a card gallery with live reload.
 
 ## 🖥️ Desktop app
 
-1. **Download** — the DMG for your Mac from [Releases](../../releases) (`arm64` for Apple Silicon, x64 otherwise)
-2. **Launch** — on the security warning, click **Done** (not **Move to Trash**), then approve via **Open Anyway** in System Settings → Privacy & Security
+1. **Download** — the DMG for your Mac from [Releases](../../releases) (`arm64` for Apple Silicon)
+2. **Launch** — on the security warning, click **Done** (not **Move to Trash**), then approve via **Open Anyway** in `System Settings → Privacy & Security` (the app isn't verified by Apple — that requires joining the Apple Developer Program, $99/year)
 3. **Pick a folder** — the gallery opens in your browser
-
-> [!NOTE]
-> The warning appears because the app isn't verified by Apple (that requires joining the Apple Developer Program, $99/year).
 
 Click the menu bar icon to manage the server.
 
@@ -26,7 +23,7 @@ Click the menu bar icon to manage the server.
 **Run without installing**
 
 ```bash
-npx docserve ~/reports --open   # serve a folder
+npx docserve ~/reports --open   # serve a folder (npx docserve <folder>)
 npx docserve stop               # stop the running server
 ```
 
@@ -35,7 +32,7 @@ npx docserve stop               # stop the running server
 ```bash
 npm install -g docserve
 
-docserve ~/reports --open   # serve a folder
+docserve ~/reports --open   # serve a folder (docserve <folder>)
 docserve stop               # stop the running server
 ```
 
