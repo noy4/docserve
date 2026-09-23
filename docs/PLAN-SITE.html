@@ -339,17 +339,17 @@
   <header class="hero">
     <div class="badge-top">
       <iconify-icon icon="mdi:web" noobserver></iconify-icon>
-      LANDING PAGE PLAN
+      HOMEPAGE PLAN
     </div>
     <h1><iconify-icon icon="mdi:home-plus-outline" width="30" noobserver></iconify-icon>docserve Site Plan</h1>
-    <p class="tagline">Landing page &amp; GitHub Pages publishing roadmap.</p>
+    <p class="tagline">Homepage &amp; GitHub Pages publishing roadmap.</p>
   </header>
 
   <!-- --- OVERVIEW --- -->
   <section>
     <h2><iconify-icon icon="mdi:information-outline" width="24" noobserver></iconify-icon>Overview</h2>
     <p class="section-desc">
-      Publish the product landing page on GitHub Pages. The site serves under the <code>/docserve/</code> subpath — every link must be relative.
+      Publish the product homepage on GitHub Pages. The site serves under the <code>/docserve/</code> subpath — every link must be relative.
     </p>
 
     <div class="table-wrap">
@@ -360,7 +360,7 @@
         <tbody>
           <tr><td>URL</td><td><code>https://noy4.github.io/docserve/</code> — repo is public, so free Pages works</td></tr>
           <tr><td>Pages source</td><td>Deploy from branch: <code>main</code> / <code>/docs</code>. No Actions, no <code>gh-pages</code> branch, zero build</td></tr>
-          <tr><td>Files</td><td><code>docs/index.html</code> (new landing) + <code>SPEC.html</code> / <code>PLAN.html</code> moved into <code>docs/</code>; <code>local.*</code> scratch stays at root, unpublished</td></tr>
+          <tr><td>Files</td><td><code>docs/index.html</code> (new homepage) + <code>SPEC.html</code> / <code>PLAN.html</code> moved into <code>docs/</code>; <code>local.*</code> scratch stays at root, unpublished</td></tr>
           <tr><td>Design</td><td>Reuse the SPEC.html tokens — CSS variables, Geist Mono, iconify MDI, auto light/dark, single static file</td></tr>
         </tbody>
       </table>
@@ -380,11 +380,11 @@
     <div class="timeline">
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:check-circle" style="color:var(--green)" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
-              <iconify-icon icon="mdi:star-four-points-outline" style="color:var(--purple)" noobserver></iconify-icon>
+              <iconify-icon icon="mdi:star-four-points-outline" style="color:var(--green)" noobserver></iconify-icon>
               Phase 4 — Polish
             </span>
             <span class="step-meta">P2</span>
@@ -393,22 +393,22 @@
             Social preview and cross-links after the site is live.
           </div>
           <div class="tasks">
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:card-text-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">OG / SNS card</div>
-                <div class="task-desc"><code>og:title</code> / <code>og:description</code> / <code>og:image</code> (gallery screenshot) · <code>twitter:card</code></div>
+                <div class="task-desc"><code>og:title</code> / <code>og:description</code> / <code>og:url</code> / <code>og:image</code> = <code>icon.png</code> (1024×1024 — SVG は SNS クローラ非対応のため PNG) · <code>twitter:card</code> summary</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
               <div class="task-title">README banner</div>
-              <div class="task-desc">live site URL at the top · Documentation section gains <code>PLAN.html</code> and the landing link</div>
+              <div class="task-desc">homepage URL added under the tagline · Documentation lists SPEC / PLAN</div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:arrow-u-left-top" noobserver></iconify-icon>
               <div class="task-title">Cross-links</div>
-              <div class="task-desc">SPEC / PLAN footers link back to the landing page; GitHub repo <em>About</em> → homepage URL</div>
+              <div class="task-desc">SPEC / PLAN / PLAN-SITE footers link back to <code>./index.html</code>; GitHub repo <em>About</em> → homepage URL set via <code>gh api</code></div>
             </div>
           </div>
           <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: SNS card preview on the live URL · all cross-links resolve</p>
@@ -450,7 +450,7 @@
           <div class="step-head">
             <span class="step-title">
               <iconify-icon icon="mdi:palette-outline" style="color:var(--green)" noobserver></iconify-icon>
-              Phase 2 — Landing page
+              Phase 2 — Homepage
             </span>
             <span class="step-meta">P0</span>
           </div>
@@ -531,6 +531,7 @@
       Related
     </div>
     <ul>
+      <li><iconify-icon icon="mdi:home-outline" noobserver></iconify-icon><a href="./index.html" target="_blank" rel="noopener">docserve — homepage</a></li>
       <li><iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon><a href="./SPEC.html" target="_blank" rel="noopener">SPEC.html</a> — design &amp; implementation specification</li>
       <li><iconify-icon icon="mdi:flag-checkered" noobserver></iconify-icon><a href="./PLAN.html" target="_blank" rel="noopener">PLAN.html</a> — docserve implementation roadmap</li>
       <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://docs.github.com/en/pages/quickstart" target="_blank" rel="noopener">GitHub Pages quickstart</a> — branch-based publishing</li>

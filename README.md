@@ -4,6 +4,8 @@
 
 Serves a folder of HTML as a card gallery with live reload.
 
+[Homepage](https://noy4.github.io/docserve/)
+
 ## ✨ Features
 
 - 🖼️ **Gallery** — card grid, iframe previews, copy path, auto date resolution
@@ -21,7 +23,7 @@ Click the menu bar icon to manage the server.
 ## ⌨️ CLI
 
 ```bash
-npx @noy4/docserve ~/reports --open   # serve a folder (@noy4/docserve <folder>)
+npx @noy4/docserve ~/reports --open   # serve a folder (npx @noy4/docserve <folder>)
 npx @noy4/docserve stop               # stop the running server
 ```
 
