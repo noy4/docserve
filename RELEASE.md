@@ -11,3 +11,4 @@ Notes:
 
 - Forgetting step 1 means existing users never see the "New version available" tray notice
 - Always clean `desktop/dist` first so stale DMGs don't ship
+- The build is ad-hoc signed via the `afterPack` hook — without it, macOS on Apple Silicon reports the app as "damaged"

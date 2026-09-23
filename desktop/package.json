@@ -1,7 +1,7 @@
 {
   "name": "docserve-desktop",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "docserve desktop app",
   "author": "noy4",
   "main": "src/main.mjs",
@@ -13,6 +13,7 @@
   "build": {
     "appId": "dev.docserve.desktop",
     "productName": "Docserve",
+    "afterPack": "scripts/adhoc-sign.cjs",
     "directories": {
       "output": "dist"
     },
