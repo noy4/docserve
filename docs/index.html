@@ -209,8 +209,20 @@
     gap: 12px;
     margin: 16px 0;
   }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (min-width: 524px) and (max-width: 775px) {
+    .grid-3 .card:last-child { grid-column: 1 / -1; }
+  }
   @media (max-width: 620px) {
     .grid-2 { grid-template-columns: 1fr; }
+    .hero { padding: 48px 0 40px; }
+    .logo { width: 104px; height: 104px; }
+    section { margin-top: 40px; }
   }
   .card {
     background: var(--surface);
@@ -228,6 +240,15 @@
     font-size: 22px;
     color: var(--primary);
     flex-shrink: 0;
+  }
+  .grid-3 .card .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .grid-3 .card .card-head iconify-icon {
+    font-size: 26px;
   }
   .card h4 {
     font-size: 0.95rem;
@@ -345,15 +366,13 @@
 
   <!-- --- FEATURES --- -->
   <section>
-    <h2><iconify-icon icon="mdi:view-grid-outline" width="24" noobserver></iconify-icon>Features</h2>
-
-    <div class="grid-2">
+    <div class="grid-3">
       <div class="card">
         <div class="card-head">
           <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
           <h4>Gallery</h4>
         </div>
-        <p>Card grid, iframe previews, copy-path button, automatic date resolution.</p>
+        <p>Card grid, iframe previews, copy-path button.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -368,13 +387,6 @@
           <h4>Desktop &amp; CLI</h4>
         </div>
         <p>Control it from the menu bar or the terminal.</p>
-      </div>
-      <div class="card">
-        <div class="card-head">
-          <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
-          <h4>Zero dependencies</h4>
-        </div>
-        <p>Node stdlib only (<code>http</code> / <code>fs.watch</code> / <code>crypto</code>). No <code>npm install</code>.</p>
       </div>
     </div>
   </section>
