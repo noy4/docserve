@@ -95,15 +95,32 @@ describe("docserve server", () => {
   })
 
   it("lists html files with resolved metadata on /api/files", async () => {
+    writeFileSync(join(content, "favicon.svg"), "<svg xmlns='http://www.w3.org/2000/svg'/>")
+    writeFileSync(join(content, "fav.html"), '<html><head><link rel="icon" href="favicon.svg"><title>Fav</title></head></html>')
+    writeFileSync(join(content, "data-icon.html"), `<html><head><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='#d6492f'/></svg>"></head></html>`)
+    writeFileSync(join(content, "escaping.html"), '<html><head><link rel="icon" href="../outside.png"></head></html>')
+    mkdirSync(join(content, "nested"), { recursive: true })
+    writeFileSync(join(content, "nested/linked.html"), '<html><head><link rel="shortcut icon" href="icons/deep.png"></head></html>')
+
     const files = await (await fetch(`http://localhost:${port}/api/files`)).json()
     assert.ok(Array.isArray(files))
     const page = files.find((f) => f.path.endsWith("page.html"))
     assert.ok(page)
-    assert.deepEqual(Object.keys(page).sort(), ["created", "modified", "path", "title", "url"])
+    assert.deepEqual(Object.keys(page).sort(), ["created", "modified", "path", "title", "url"], "no favicon key when unset")
     assert.equal(page.url, "/page.html")
     assert.equal(page.title, "page.html", "title falls back to the file name")
     assert.equal(typeof page.created, "number")
     assert.equal(typeof page.modified, "number")
+
+    const fav = files.find((f) => f.path.endsWith("fav.html"))
+    assert.equal(fav.favicon, "/favicon.svg", "relative href resolves against the page URL")
+    assert.equal(
+      files.find((f) => f.path.endsWith("data-icon.html")).favicon,
+      "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23d6492f'/></svg>",
+      "data URI with raw <> and inner quotes survives; raw # is percent-encoded",
+    )
+    assert.equal(files.find((f) => f.path.endsWith("linked.html")).favicon, "/nested/icons/deep.png")
+    assert.equal(files.find((f) => f.path.endsWith("escaping.html")).favicon, undefined, "hrefs escaping docsDir are dropped")
   })
 
   it("answers 403, 400 and 404 for bad paths", async () => {
@@ -113,7 +130,7 @@ describe("docserve server", () => {
   })
 
   it("targets only the page whose file changed", async () => {
-    mkdirSync(join(content, "nested"))
+    mkdirSync(join(content, "nested"), { recursive: true })
     const changed = join(content, "nested/changed.html")
     writeFileSync(changed, "<html>before</html>")
     writeFileSync(join(content, "nested/untouched.html"), "<html>before</html>")

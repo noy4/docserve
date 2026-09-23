@@ -509,7 +509,7 @@
         </thead>
         <tbody>
           <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched from <code>/api/files</code>; <code>docsDir/index.html</code> is excluded</td></tr>
-          <tr><td><code>/api/files</code></td><td>JSON list: <code>title</code>, <code>url</code> (docsDir-relative link), <code>path</code> (absolute), <code>created</code>, <code>modified</code> per <code>*.html</code></td></tr>
+          <tr><td><code>/api/files</code></td><td>JSON list: <code>title</code>, <code>url</code> (docsDir-relative link), <code>path</code> (absolute), <code>created</code>, <code>modified</code>, <code>favicon</code> (resolved <code>&lt;link rel="icon"&gt;</code> URL, omitted when unset) per <code>*.html</code></td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
         </tbody>
@@ -536,6 +536,7 @@
         </thead>
         <tbody>
           <tr><td>Title</td><td>Page <code>&lt;title&gt;</code>, falling back to the file name</td></tr>
+          <tr><td>Favicon</td><td>Page <code>&lt;link rel="icon"&gt;</code>, shown before the title; hidden when unset</td></tr>
           <tr><td>Preview</td><td><code>&lt;iframe&gt;</code> of the page, lazy-loaded</td></tr>
           <tr><td>Created / Modified</td><td>Date resolution below</td></tr>
           <tr><td>Copy path</td><td>Absolute file path to the clipboard</td></tr>

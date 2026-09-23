@@ -140,6 +140,14 @@
   }
 
   .meta .title { font-size: 0.85rem; font-weight: 600; line-height: 1.4; }
+  .meta .title .favicon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    vertical-align: -3px;
+    border-radius: 4px;
+    object-fit: contain;
+  }
   .date { font-size: 0.7rem; color: var(--muted); }
 
   .empty {
@@ -289,7 +297,18 @@
         }),
       ]),
       el("div", { class: "meta" }, [
-        el("div", { class: "title", text: file.title }),
+        el("div", { class: "title" }, [
+          file.favicon
+            ? el("img", {
+                class: "favicon",
+                src: file.favicon,
+                alt: "",
+                loading: "lazy",
+                onerror: (e) => e.currentTarget.remove(),
+              })
+            : null,
+          el("span", { text: file.title }),
+        ]),
         el("div", { class: "date", text: displayDate(file.created) }),
       ]),
     ])
