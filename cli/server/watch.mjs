@@ -1,18 +1,22 @@
 // UpdateListener: watch docsDir recursively for *.html changes and broadcast
-// debounced batches over the reload socket.
+// debounced batches over the reload socket. The gallery template is watched
+// too; its edits set templateChanged so gallery tabs pick them up even though
+// nothing in docsDir changed.
 //
 // The gallery list is every *.html except any index.html; files outside that
 // set never flip contentSetChanged.
 import { existsSync, watch } from "node:fs"
-import { basename, resolve } from "node:path"
+import { basename, dirname, resolve } from "node:path"
 import { isWithin, listHtmlFiles, normalizedRelative } from "./files.mjs"
 
 const DEBOUNCE_MS = 50 // like livePreview.previewDebounceDelay
+const TEMPLATE_TOUCH = "\u0000template" // sentinel: never a real docsDir-relative path
 
 export class UpdateListener {
   constructor(options = {}) {
     this.wss = options.wss
     this.docsDir = options.docsDir
+    this.templatePath = options.templatePath
     this.debounceMs = options.debounceMs ?? DEBOUNCE_MS
     this.knownFiles = new Set()
     this.broadcastQueue = Promise.resolve()
@@ -42,12 +46,25 @@ export class UpdateListener {
         this.queueBroadcast(normalizedRelative(this.docsDir, full))
       }).on("error", () => {}),
     )
+
+    if (this.templatePath) {
+      // Watch the template's directory: atomic saves replace the file, so the
+      // file itself would miss events.
+      const templateName = basename(this.templatePath)
+      this.watchers.push(
+        watch(dirname(this.templatePath), (event, filename) => {
+          if (filename === templateName) this.queueBroadcast(TEMPLATE_TOUCH)
+        }).on("error", () => {}),
+      )
+    }
   }
 
   async broadcastChanges(touched) {
     let contentSetChanged = false
+    const templateChanged = touched.includes(TEMPLATE_TOUCH)
+    const pages = touched.filter((rel) => rel !== TEMPLATE_TOUCH)
 
-    for (const rel of touched) {
+    for (const rel of pages) {
       if (basename(rel) === "index.html") continue // never a gallery card
       const full = resolve(this.docsDir, rel)
       const exists = existsSync(full)
@@ -62,7 +79,7 @@ export class UpdateListener {
       }
     }
 
-    this.wss.broadcast({ type: "change", pages: touched, contentSetChanged })
+    this.wss.broadcast({ type: "change", pages, contentSetChanged, templateChanged })
   }
 
   close() {

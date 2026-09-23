@@ -48,7 +48,7 @@ const MIME = {
 
 export async function runServer({ docsDir, port: initialPort, open = false }) {
   const wss = new WebSocketServer({ path: WS_PATH })
-  const updateListener = new UpdateListener({ wss, docsDir })
+  const updateListener = new UpdateListener({ wss, docsDir, templatePath: INDEX_TEMPLATE })
   let port = initialPort // actually bound port (may fall back +1 on conflict)
 
   const cleanup = () => {

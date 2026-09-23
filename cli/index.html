@@ -35,7 +35,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-    padding: 40px 24px;
+    padding: 40px 80px;
   }
 
   h1 {
@@ -324,12 +324,14 @@
   }
 
   function connectLiveReload() {
-    // Reload when the set of files changes; a dropped socket recovers after restart.
+    // Reload when the set of files or the gallery template itself changes;
+    // a dropped socket recovers after restart.
     const ws = new WebSocket(`${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/__reload`)
     ws.addEventListener("message", (e) => {
       let change
       try { change = JSON.parse(e.data) } catch { return }
-      if (change?.type === "change" && change.contentSetChanged) location.reload()
+      if (change?.type === "change" && (change.contentSetChanged || change.templateChanged))
+        location.reload()
     })
     ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000))
   }

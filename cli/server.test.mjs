@@ -124,7 +124,12 @@ describe("docserve server", () => {
     try {
       writeFileSync(changed, "<html>after</html>")
       const change = await waitForChange(ws, (c) => c.pages.includes("nested/changed.html"))
-      assert.deepEqual(change, { type: "change", pages: ["nested/changed.html"], contentSetChanged: false })
+      assert.deepEqual(change, {
+        type: "change",
+        pages: ["nested/changed.html"],
+        contentSetChanged: false,
+        templateChanged: false,
+      })
     } finally {
       ws.close()
     }
@@ -140,6 +145,7 @@ describe("docserve server", () => {
         type: "change",
         pages: [".tmp-gallery-add.html"],
         contentSetChanged: true,
+        templateChanged: false,
       })
 
       writeFileSync(file, "<html>edited</html>")
@@ -147,6 +153,7 @@ describe("docserve server", () => {
         type: "change",
         pages: [".tmp-gallery-add.html"],
         contentSetChanged: false,
+        templateChanged: false,
       })
 
       rmSync(file)
@@ -154,9 +161,29 @@ describe("docserve server", () => {
         type: "change",
         pages: [".tmp-gallery-add.html"],
         contentSetChanged: true,
+        templateChanged: false,
       })
     } finally {
       rmSync(file, { force: true })
+      ws.close()
+    }
+  })
+
+  it("flags gallery template edits so open galleries reload", async () => {
+    const ws = new WebSocket(`ws://localhost:${port}${WS_PATH}`)
+    await once(ws, "open")
+    const template = join(dirname(CLI), "index.html")
+    const original = readFileSync(template, "utf8")
+    try {
+      writeFileSync(template, `${original}\n<!-- template touch -->`)
+      assert.deepEqual(await waitForChange(ws, (c) => c.templateChanged), {
+        type: "change",
+        pages: [],
+        contentSetChanged: false,
+        templateChanged: true,
+      })
+    } finally {
+      writeFileSync(template, original)
       ws.close()
     }
   })

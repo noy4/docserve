@@ -556,10 +556,11 @@
       Open tabs stay current through a WebSocket at <code>/__reload</code>. File events are batched for 50 ms and broadcast as one message.
     </p>
 
-    <pre>{ "type": "change", "pages": ["foo.html", "sub/bar.html"], "contentSetChanged": false }</pre>
+    <pre>{ "type": "change", "pages": ["foo.html", "sub/bar.html"], "contentSetChanged": false, "templateChanged": false }</pre>
 
     <p class="section-desc">
-      <code>pages</code> holds the docsDir-relative paths touched in the batch; <code>contentSetChanged</code> is true when a file was added or removed.
+      <code>pages</code> holds the docsDir-relative paths touched in the batch; <code>contentSetChanged</code> is true when a file was added or removed;
+      <code>templateChanged</code> is true when the gallery template itself was edited.
     </p>
 
     <div class="table-wrap">
@@ -569,7 +570,7 @@
         </thead>
         <tbody>
           <tr><td>Page tab</td><td>Its own path appears in <code>pages</code></td></tr>
-          <tr><td>Gallery tab</td><td><code>contentSetChanged</code> is <code>true</code></td></tr>
+          <tr><td>Gallery tab</td><td><code>contentSetChanged</code> or <code>templateChanged</code> is <code>true</code></td></tr>
           <tr><td>iframe preview</td><td>Never connects — the <code>window.self !== window.top</code> guard keeps edits from reloading previews</td></tr>
         </tbody>
       </table>
