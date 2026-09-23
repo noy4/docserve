@@ -1,0 +1,32 @@
+# Publishes the desktop app (Docserve.app) on v* tags.
+#
+# Unsigned build — no secrets required. Both DMG archs build in one job;
+# artifacts land on a GitHub Release created with gh.
+#
+# Note: tags are v* for the desktop app and cli-v* for the CLI (publish-cli.yml).
+name: release-desktop
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - run: npm ci
+        working-directory: desktop
+      - run: npm run dist
+        working-directory: desktop
+      - run: shasum -a 256 dist/*.dmg | sed 's|dist/||' > dist/sha256sums.txt
+        working-directory: desktop
+      - run: gh release create "$GITHUB_REF_NAME" dist/Docserve-*.dmg dist/sha256sums.txt --title "Docserve ${GITHUB_REF_NAME#v}" --generate-notes
+        working-directory: desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
