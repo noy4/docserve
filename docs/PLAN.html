@@ -336,11 +336,11 @@
                 <div class="task-desc">same <code>docsDir</code> → point at its URL (unchanged) · different <code>docsDir</code> → start a new instance instead of erroring · port fallback +1 already avoids collisions</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:console" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title"><code>stop</code> / <code>status</code></div>
-                <div class="task-desc"><code>docserve [dir] stop</code> stops that folder · <code>stop --all</code> stops every instance · <code>status</code> lists all (url + docsDir), exit 1 when none</div>
+                <div class="task-desc"><code>docserve [dir] stop</code> stops that folder · bare <code>stop</code> stops every instance · <code>status</code> lists all (url + docsDir), exit 1 when none</div>
               </div>
             </div>
             <div class="task">
@@ -354,7 +354,7 @@
               <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Tests</div>
-                <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · <code>stop --all</code> · stale instance file pruned · each run gets a temp <code>DOCSERVE_STATE_DIR</code> (parallel-safe)</div>
+                <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · bare <code>stop</code> stops all · stale instance file pruned · each run gets a temp <code>DOCSERVE_STATE_DIR</code> (parallel-safe)</div>
               </div>
             </div>
             <div class="task">

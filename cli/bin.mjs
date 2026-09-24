@@ -32,8 +32,8 @@ Arguments:
   dir                Folder of HTML files to serve (default: current directory)
 
 Commands:
-  stop               Stop the running docserve server
-  status             Show whether a server is running (exit 1 if none)
+  stop [dir]         Stop the server serving dir, or every server when dir is omitted
+  status             List the running servers (url + docs); exit 1 if none
 
 Options:
   --open             Open the gallery in the browser once the port is bound
@@ -45,7 +45,7 @@ Options:
 
 async function main() {
   const args = parseCliArgs()
-  if (args.command === "stop") return stopServer()
+  if (args.command === "stop") return stopServer(args)
   if (args.command === "status") return showStatus()
   return startServer(args)
 }
@@ -114,9 +114,15 @@ function parseCliArgs() {
   }
 }
 
-function stopServer() {
-  const states = listLiveStates() // stale state (dead pid) is removed silently
+function stopServer(args) {
+  const dir = args.dir ? path.resolve(args.dir) : null
+  // listLiveStates() prunes stale state (dead pid) silently.
+  const states = dir ? [findByDir(dir)].filter(Boolean) : listLiveStates()
   if (!states.length) {
+    if (dir) {
+      console.error(`docserve is not serving ${dir}.`)
+      process.exit(1)
+    }
     console.log("docserve is not running.")
     return
   }
@@ -126,6 +132,7 @@ function stopServer() {
     } catch {}
     removeState(state)
     console.log(`Stopped docserve (${state.url})`)
+    console.log(`  docs : ${state.docsDir}`)
   }
 }
 
@@ -135,7 +142,8 @@ function showStatus() {
     console.error("docserve is not running.")
     process.exit(1)
   }
-  for (const state of states) {
+  for (const [index, state] of states.entries()) {
+    if (index > 0) console.log()
     console.log(state.url)
     console.log(`docs : ${state.docsDir}`)
   }
