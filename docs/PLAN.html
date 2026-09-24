@@ -247,18 +247,6 @@
   @media (max-width: 620px) {
     .tasks { grid-template-columns: 1fr; }
   }
-  .verify {
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin: 12px 0 0;
-  }
-  .verify iconify-icon {
-    font-size: 15px;
-    color: var(--muted);
-    vertical-align: -2px;
-    margin-right: 6px;
-  }
-
   /* Footer */
   footer {
     margin-top: 56px;
@@ -318,39 +306,38 @@
             <span class="step-meta">P2</span>
           </div>
           <div class="step-body">
-            Run a dev instance next to the installed app with zero configuration: an unpackaged app (<code>app.isPackaged === false</code>) auto-detects dev mode — separate userData (own instance lock), docserve home at <code>~/.docserve-dev/</code> (<code>state/</code> and <code>desktop.json</code> inside), and the CLI symlink untouched.
+            Run a dev instance next to the installed app — separate user data and state.
           </div>
           <div class="tasks">
             <div class="task done">
               <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Auto dev mode</div>
-                <div class="task-desc">in main, when <code>!app.isPackaged</code>: <code>app.setPath("userData", …-dev)</code> before the lock + set <code>DOCSERVE_HOME=~/.docserve-dev</code> → two menu bar icons coexist</div>
+                <div class="task-desc">an unpackaged app detects dev mode on its own and runs on separate user data and state, so two menu bar icons coexist</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">Sandbox <code>desktop.json</code></div>
-                <div class="task-desc">place it in <code>dirname(STATES_DIR)</code> (unchanged location by default) → recent/resume never touch the production file</div>
+                <div class="task-title">Sandboxed state</div>
+                <div class="task-desc">recent folders and the resume set stay inside the dev sandbox</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:link-off" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Skip symlink in dev</div>
-                <div class="task-desc"><code>ensureCliSymlink()</code> does nothing when <code>DOCSERVE_HOME</code> is set</div>
+                <div class="task-desc">dev never rewrites the CLI symlink owned by the installed app</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:image-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Dev tray icon</div>
-                <div class="task-desc">menu bar icon only; committed <code>-dev</code> PNG variants (ring-cut + accent dot) load when unpackaged</div>
+                <div class="task-desc">a distinct menu bar icon to tell the dev instance apart</div>
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: installed app + <code>npm -C desktop run start</code> side by side (no env) → two tray icons, separate state, dev boot leaves <code>~/.local/bin/docserve</code> untouched</p>
         </div>
       </div>
 
@@ -412,7 +399,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>docserve ~/a --background</code> + <code>docserve ~/b --background</code> → <code>status</code> lists both on 4242/4243 · editing in <code>~/a</code> doesn't touch <code>~/b</code> tabs · tray stops one without the other</p>
         </div>
       </div>
 
@@ -459,7 +445,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>npx @noy4/docserve ~/reports --open</code> serves a gallery in a clean environment · provenance badge visible on the npmjs.com package page</p>
         </div>
       </div>
 
@@ -513,7 +498,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>npm run dist</code> DMG launches via Open Anyway · tray start/stop from the installed app · Open opens the gallery</p>
         </div>
       </div>
 
@@ -567,7 +551,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: all menu flows, including a folder switch while running</p>
         </div>
       </div>
 
@@ -600,7 +583,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node --test cli/</code> green</p>
         </div>
       </div>
 
@@ -647,7 +629,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: start → status → stop cycle; background + open; stale <code>state.json</code></p>
         </div>
       </div>
 
@@ -687,7 +668,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: edit reloads its own tab only; add/delete reloads the gallery; previews never reload</p>
         </div>
       </div>
 
@@ -720,7 +700,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: cards render with resolved dates; nested assets load</p>
         </div>
       </div>
 
@@ -767,10 +746,6 @@
               </div>
             </div>
           </div>
-          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>node cli/bin.mjs ~/reports</code> — <code>curl /</code>, raw page, traversal <code>403</code>, bad escape <code>400</code></p>
-        </div>
-      </div>
-
     </div>
   </section>
 
