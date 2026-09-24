@@ -308,7 +308,7 @@
     <div class="timeline">
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" style="color:var(--muted)" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -350,14 +350,14 @@
                 <div class="task-desc">watch the <code>state/</code> dir · one row per instance (Open / Stop submenu) · "Add Folder…" starts another · "Stop All" · <code>desktop.json</code> → <code>{recentDirs, resumeDirs}</code> (snapshot the running set before quit → resume exactly that set next launch) · filled icon when ≥ 1 running · Quit stops all</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Tests</div>
                 <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · bare <code>stop</code> stops all · stale instance file pruned · each run gets a temp <code>DOCSERVE_STATE_DIR</code> (parallel-safe)</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:pencil-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">SPEC update</div>
@@ -737,7 +737,7 @@
       <li><iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon><a href="./SPEC.html" target="_blank" rel="noopener">SPEC.html</a> — design &amp; implementation specification</li>
       <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/microsoft/vscode-livepreview" target="_blank" rel="noopener">microsoft/vscode-livepreview</a> — VS Code's local preview server with live reload</li>
     </ul>
-    <div class="colophon">docserve PLAN · 2026-09-23</div>
+    <div class="colophon">docserve PLAN · created 2026-09-21</div>
   </footer>
 
 </div>

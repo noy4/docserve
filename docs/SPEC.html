@@ -324,7 +324,7 @@
           <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
           <h4>Gallery</h4>
         </div>
-        <p>Card grid, iframe previews, copy-path button, automatic date resolution.</p>
+        <p>Card grid, iframe previews, copy-path button.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -361,7 +361,7 @@
 │   ├── index.html                <span class="c"># gallery template, served at /</span>
 │   └── server/
 │       ├── index.mjs             <span class="c"># HTTP server + lifecycle</span>
-│       ├── state.mjs             <span class="c"># state.json read/write · pid liveness</span>
+│       ├── state.mjs             <span class="c"># per-instance state files · pid liveness</span>
 │       ├── files.mjs             <span class="c"># *.html listing · meta + git dates · path utils</span>
 │       ├── inject.mjs            <span class="c"># reload client + copy button</span>
 │       ├── websocket.mjs         <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
@@ -370,9 +370,9 @@
     ├── package.json
     └── src/
         ├── main.mjs              <span class="c"># App · single instance lock · wiring</span>
-        ├── server.mjs            <span class="c"># spawn/stop CLI · state.json liveness</span>
+        ├── server.mjs            <span class="c"># spawn/stop CLI · state file liveness</span>
         ├── state.mjs             <span class="c"># fs.watch + 2 s polling → menu rebuild</span>
-        ├── tray.mjs              <span class="c"># tray menu · icons · Change Folder…</span>
+        ├── tray.mjs              <span class="c"># tray menu · icons · Add Folder…</span>
         └── assets/               <span class="c"># tray icons (running / stopped)</span></pre>
   </section>
 
@@ -436,19 +436,19 @@
         <!-- Desktop -->
         <rect class="node" x="48" y="340" width="200" height="52" rx="6"/>
         <text class="tt" x="148" y="362">Desktop app (Electron)</text>
-        <text class="tm" x="148" y="378">tray · start/stop · change folder</text>
+        <text class="tm" x="148" y="378">tray · start/stop · add folder</text>
 
         <!-- State file -->
         <rect class="node" x="296" y="340" width="220" height="52" rx="6"/>
-        <text class="tt" x="406" y="362" style="font-family: var(--mono); font-size: 11px;">state.json</text>
-        <text class="tm" x="406" y="378">{pid, port, url, docsDir}</text>
+        <text class="tt" x="406" y="362" style="font-family: var(--mono); font-size: 11px;">state/&lt;port&gt;-&lt;name&gt;.json</text>
+        <text class="tm" x="406" y="378">{pid, port, url, docsDir} · one per instance</text>
       </svg>
     </div>
 
     <h3><iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>Runtime state</h3>
     <p class="section-desc">
-      The server writes <code>~/.cache/docserve/state.json</code> once the port is bound and removes it on clean shutdown.
-      Readers verify the PID is alive (<code>kill(pid, 0)</code>) and treat dead-PID state as stale.
+      Each instance writes its own <code>~/.cache/docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name) once the port is bound and removes it on clean shutdown.
+      Readers verify the PID is alive (<code>kill(pid, 0)</code>) and prune dead-PID files in place; <code>DOCSERVE_STATE_DIR</code> overrides the state dir.
     </p>
     <div class="table-wrap">
       <table>
@@ -466,8 +466,8 @@
 
     <div class="callout">
       <iconify-icon icon="mdi:information-outline" noobserver></iconify-icon>
-      <strong>Single instance:</strong> starting with the same <code>docsDir</code> while a server runs just points at its URL (opens the browser with <code>--open</code>, prints it otherwise).
-      A different <code>docsDir</code> requires <code>docserve stop</code> first.
+      <strong>One instance per folder:</strong> starting with the same <code>docsDir</code> while its server runs just points at its URL (opens the browser with <code>--open</code>, prints it otherwise).
+      A different <code>docsDir</code> starts its own instance — one process (and one port) per folder; on a port conflict the port falls back +1.
     </div>
   </section>
 
@@ -483,12 +483,12 @@
         </thead>
         <tbody>
           <tr><td><code>[dir]</code></td><td>Folder to serve (default: <code>.</code>). Errors with exit 1 if it does not exist</td></tr>
-          <tr><td><code>(none)</code></td><td>Foreground start. <code>Ctrl+C</code> stops the server and removes <code>state.json</code></td></tr>
-          <tr><td><code>stop</code></td><td>SIGTERM to the <code>pid</code> in <code>state.json</code>, then clears it. Stale state (dead pid) is removed silently</td></tr>
-          <tr><td><code>status</code></td><td>Print <code>url</code> and <code>docsDir</code> if a live server is found; exit 1 otherwise</td></tr>
+          <tr><td><code>(none)</code></td><td>Foreground start. <code>Ctrl+C</code> stops that instance and removes its state file</td></tr>
+          <tr><td><code>stop</code></td><td>Stop the server serving <code>[dir]</code>, or every instance when <code>[dir]</code> is omitted. Stale state (dead pid) is pruned silently</td></tr>
+          <tr><td><code>status</code></td><td>List every running instance (<code>url</code> + <code>docsDir</code>); exit 1 when none</td></tr>
           <tr><td><code>--open</code></td><td>Open the gallery in the browser once the port is bound</td></tr>
-          <tr><td><code>--port &lt;n&gt;</code></td><td>Port to bind (default <code>4242</code>). On conflict, falls back +1 up to 20 tries and records the bound port in <code>state.json</code></td></tr>
-          <tr><td><code>--background</code></td><td>Start detached; state is written to <code>state.json</code></td></tr>
+          <tr><td><code>--port &lt;n&gt;</code></td><td>Port to bind (default <code>4242</code>). On conflict, falls back +1 up to 20 tries and records the bound port in the instance's state file</td></tr>
+          <tr><td><code>--background</code></td><td>Start detached; the bound port and pid land in the state dir</td></tr>
           <tr><td><code>-h</code> / <code>-v</code></td><td>Show help / version</td></tr>
         </tbody>
       </table>
@@ -610,7 +610,7 @@
   <section>
     <h2><iconify-icon icon="mdi:apple" width="24" noobserver></iconify-icon>Desktop app</h2>
     <p class="section-desc">
-      A macOS menu bar client with zero windows — the Electron main process only spawns the CLI and watches <code>state.json</code> (<code>fs.watch</code> + 2 s polling, pid liveness check).
+      A macOS menu bar client with zero windows — the Electron main process only spawns the CLI and watches the CLI's state files (<code>fs.watch</code> + 2 s polling, pid liveness check).
     </p>
 
     <div class="table-wrap">
@@ -619,29 +619,29 @@
           <tr><th>Behavior</th><th>Detail</th></tr>
         </thead>
         <tbody>
-          <tr><td>Tray icon</td><td>Outline when stopped, filled when running</td></tr>
-          <tr><td>Start / Stop</td><td>Toggles <code>docserve &lt;dir&gt; --background --open</code> and <code>docserve stop</code></td></tr>
-          <tr><td>Change Folder…</td><td><code>dialog.showOpenDialog</code>; stops the running server, restarts with the new folder, and opens the gallery</td></tr>
-          <tr><td>Last folder</td><td>Remembers the chosen folder in <code>~/.cache/docserve/desktop.json</code> (<code>{lastDir}</code>), kept across restarts unlike the ephemeral <code>state.json</code>; shown in <em>Serving</em> while stopped and used as the default for <strong>Start</strong> and <strong>Change Folder…</strong></td></tr>
-          <tr><td>Quit</td><td>Stops the server, then <code>app.quit()</code></td></tr>
+          <tr><td>Tray icon</td><td>Outline when stopped, filled when ≥ 1 instance is running</td></tr>
+          <tr><td>Instances</td><td>One row per instance (<code>folder — port</code>) with an Open / Stop submenu</td></tr>
+          <tr><td>Start / Stop All</td><td><strong>Start Server</strong> (shown while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code></td></tr>
+          <tr><td>Add Folder…</td><td><code>dialog.showOpenDialog</code>; starts another instance without stopping the rest — an already-served folder just opens its gallery</td></tr>
+          <tr><td>Recent folders</td><td>Started folders land in <code>~/.cache/docserve/desktop.json</code> (<code>{recentDirs}</code>, max 5), the default for Start Server and Add Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
+          <tr><td>Quit</td><td>Stops all servers, then <code>app.quit()</code></td></tr>
           <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
         </tbody>
       </table>
     </div>
 
-    <pre>● Running                     <span class="c"># status item (disabled)</span>
-Open (http://localhost:4242)
-Stop Server
+    <pre>● Running (2)                 <span class="c"># status item (disabled)</span>
+▸ reports — 4242              <span class="c"># one row per instance (submenu: Open (localhost:4242) / Stop)</span>
+▸ notes — 4243
 ─────────────────────────────
-Serving: ~/reports            <span class="c"># current folder (disabled)</span>
-Change Folder…
+Add Folder…                   <span class="c"># starts another instance</span>
+Stop All                      <span class="c"># bare docserve stop</span>
 ─────────────────────────────
 Quit docserve
 
-<span class="c"># stopped:</span>
 ○ Stopped
-Start Server                  <span class="c"># docserve &lt;dir&gt; --background --open</span>
-Stop Server                   <span class="c"># disabled</span></pre>
+─────────────────────────────
+Start Server                  <span class="c"># docserve &lt;recentDir&gt; --background --open</span>
   </section>
 
   <footer>
@@ -653,7 +653,7 @@ Stop Server                   <span class="c"># disabled</span></pre>
       <li><iconify-icon icon="mdi:home-outline" noobserver></iconify-icon><a href="./index.html" target="_blank" rel="noopener">docserve — homepage</a></li>
       <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/microsoft/vscode-livepreview" target="_blank" rel="noopener">microsoft/vscode-livepreview</a> — VS Code's local preview server with live reload</li>
     </ul>
-    <div class="colophon">docserve SPEC · cli / desktop · 2026-09-21</div>
+    <div class="colophon">docserve SPEC · cli / desktop · created 2026-09-21</div>
   </footer>
 
 </div>

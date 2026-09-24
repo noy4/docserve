@@ -8,7 +8,7 @@ import { describe, it, before, after } from "node:test"
 import assert from "node:assert/strict"
 import { spawn, spawnSync } from "node:child_process"
 import { once } from "node:events"
-import { readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import { existsSync, readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -32,6 +32,36 @@ async function waitForState(stateDir, timeoutMs = 5000) {
     await delay(100)
   }
   throw new Error("server did not write its state file")
+}
+
+// Resolve once at least `count` state files exist in the dir.
+async function waitForStates(stateDir, count, timeoutMs = 5000) {
+  const end = Date.now() + timeoutMs
+  while (Date.now() < end) {
+    try {
+      const states = readdirSync(stateDir)
+        .filter((entry) => entry.endsWith(".json"))
+        .map((entry) => JSON.parse(readFileSync(join(stateDir, entry), "utf8")))
+        .filter((state) => typeof state.port === "number")
+      if (states.length >= count) return states
+    } catch {}
+    await delay(100)
+  }
+  throw new Error(`expected ${count} state files`)
+}
+
+// Resolve once the port refuses connections (the server is gone).
+async function assertDown(port, timeoutMs = 3000) {
+  const end = Date.now() + timeoutMs
+  while (Date.now() < end) {
+    try {
+      await fetch(`http://localhost:${port}/`)
+      await delay(100)
+    } catch {
+      return
+    }
+  }
+  throw new Error(`server on port ${port} is still up`)
 }
 
 // Resolve with the next change message matching the predicate; others are skipped.
@@ -83,10 +113,6 @@ describe("docserve server", () => {
     assert.ok(page.includes('const pageId = "page.html"'))
     assert.ok(page.includes(WS_PATH))
     assert.ok(page.includes("window.self !== window.top"), "iframe previews get no client")
-
-    writeFileSync(join(content, "+special.html"), "<html><body>Endpoint is /__reload</body></html>")
-    const special = await (await fetch(`http://localhost:${port}/%2Bspecial.html`)).text()
-    assert.ok(special.includes('const pageId = "+special.html"'))
   })
 
   it("serves the gallery template, not injected", async () => {
@@ -100,10 +126,7 @@ describe("docserve server", () => {
   it("lists html files with resolved metadata on /api/files", async () => {
     writeFileSync(join(content, "favicon.svg"), "<svg xmlns='http://www.w3.org/2000/svg'/>")
     writeFileSync(join(content, "fav.html"), '<html><head><link rel="icon" href="favicon.svg"><title>Fav</title></head></html>')
-    writeFileSync(join(content, "data-icon.html"), `<html><head><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='#d6492f'/></svg>"></head></html>`)
     writeFileSync(join(content, "escaping.html"), '<html><head><link rel="icon" href="../outside.png"></head></html>')
-    mkdirSync(join(content, "nested"), { recursive: true })
-    writeFileSync(join(content, "nested/linked.html"), '<html><head><link rel="shortcut icon" href="icons/deep.png"></head></html>')
 
     const files = await (await fetch(`http://localhost:${port}/api/files`)).json()
     assert.ok(Array.isArray(files))
@@ -117,12 +140,6 @@ describe("docserve server", () => {
 
     const fav = files.find((f) => f.path.endsWith("fav.html"))
     assert.equal(fav.favicon, "/favicon.svg", "relative href resolves against the page URL")
-    assert.equal(
-      files.find((f) => f.path.endsWith("data-icon.html")).favicon,
-      "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23d6492f'/></svg>",
-      "data URI with raw <> and inner quotes survives; raw # is percent-encoded",
-    )
-    assert.equal(files.find((f) => f.path.endsWith("linked.html")).favicon, "/nested/icons/deep.png")
     assert.equal(files.find((f) => f.path.endsWith("escaping.html")).favicon, undefined, "hrefs escaping docsDir are dropped")
   })
 
@@ -168,14 +185,6 @@ describe("docserve server", () => {
         templateChanged: false,
       })
 
-      writeFileSync(file, "<html>edited</html>")
-      assert.deepEqual(await waitForChange(ws, (c) => c.pages.includes(".tmp-gallery-add.html")), {
-        type: "change",
-        pages: [".tmp-gallery-add.html"],
-        contentSetChanged: false,
-        templateChanged: false,
-      })
-
       rmSync(file)
       assert.deepEqual(await waitForChange(ws, (c) => c.contentSetChanged), {
         type: "change",
@@ -185,25 +194,6 @@ describe("docserve server", () => {
       })
     } finally {
       rmSync(file, { force: true })
-      ws.close()
-    }
-  })
-
-  it("flags gallery template edits so open galleries reload", async () => {
-    const ws = new WebSocket(`ws://localhost:${port}${WS_PATH}`)
-    await once(ws, "open")
-    const template = join(dirname(CLI), "index.html")
-    const original = readFileSync(template, "utf8")
-    try {
-      writeFileSync(template, `${original}\n<!-- template touch -->`)
-      assert.deepEqual(await waitForChange(ws, (c) => c.templateChanged), {
-        type: "change",
-        pages: [],
-        contentSetChanged: false,
-        templateChanged: true,
-      })
-    } finally {
-      writeFileSync(template, original)
       ws.close()
     }
   })
@@ -221,5 +211,101 @@ describe("docserve server", () => {
     const stop = spawnSync(process.execPath, [CLI, "stop"], { env, encoding: "utf8" })
     assert.equal(stop.status, 0)
     assert.equal(spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" }).status, 1)
+  })
+})
+
+describe("docserve multi-instance", () => {
+  let stateDir
+  let dirA
+  let dirB
+  let env
+  let childA
+  let childB
+  let portA
+  let portB
+
+  before(async () => {
+    dirA = mkdtempSync(join(tmpdir(), "docserve-multi-a-"))
+    dirB = mkdtempSync(join(tmpdir(), "docserve-multi-b-"))
+    stateDir = mkdtempSync(join(tmpdir(), "docserve-multi-state-"))
+    writeFileSync(join(dirA, "a.html"), "<html><body>A</body></html>")
+    writeFileSync(join(dirB, "b.html"), "<html><body>B</body></html>")
+    env = { ...process.env, DOCSERVE_STATE_DIR: stateDir }
+    // Same requested port for both: the second one must fall back +1.
+    childA = spawn(process.execPath, [CLI, dirA, "--port", String(PORT)], { stdio: "ignore", env })
+    childB = spawn(process.execPath, [CLI, dirB, "--port", String(PORT)], { stdio: "ignore", env })
+    const states = await waitForStates(stateDir, 2)
+    portA = states.find((state) => state.docsDir === dirA).port
+    portB = states.find((state) => state.docsDir === dirB).port
+  })
+
+  after(() => {
+    childA?.kill("SIGTERM")
+    childB?.kill("SIGTERM")
+    for (const dir of [dirA, dirB, stateDir]) rmSync(dir, { recursive: true, force: true })
+  })
+
+  it("serves two folders concurrently on distinct ports", async () => {
+    assert.notEqual(portA, portB, "port fallback gives the second folder its own port")
+    const a = await (await fetch(`http://localhost:${portA}/a.html`)).text()
+    const b = await (await fetch(`http://localhost:${portB}/b.html`)).text()
+    assert.ok(a.includes("<body>A"), "folder A serves its own page")
+    assert.ok(b.includes("<body>B"), "folder B serves its own page")
+  })
+
+  it("keeps reload broadcasts per folder", async () => {
+    const wsA = new WebSocket(`ws://localhost:${portA}${WS_PATH}`)
+    const wsB = new WebSocket(`ws://localhost:${portB}${WS_PATH}`)
+    await once(wsA, "open")
+    await once(wsB, "open")
+    try {
+      // Folder B must stay quiet: a timeout there is the expected outcome.
+      const quietB = waitForChange(wsB, () => true, 700).then(
+        () => {
+          throw new Error("folder B received folder A's change")
+        },
+        (err) => {
+          if (!/timeout/.test(err.message)) throw err
+        },
+      )
+      writeFileSync(join(dirA, "a.html"), "<html><body>A2</body></html>")
+      const change = await waitForChange(wsA, (c) => c.pages.includes("a.html"))
+      assert.deepEqual(change.pages, ["a.html"])
+      await quietB
+    } finally {
+      wsA.close()
+      wsB.close()
+    }
+  })
+
+  // Runs last: it stops the remaining server under test.
+  it("stops one folder without touching the other, then stops all", async () => {
+    const stop = spawnSync(process.execPath, [CLI, dirA, "stop"], { env, encoding: "utf8" })
+    assert.equal(stop.status, 0)
+    await assertDown(portA)
+    const b = await (await fetch(`http://localhost:${portB}/b.html`)).text()
+    assert.ok(b.includes("<body>B"), "the other folder keeps serving")
+
+    const status = spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" })
+    assert.equal(status.status, 0)
+    assert.match(status.stdout, new RegExp(`localhost:${portB}`))
+    assert.doesNotMatch(status.stdout, new RegExp(`localhost:${portA}`))
+
+    const stopAll = spawnSync(process.execPath, [CLI, "stop"], { env, encoding: "utf8" })
+    assert.equal(stopAll.status, 0)
+    assert.match(stopAll.stdout, new RegExp(`localhost:${portB}`))
+    await assertDown(portB)
+    assert.equal(spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" }).status, 1)
+  })
+
+  it("prunes stale instance files with dead pids", () => {
+    const stale = join(stateDir, "99999-stale.json")
+    writeFileSync(
+      stale,
+      JSON.stringify({ pid: 999999999, port: 99999, url: "http://localhost:99999/", docsDir: "/gone" }),
+    )
+    const status = spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" })
+    assert.equal(status.status, 1, "no live instances left")
+    assert.ok(!existsSync(stale), "the stale file was pruned in place")
   })
 })

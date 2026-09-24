@@ -32,7 +32,7 @@ Arguments:
   dir                Folder of HTML files to serve (default: current directory)
 
 Commands:
-  stop [dir]         Stop the server serving dir, or every server when dir is omitted
+  stop               Stop the server serving [dir], or every server when [dir] is omitted
   status             List the running servers (url + docs); exit 1 if none
 
 Options:
