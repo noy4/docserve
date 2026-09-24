@@ -511,28 +511,28 @@
               <iconify-icon icon="mdi:power" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Start / Stop toggle</div>
-                <div class="task-desc">spawn the CLI · Open reads the URL from <code>state.json</code></div>
+                <div class="task-desc">start and stop the CLI from the menu; Open opens the running gallery</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">State watch</div>
-                <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.docserve/</code>)</div>
+                <div class="task-desc">the menu rebuilds itself from the CLI's state files, staying accurate even when servers change outside the app</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Change Folder…</div>
-                <div class="task-desc">stop → restart · remember the last folder in <code>desktop.json</code></div>
+                <div class="task-desc">a new folder restarts serving; the last folder is remembered</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Quit &amp; first launch</div>
-                <div class="task-desc">stop → <code>app.quit()</code> · symlink the CLI to <code>~/.local/bin/docserve</code></div>
+                <div class="task-desc">quitting stops every server; the CLI is linked into <code>~/.local/bin/docserve</code> for terminal use</div>
               </div>
             </div>
           </div>
