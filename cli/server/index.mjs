@@ -49,17 +49,21 @@ const MIME = {
 export async function runServer({ docsDir, port: initialPort, open = false }) {
   const wss = new WebSocketServer({ path: WS_PATH })
   const updateListener = new UpdateListener({ wss, docsDir, templatePath: INDEX_TEMPLATE })
-  let port = initialPort // actually bound port (may fall back +1 on conflict)
+  let port = initialPort
+
+  const server = createServer(createNodeServerAdapter(createHandler({ docsDir })))
+  wss.attach(server)
 
   const cleanup = () => {
     updateListener.close()
+    wss.close()
     clearState()
+    server.closeAllConnections()
+    if (server.listening) server.close()
   }
   process.on("SIGINT", () => { cleanup(); process.exit(0) })
   process.on("SIGTERM", () => { cleanup(); process.exit(0) })
 
-  const server = createServer(createNodeServerAdapter(createHandler({ docsDir })))
-  wss.attach(server)
   server.on("error", (err) => {
     if (err.code === "EADDRINUSE" && port < initialPort + MAX_PORT_TRIES) {
       port += 1
@@ -76,7 +80,7 @@ export async function runServer({ docsDir, port: initialPort, open = false }) {
     console.log(state.url)
     if (open && process.platform === "darwin") exec(`open ${state.url}`)
   })
-  return { server, wss, updateListener }
+  return { server, wss, updateListener, close: cleanup }
 }
 
 // --- Node server adapter ---

@@ -54,6 +54,15 @@ export class WebSocketServer {
       }
     }
   }
+
+  close() {
+    for (const socket of this.clients) {
+      try {
+        socket.destroy()
+      } catch {}
+    }
+    this.clients.clear()
+  }
 }
 
 function acceptKey(key) {

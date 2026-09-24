@@ -12,6 +12,7 @@ import { existsSync, readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, 
 import { tmpdir } from "node:os"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
+import { runServer } from "./server/index.mjs"
 
 const CLI = join(dirname(fileURLToPath(import.meta.url)), "bin.mjs")
 const PORT = 20000 + Math.floor(Math.random() * 20000)
@@ -211,6 +212,20 @@ describe("docserve server", () => {
     const stop = spawnSync(process.execPath, [CLI, "stop"], { env, encoding: "utf8" })
     assert.equal(stop.status, 0)
     assert.equal(spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" }).status, 1)
+  })
+
+  it("gracefully shuts down by closing active sockets and releasing the port", async () => {
+    const testDir = mkdtempSync(join(tmpdir(), "docserve-graceful-"))
+    const testPort = 35000 + Math.floor(Math.random() * 10000)
+    const { server, wss, close } = await runServer({ docsDir: testDir, port: testPort })
+    const ws = new WebSocket(`ws://localhost:${testPort}/__reload`)
+    await once(ws, "open")
+    assert.equal(wss.clients.size, 1)
+
+    close()
+    await assertDown(testPort)
+    assert.equal(wss.clients.size, 0)
+    rmSync(testDir, { recursive: true, force: true })
   })
 })
 
