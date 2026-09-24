@@ -372,7 +372,7 @@
         ├── main.mjs              <span class="c"># App · single instance lock · wiring</span>
         ├── server.mjs            <span class="c"># spawn/stop CLI · state file liveness</span>
         ├── state.mjs             <span class="c"># fs.watch + 2 s polling → menu rebuild</span>
-        ├── tray.mjs              <span class="c"># tray menu · icons · Add Folder…</span>
+        ├── tray.mjs              <span class="c"># tray menu · icons · Open Folder…</span>
         └── assets/               <span class="c"># tray icons (running / stopped)</span></pre>
   </section>
 
@@ -622,8 +622,8 @@
           <tr><td>Tray icon</td><td>Outline when stopped, filled when ≥ 1 instance is running</td></tr>
           <tr><td>Instances</td><td>One row per instance (<code>folder — port</code>) with an Open / Stop submenu</td></tr>
           <tr><td>Start / Stop All</td><td><strong>Start Server</strong> (shown while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code></td></tr>
-          <tr><td>Add Folder…</td><td><code>dialog.showOpenDialog</code>; starts another instance without stopping the rest — an already-served folder just opens its gallery</td></tr>
-          <tr><td>Recent folders</td><td>Started folders land in <code>~/.docserve/desktop.json</code> (<code>{recentDirs}</code>, max 5), the default for Start Server and Add Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
+          <tr><td>Open Folder…</td><td><code>dialog.showOpenDialog</code>; starts another instance and opens its gallery without stopping the rest — an already-served folder just opens its gallery</td></tr>
+          <tr><td>Recent folders</td><td>Started folders land in <code>~/.docserve/desktop.json</code> (<code>{recentDirs}</code>, max 5), the default for Start Server and Open Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
           <tr><td>Quit</td><td>Stops all servers, then <code>app.quit()</code></td></tr>
           <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
         </tbody>
@@ -634,7 +634,7 @@
 ▸ reports — 4242              <span class="c"># one row per instance (submenu: Open (localhost:4242) / Stop)</span>
 ▸ notes — 4243
 ─────────────────────────────
-Add Folder…                   <span class="c"># starts another instance</span>
+Open Folder…                  <span class="c"># starts another instance</span>
 Stop All                      <span class="c"># bare docserve stop</span>
 ─────────────────────────────
 Quit docserve

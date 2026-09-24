@@ -7,7 +7,7 @@
 // │ App                                                    │
 // │ ├─ ServerManager  spawn/stop CLI · state files         │
 // │ ├─ StateWatcher   fs.watch + 2 s polling → update()    │
-// │ └─ TrayController menu · icons · Add Folder…           │
+// │ └─ TrayController menu · icons · Open Folder…          │
 // └────────────────────────────────────────────────────────┘
 import { app, dialog } from "electron"
 import { sandboxDev } from "./dev.mjs"
@@ -67,7 +67,7 @@ class App {
     if (dir) {
       this.server.start(dir, { silent: true })
     } else {
-      this.tray.addFolder(true)
+      this.tray.openFolder(true)
     }
   }
 }

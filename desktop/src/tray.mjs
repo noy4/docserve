@@ -1,4 +1,4 @@
-// The menu bar tray: status, instance rows (Open / Stop), Add Folder…, Quit.
+// The menu bar tray: status, instance rows (Open / Stop), Open Folder…, Quit.
 import os from "node:os"
 import path from "node:path"
 import { Tray, Menu, nativeImage, dialog, shell, app } from "electron"
@@ -75,7 +75,7 @@ export class TrayController {
       })),
       { type: "separator" },
       ...(states.length ? [] : [{ label: "Start Server", click: () => this.#start() }]),
-      { label: "Add Folder...", click: () => this.addFolder(true) },
+      { label: "Open Folder...", click: () => this.openFolder(true) },
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
       { type: "separator" },
       ...(this.updateAvailable
@@ -96,11 +96,11 @@ export class TrayController {
     if (dir) {
       this.server.start(dir, { open: true })
     } else {
-      this.addFolder(true)
+      this.openFolder(true)
     }
   }
 
-  async addFolder(open = false) {
+  async openFolder(open = false) {
     // LSUIElement app: without stealing focus the dialog opens behind Finder.
     if (process.platform === "darwin") {
       app.focus({ steal: true })
