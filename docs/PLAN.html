@@ -444,42 +444,42 @@
             <span class="step-meta">P2</span>
           </div>
           <div class="step-body">
-            Unsigned macOS distribution: an electron-builder DMG published on GitHub Releases. No auto-update (electron-updater requires code signing), so the tray shows a "new version" notice instead. npm publish of the CLI is a separate future phase.
+            An unsigned macOS DMG published on GitHub Releases.
           </div>
           <div class="tasks">
             <div class="task done">
               <iconify-icon icon="mdi:file-link-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Packaging-ready CLI resolution</div>
-                <div class="task-desc"><code>server.mjs</code> — resolve the CLI from the dev layout / <code>app.asar.unpacked</code> / <code>process.resourcesPath</code> · keeps the <code>docserve</code> PATH fallback</div>
+                <div class="task-desc">the app finds the bundled CLI in both dev and installed layouts, with the <code>docserve</code> PATH fallback kept</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">electron-builder config</div>
-                <div class="task-desc">appId · <code>files</code> + <code>asarUnpack</code> for <code>cli/</code> + <code>extraResources</code> from <code>../cli</code> · <code>LSUIElement</code> · dmg (arm64 + x64) · <code>identity: null</code> + hardened runtime off</div>
+                <div class="task-desc">an unsigned DMG for arm64 and x64, bundled with the CLI, menu-bar only</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:image-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">App icon</div>
-                <div class="task-desc"><code>build/icon.icns</code> from a 1024 px source · replaces the default Electron icon in Finder / installer</div>
+                <div class="task-desc">the default Electron icon replaced in Finder and the installer</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:github" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">GitHub Release</div>
-                <div class="task-desc">DMG + sha256 per arch · README: install via <em>System Settings → Privacy &amp; Security → Open Anyway</em> (macOS 15 removed right-click open)</div>
+                <div class="task-desc">DMGs for both architectures attached to GitHub Releases, with an Open Anyway install guide in the README</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:bell-badge-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Update notice</div>
-                <div class="task-desc">tray checks the latest GitHub Release tag → "New version available" menu item opens the release page (no in-app update)</div>
+                <div class="task-desc">the tray checks the latest release and offers a menu item to open its page (no auto-update)</div>
               </div>
             </div>
           </div>
