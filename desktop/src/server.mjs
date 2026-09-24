@@ -31,25 +31,27 @@ const START_TIMEOUT_MS = 60000
 
 export class ServerManager {
   constructor() {
-    this.starting = null // { dir, timer }
+    this.startingDirs = new Set() // dirs with a spawn in flight
+    this.startTimers = new Map() // dir → START_TIMEOUT_MS guard
     this.onChange = null
     this.onStartError = null
   }
 
-  // Live instances, sorted by port. Any live instance clears the starting flag.
+  // Live instances, sorted by port. Any live instance clears the starting flags.
   getStates() {
     const states = readStates().filter((state) => isProcessAlive(state.pid))
-    if (states.length) this.#clearStarting()
+    if (states.length) this.#clearStartingAll()
     return states
   }
 
   isStarting() {
-    return this.starting !== null
+    return this.startingDirs.size > 0
   }
 
   start(dir, { open = false, silent = false } = {}) {
-    if (!dir || this.starting) return
-    this.starting = { dir, timer: setTimeout(() => this.#clearStarting(), START_TIMEOUT_MS) }
+    if (!dir || this.startingDirs.has(dir)) return
+    this.startingDirs.add(dir)
+    this.startTimers.set(dir, setTimeout(() => this.#clearStart(dir), START_TIMEOUT_MS))
     this.pushRecentDir(dir)
     this.#changed()
     console.log(`[docserve-desktop] start: ${dir}${open ? " (open)" : ""}${silent ? " (silent)" : ""}`)
@@ -61,8 +63,9 @@ export class ServerManager {
       stderr = (stderr + chunk).slice(-800)
     })
     child.on("exit", (code) => {
-      if (code !== 0 && this.starting) {
-        this.#clearStarting()
+      const wasStarting = this.startingDirs.delete(dir)
+      this.#clearStart(dir)
+      if (code !== 0 && wasStarting) {
         this.#changed()
         if (silent) {
           console.warn(`[docserve-desktop] start failed: ${dir}: ${stderr.trim() || `exit code ${code}`}`)
@@ -84,11 +87,24 @@ export class ServerManager {
   }
 
   stopSync() {
-    this.#clearStarting()
+    this.#clearStartingAll()
     if (this.getStates().length) {
       const { command, args, env } = this.#cliCommand(["stop"])
       spawnSync(command, args, { env, stdio: "ignore" })
     }
+  }
+
+  // Remember which folders are serving right now, so the next launch can
+  // resume exactly this set (called on before-quit, before stopping).
+  snapshotRunningDirs() {
+    const dirs = this.getStates().map((state) => state.docsDir)
+    try {
+      fs.mkdirSync(CACHE_ROOT, { recursive: true })
+      fs.writeFileSync(
+        DESKTOP_FILE,
+        JSON.stringify({ recentDirs: this.readRecentDirs(), resumeDirs: dirs }, null, 2) + "\n",
+      )
+    } catch {}
   }
 
   ensureCliSymlink() {
@@ -123,6 +139,11 @@ export class ServerManager {
     return typeof data?.lastDir === "string" ? [data.lastDir] : []
   }
 
+  readResumeDirs() {
+    const data = readJson(DESKTOP_FILE)
+    return Array.isArray(data?.resumeDirs) ? data.resumeDirs.filter((d) => typeof d === "string") : null
+  }
+
   pushRecentDir(dir) {
     const dirs = [dir, ...this.readRecentDirs().filter((d) => d !== dir)].slice(0, MAX_RECENT_DIRS)
     try {
@@ -139,9 +160,17 @@ export class ServerManager {
     this.onChange?.()
   }
 
-  #clearStarting() {
-    if (this.starting?.timer) clearTimeout(this.starting.timer)
-    this.starting = null
+  #clearStart(dir) {
+    this.startingDirs.delete(dir)
+    const timer = this.startTimers.get(dir)
+    if (timer) {
+      clearTimeout(timer)
+      this.startTimers.delete(dir)
+    }
+  }
+
+  #clearStartingAll() {
+    for (const dir of [...this.startingDirs]) this.#clearStart(dir)
   }
 
   #runCli(args) {

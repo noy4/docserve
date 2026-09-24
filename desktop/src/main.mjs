@@ -33,7 +33,12 @@ class App {
 
   start() {
     app.on("second-instance", () => this.tray.update())
-    app.on("before-quit", () => this.server.stopSync())
+    // Snapshot the running set before stopping, so the next launch resumes
+    // exactly the folders that were serving at quit.
+    app.on("before-quit", () => {
+      this.server.snapshotRunningDirs()
+      this.server.stopSync()
+    })
     app.on("window-all-closed", () => {})
     this.#boot()
   }
@@ -47,10 +52,16 @@ class App {
     this.#resume()
   }
 
-  // Auto-resume: restart the most recent folder silently; without one, ask
-  // for a folder and open the gallery. Running servers are never disturbed.
+  // Auto-resume: bring back the folders that were serving at quit; without a
+  // snapshot (first run / crash), fall back to the most recent folder, or ask.
+  // Running servers are never disturbed.
   #resume() {
     if (this.server.getStates().length) return
+    const resumeDirs = this.server.readResumeDirs()
+    if (resumeDirs) {
+      for (const dir of resumeDirs) this.server.start(dir, { silent: true })
+      return
+    }
     const dir = this.server.readRecentDirs()[0]
     if (dir) {
       this.server.start(dir, { silent: true })

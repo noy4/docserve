@@ -121,8 +121,8 @@ export class TrayController {
     this.server.start(dir, { open })
   }
 
-  async #quit() {
-    await this.server.stop()
+  #quit() {
+    // before-quit snapshots the running set and stops all servers.
     app.quit()
   }
 }
