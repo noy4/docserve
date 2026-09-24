@@ -20,5 +20,9 @@ function clientJs(pageId, absPath) {
     ABS_PATH: JSON.stringify(absPath).replaceAll("<", "\\u003c"),
     WS_PATH: JSON.stringify(WS_PATH),
   }
-  return clientTemplate.replace(/__DOCSERVE_(PAGE_ID|ABS_PATH|WS_PATH)__/g, (_, key) => values[key])
+  let rendered = clientTemplate
+  for (const [key, value] of Object.entries(values)) {
+    rendered = rendered.replaceAll(`__DOCSERVE_${key}__`, () => value)
+  }
+  return rendered
 }

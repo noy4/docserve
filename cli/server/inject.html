@@ -2,9 +2,13 @@
 (() => {
   // iframes: no reload loop from dropped sockets, no copy button
   if (window.self !== window.top) return
+
   const pageId = __DOCSERVE_PAGE_ID__
+  const absPath = __DOCSERVE_ABS_PATH__
+  const wsPath = __DOCSERVE_WS_PATH__
+
   const proto = location.protocol === "https:" ? "wss:" : "ws:"
-  const ws = new WebSocket(proto + "//" + location.host + __DOCSERVE_WS_PATH__)
+  const ws = new WebSocket(proto + "//" + location.host + wsPath)
   ws.addEventListener("message", (e) => {
     let change
     try { change = JSON.parse(e.data) } catch { return }
@@ -14,7 +18,6 @@
   })
   ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000))
 
-  const absPath = __DOCSERVE_ABS_PATH__
   const style = document.createElement("style")
   style.textContent = `#docserve-copy {
   position: fixed;
