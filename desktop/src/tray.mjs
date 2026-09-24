@@ -52,13 +52,14 @@ export class TrayController {
   }
 
   #buildMenu(states, status) {
+    const ___ = { type: "separator" }
     const updateItems = []
     if (this.updateAvailable) {
       updateItems.push({
         label: `New version available — v${this.updateAvailable.version}`,
         click: () => shell.openExternal(this.updateAvailable.url),
       })
-      updateItems.push({ type: "separator" })
+      updateItems.push(___)
     }
 
     return Menu.buildFromTemplate([
@@ -79,14 +80,15 @@ export class TrayController {
           { label: "Stop", click: () => this.server.stopDir(state.docsDir) },
         ],
       })),
-      { type: "separator" },
+      ___,
+
       // actions
       ...(states.length ? [] : [{ label: "Start Server", click: () => this.#start() }]),
       { label: "Open Folder...", click: () => this.openFolder(true) },
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
-      { type: "separator" },
+      ___,
+
       ...updateItems,
-      // quit
       { label: "Quit docserve", click: () => this.#quit() },
     ])
   }
