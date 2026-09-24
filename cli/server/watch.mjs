@@ -7,7 +7,7 @@
 // set never flip contentSetChanged.
 import { existsSync, watch } from "node:fs"
 import { basename, dirname, resolve } from "node:path"
-import { isWithin, listHtmlFiles, normalizedRelative } from "./files.mjs"
+import { isWithin, listHtmlFiles, normalizedRelative, shouldIgnore } from "./files.mjs"
 
 const DEBOUNCE_MS = 50 // like livePreview.previewDebounceDelay
 const TEMPLATE_TOUCH = "\u0000template" // sentinel: never a real docsDir-relative path
@@ -41,6 +41,7 @@ export class UpdateListener {
     this.watchers.push(
       watch(this.docsDir, { recursive: true }, (event, filename) => {
         if (!filename?.endsWith(".html")) return
+        if (shouldIgnore(filename)) return
         const full = resolve(this.docsDir, filename)
         if (!isWithin(this.docsDir, full)) return
         this.queueBroadcast(normalizedRelative(this.docsDir, full))

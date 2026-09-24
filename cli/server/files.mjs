@@ -22,6 +22,7 @@ export async function listHtmlFiles(docsDir, out = []) {
   }
   for (const entry of entries) {
     const full = join(docsDir, entry.name)
+    if (shouldIgnore(entry.name)) continue
     if (entry.isDirectory()) {
       await listHtmlFiles(full, out)
     } else if (entry.name.endsWith(".html") && entry.name !== "index.html") {
@@ -214,4 +215,11 @@ export function isWithin(base, path) {
 
 export function normalizedRelative(base, path) {
   return relative(base, path).split(sep).join("/")
+}
+
+export function shouldIgnore(relPath) {
+  return relPath
+    .split(/[/\\]/)
+    .filter(Boolean)
+    .some((part) => part.startsWith(".") || part === "node_modules")
 }

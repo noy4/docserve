@@ -13,6 +13,7 @@ import { tmpdir } from "node:os"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 import { runServer } from "./server/index.mjs"
+import { listHtmlFiles, shouldIgnore } from "./server/files.mjs"
 
 const CLI = join(dirname(fileURLToPath(import.meta.url)), "bin.mjs")
 const PORT = 20000 + Math.floor(Math.random() * 20000)
@@ -226,6 +227,36 @@ describe("docserve server", () => {
     await assertDown(testPort)
     assert.equal(wss.clients.size, 0)
     rmSync(testDir, { recursive: true, force: true })
+  })
+
+  it("ignores hidden files and directories, and node_modules", async () => {
+    assert.equal(shouldIgnore(".git/HEAD"), true)
+    assert.equal(shouldIgnore("sub/.git/config"), true)
+    assert.equal(shouldIgnore("node_modules/pkg/index.html"), true)
+    assert.equal(shouldIgnore("sub/node_modules/pkg/index.html"), true)
+    assert.equal(shouldIgnore(".DS_Store"), true)
+    assert.equal(shouldIgnore(".draft.html"), true)
+    assert.equal(shouldIgnore("sub/.draft.html"), true)
+    assert.equal(shouldIgnore("valid.html"), false)
+    assert.equal(shouldIgnore("sub/valid.html"), false)
+
+    const testDir = mkdtempSync(join(tmpdir(), "docserve-ignore-"))
+    try {
+      mkdirSync(join(testDir, ".git"), { recursive: true })
+      mkdirSync(join(testDir, "node_modules", "pkg"), { recursive: true })
+      mkdirSync(join(testDir, "sub"), { recursive: true })
+
+      writeFileSync(join(testDir, ".git", "hidden.html"), "<html></html>")
+      writeFileSync(join(testDir, ".draft.html"), "<html></html>")
+      writeFileSync(join(testDir, "node_modules", "pkg", "vendor.html"), "<html></html>")
+      writeFileSync(join(testDir, "sub", "ok.html"), "<html></html>")
+
+      const files = await listHtmlFiles(testDir)
+      assert.equal(files.length, 1)
+      assert.ok(files[0].endsWith("sub/ok.html") || files[0].endsWith("sub\\ok.html"))
+    } finally {
+      rmSync(testDir, { recursive: true, force: true })
+    }
   })
 })
 
