@@ -52,17 +52,23 @@ export class TrayController {
   }
 
   #buildMenu(states, status) {
+    const updateItems = []
+    if (this.updateAvailable) {
+      updateItems.push({
+        label: `New version available — v${this.updateAvailable.version}`,
+        click: () => shell.openExternal(this.updateAvailable.url),
+      })
+      updateItems.push({ type: "separator" })
+    }
+
     return Menu.buildFromTemplate([
+      // status
       {
-        label:
-          status === "running"
-            ? `Running (${states.length})`
-            : status === "starting"
-              ? "Starting…"
-              : "Stopped",
+        label: status === "running" ? `Running (${states.length})` : "Stopped",
         icon: status === "running" ? this.icons.menuRunning : this.icons.menuStopped,
         enabled: false,
       },
+      // running servers
       ...states.map((state) => ({
         label: `${path.basename(state.docsDir)} — ${safePort(state.url)}`,
         submenu: [
@@ -74,19 +80,13 @@ export class TrayController {
         ],
       })),
       { type: "separator" },
+      // actions
       ...(states.length ? [] : [{ label: "Start Server", click: () => this.#start() }]),
       { label: "Open Folder...", click: () => this.openFolder(true) },
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
       { type: "separator" },
-      ...(this.updateAvailable
-        ? [
-          {
-            label: `New version available — v${this.updateAvailable.version}`,
-            click: () => shell.openExternal(this.updateAvailable.url),
-          },
-          { type: "separator" },
-        ]
-        : []),
+      ...updateItems,
+      // quit
       { label: "Quit docserve", click: () => this.#quit() },
     ])
   }
