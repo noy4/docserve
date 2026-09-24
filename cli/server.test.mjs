@@ -209,14 +209,14 @@ describe("docserve server", () => {
   })
 
   // Runs last: it stops the server under test.
-  it("enforces the single-instance rule and the stop/status lifecycle", () => {
+  it("points at the running server for the same folder and stops it", () => {
     const status = spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" })
     assert.equal(status.status, 0)
     assert.match(status.stdout, /localhost:\d+/)
 
-    const other = spawnSync(process.execPath, [CLI, otherDir], { env, encoding: "utf8" })
-    assert.equal(other.status, 1)
-    assert.match(other.stderr, /already running/)
+    const same = spawnSync(process.execPath, [CLI, content], { env, encoding: "utf8" })
+    assert.equal(same.status, 0)
+    assert.match(same.stdout, /already serving this folder/)
 
     const stop = spawnSync(process.execPath, [CLI, "stop"], { env, encoding: "utf8" })
     assert.equal(stop.status, 0)

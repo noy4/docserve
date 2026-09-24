@@ -148,23 +148,13 @@ async function startServer(args) {
     process.exit(1)
   }
 
-  // Single instance: same docsDir just opens its URL; a different docsDir
-  // requires docserve stop first.
+  // Single instance per folder: same docsDir just opens its URL; a different
+  // docsDir starts its own instance (the port fallback avoids collisions).
   const running = findByDir(docsDir)
   if (running) {
     if (args.open) openBrowser(running.url)
     console.log(`docserve is already serving this folder: ${running.url}`)
     return
-  }
-  const other = listLiveStates().find((state) => state.docsDir !== docsDir)
-  if (other) {
-    console.error([
-      "[docserve] A server is already running for a different folder.",
-      `  url  : ${other.url}`,
-      `  docs : ${other.docsDir}`,
-      "Stop it first: docserve stop",
-    ].join("\n"))
-    process.exit(1)
   }
 
   if (args.background) return startBackground(args, docsDir)
@@ -182,7 +172,7 @@ async function startBackground(args, docsDir) {
   const child = spawn(process.execPath, childArgs, { detached: true, stdio: "ignore" })
   child.unref()
 
-  const state = await waitForState()
+  const state = await waitForState(child.pid)
   if (!state) {
     console.error("[docserve] Server did not report startup (no state file). Try running in the foreground.")
     process.exit(1)
@@ -194,11 +184,12 @@ async function startBackground(args, docsDir) {
   console.log("  stop : docserve stop")
 }
 
-async function waitForState({ timeoutMs = 10000, intervalMs = 200 } = {}) {
+// Poll the state dir until the server with the given pid reports its state.
+async function waitForState(pid, { timeoutMs = 10000, intervalMs = 200 } = {}) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    const states = listLiveStates()
-    if (states.length) return states[0]
+    const state = listLiveStates().find((entry) => entry.pid === pid)
+    if (state) return state
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
   }
   return null
