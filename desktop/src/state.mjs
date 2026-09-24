@@ -14,11 +14,11 @@ export class StateWatcher {
   }
 
   start() {
-    this.#arm()
+    this.#rewatch()
     this.poll = setInterval(this.onChange, POLL_INTERVAL_MS)
   }
 
-  #arm() {
+  #rewatch() {
     for (const watcher of this.watchers) {
       try {
         watcher.close()
@@ -42,7 +42,7 @@ export class StateWatcher {
     if (this.timer) return
     this.timer = setTimeout(() => {
       this.timer = null
-      this.#arm()
+      this.#rewatch()
       this.onChange()
     }, DEBOUNCE_MS)
   }
