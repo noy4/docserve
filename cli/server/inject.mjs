@@ -1,9 +1,12 @@
 // Injection: every text/html response served from docsDir gets one client script
 // before the last </body> (appended at the end if the tag is missing). The script
 // exits immediately inside iframes, so previews get neither part; the gallery
-// template ships its own client.
+// template ships its own client. The client template is loaded once at startup.
+import { readFileSync } from "node:fs"
 
 export const WS_PATH = "/__reload"
+
+const clientTemplate = readFileSync(new URL("./inject.html", import.meta.url), "utf8")
 
 export function injectIntoHtml(html, pageId, absPath) {
   const idx = html.toLowerCase().lastIndexOf("</body>")
@@ -12,89 +15,10 @@ export function injectIntoHtml(html, pageId, absPath) {
 }
 
 function clientJs(pageId, absPath) {
-  return `<script>
-(() => {
-  // iframes: no reload loop from dropped sockets, no copy button
-  if (window.self !== window.top) return
-  const pageId = ${JSON.stringify(pageId).replaceAll("<", "\\u003c")}
-  const proto = location.protocol === "https:" ? "wss:" : "ws:"
-  const ws = new WebSocket(proto + "//" + location.host + "${WS_PATH}")
-  ws.addEventListener("message", (e) => {
-    let change
-    try { change = JSON.parse(e.data) } catch { return }
-    if (change?.type === "change" && Array.isArray(change.pages) && change.pages.includes(pageId)) {
-      location.reload()
-    }
-  })
-  ws.addEventListener("close", () => setTimeout(() => location.reload(), 1000))
-
-  const absPath = ${JSON.stringify(absPath).replaceAll("<", "\\u003c")}
-  const style = document.createElement("style")
-  style.textContent = \`#docserve-copy {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 2147483647;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 28px;
-  padding: 0 10px 0 9px;
-  border: 1px solid rgba(127, 127, 138, 0.35);
-  border-radius: 8px;
-  background: rgba(127, 127, 138, 0.14);
-  color: inherit;
-  cursor: pointer;
-  opacity: 0.55;
-  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-#docserve-copy svg {
-  width: 14px;
-  height: 14px;
-  pointer-events: none;
-}
-#docserve-copy .label {
-  font: 500 11.5px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-#docserve-copy:hover {
-  opacity: 1;
-  border-color: #6c8cff;
-  color: #6c8cff;
-}
-#docserve-copy.copied {
-  opacity: 1;
-  color: #4ade80;
-  border-color: #4ade80;
-}
-@media (prefers-color-scheme: light) {
-  #docserve-copy:hover { border-color: #2563eb; color: #2563eb; }
-  #docserve-copy.copied { color: #16a34a; border-color: #16a34a; }
-}
-#docserve-copy .ic-check { display: none; }
-#docserve-copy.copied .ic-copy { display: none; }
-#docserve-copy.copied .ic-check { display: block; }\`
-  const COPY = '<svg class="ic-copy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
-  const CHECK = '<svg class="ic-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
-  const btn = document.createElement("button")
-  btn.id = "docserve-copy"
-  btn.type = "button"
-  btn.title = absPath
-  btn.innerHTML = COPY + CHECK + '<span class="label">Copy file path</span>'
-  btn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(absPath)
-      btn.classList.add("copied")
-      btn.querySelector(".label").textContent = "Copied"
-      setTimeout(() => {
-        btn.classList.remove("copied")
-        btn.querySelector(".label").textContent = "Copy file path"
-      }, 1200)
-    } catch {}
-  })
-  document.head.appendChild(style)
-  document.body.appendChild(btn)
-})()
-</script>`
+  const values = {
+    PAGE_ID: JSON.stringify(pageId).replaceAll("<", "\\u003c"),
+    ABS_PATH: JSON.stringify(absPath).replaceAll("<", "\\u003c"),
+    WS_PATH: JSON.stringify(WS_PATH),
+  }
+  return clientTemplate.replace(/__DOCSERVE_(PAGE_ID|ABS_PATH|WS_PATH)__/g, (_, key) => values[key])
 }

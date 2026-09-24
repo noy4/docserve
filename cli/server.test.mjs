@@ -113,7 +113,9 @@ describe("docserve server", () => {
     writeFileSync(join(content, "page.html"), "<html><body></body></html>")
     const page = await (await fetch(`http://localhost:${port}/page.html`)).text()
     assert.ok(page.includes('const pageId = "page.html"'))
+    assert.ok(page.includes(`const absPath = ${JSON.stringify(join(content, "page.html"))}`))
     assert.ok(page.includes(WS_PATH))
+    assert.ok(!page.includes("__DOCSERVE_"), "all injection template markers are substituted")
     assert.ok(page.includes("window.self !== window.top"), "iframe previews get no client")
   })
 
