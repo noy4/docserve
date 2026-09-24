@@ -5,13 +5,18 @@ const REPO = "noy4/docserve"
 
 export async function latestRelease() {
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+    // The repo also publishes CLI releases (cli-v*); only desktop releases
+    // are compared against the app version.
+    const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=20`, {
       headers: { "User-Agent": "docserve-desktop", Accept: "application/vnd.github+json" },
       signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) return null
-    const { tag_name, html_url } = await res.json()
-    return { version: String(tag_name).replace(/^v/, ""), url: html_url }
+    const releases = await res.json()
+    const release = (Array.isArray(releases) ? releases : [])
+      .find((r) => !r.draft && !r.prerelease && !/^cli-v/.test(String(r?.tag_name ?? "")))
+    if (!release) return null
+    return { version: String(release.tag_name).replace(/^v/, ""), url: release.html_url }
   } catch {
     return null
   }
