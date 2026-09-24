@@ -17,11 +17,12 @@ import { StateWatcher } from "./state.mjs"
 
 sandboxDev()
 
+// Single-instance lock: without it a second launch would add a second tray icon and manage the CLI twice.
 const gotLock = app.requestSingleInstanceLock()
-if (!gotLock) {
-  app.quit()
-} else {
+if (gotLock) {
   app.whenReady().then(() => new App().start())
+} else {
+  app.quit()
 }
 
 class App {
@@ -36,12 +37,11 @@ class App {
 
   start() {
     app.on("second-instance", () => this.tray.update())
-    // Snapshot before stopping; the next launch resumes this set.
     app.on("before-quit", () => {
       this.server.snapshotRunningDirs()
       this.server.stopSync()
     })
-    app.on("window-all-closed", () => {})
+    app.on("window-all-closed", () => { })
     this.#boot()
   }
 
@@ -59,7 +59,8 @@ class App {
     if (this.server.getStates().length) return
     const resumeDirs = this.server.readResumeDirs()
     if (resumeDirs) {
-      for (const dir of resumeDirs) this.server.start(dir, { silent: true })
+      for (const dir of resumeDirs)
+        this.server.start(dir, { silent: true })
       return
     }
     const dir = this.server.readRecentDirs()[0]
