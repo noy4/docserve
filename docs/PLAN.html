@@ -352,50 +352,42 @@
             <span class="step-meta">P1</span>
           </div>
           <div class="step-body">
-            Serve several folders at once with <strong>one process (and one port) per folder</strong>. The server core stays unchanged; only the state file, CLI lifecycle, and tray become multi-instance.
-            Separate processes keep root-relative links (<code>/style.css</code>) working because every folder owns <code>/</code> on its own port — a single process with <code>/&lt;name&gt;/</code> prefixes would break them. It also gives crash isolation and a trivial per-folder <code>stop</code>. Cost: one Node process (~40 MB) per folder, acceptable for a handful.
+            Serve several folders at once, one process and one port per folder.
           </div>
           <div class="tasks">
             <div class="task done">
               <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Per-instance state</div>
-                <div class="task-desc"><code>state.json</code> → <code>~/.docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name, split on the first <code>-</code>) · <code>listLiveStates()</code> prunes dead pids · <code>findByDir(docsDir)</code> matches on file contents · <code>DOCSERVE_STATE</code> (file path) is <strong>dropped</strong> in favor of <code>DOCSERVE_HOME</code> (docserve home override)</div>
+                <div class="task-desc">one state file per running folder under <code>~/.docserve/state/</code>; dead entries are pruned automatically</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Single-instance rule per folder</div>
-                <div class="task-desc">same <code>docsDir</code> → point at its URL (unchanged) · different <code>docsDir</code> → start a new instance instead of erroring · port fallback +1 already avoids collisions</div>
+                <div class="task-desc">starting a running folder again just opens its URL; a different folder starts its own instance on the next free port</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:console" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title"><code>stop</code> / <code>status</code></div>
-                <div class="task-desc"><code>docserve [dir] stop</code> stops that folder · bare <code>stop</code> stops every instance · <code>status</code> lists all (url + docsDir), exit 1 when none</div>
+                <div class="task-desc"><code>docserve stop</code> stops everything, <code>docserve &lt;dir&gt; stop</code> just that folder, <code>status</code> lists what's running</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Tray: folder list</div>
-                <div class="task-desc">watch the <code>state/</code> dir · one row per instance (Open / Stop submenu) · "Add Folder…" starts another · "Stop All" · <code>desktop.json</code> → <code>{recentDirs, resumeDirs}</code> (snapshot the running set before quit → resume exactly that set next launch) · filled icon when ≥ 1 running · Quit stops all</div>
+                <div class="task-desc">one row per running folder (open / stop), plus Add Folder…, Stop All, and the running set restored on the next launch</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Tests</div>
-                <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · bare <code>stop</code> stops all · stale instance file pruned · each run gets a temp <code>DOCSERVE_HOME</code> (parallel-safe)</div>
-              </div>
-            </div>
-            <div class="task done">
-              <iconify-icon icon="mdi:pencil-outline" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">SPEC update</div>
-                <div class="task-desc">Runtime state table · single-instance callout · CLI table · Desktop menu mock</div>
+                <div class="task-desc">two folders on distinct ports, per-folder reload and stop, each test run isolated in its own temp home</div>
               </div>
             </div>
           </div>
