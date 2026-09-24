@@ -557,14 +557,14 @@
               <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Test suite</div>
-                <div class="task-desc"><code>cli/server.test.mjs</code> — injection · <code>/__reload</code> broadcast · status codes · CLI lifecycle, run with <code>node --test</code></div>
+                <div class="task-desc">a single end-to-end suite (<code>cli/server.test.mjs</code>) run with <code>node --test</code></div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:tune" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Isolation</div>
-                <div class="task-desc"><code>DOCSERVE_STATE</code> env override for the state path · random <code>--port</code> per run (parallel-safe)</div>
+                <div class="task-desc">each run gets a temp home and a random port, so tests are parallel-safe</div>
               </div>
             </div>
           </div>
@@ -589,21 +589,21 @@
               <iconify-icon icon="mdi:console" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title"><code>stop</code> / <code>status</code></div>
-                <div class="task-desc">SIGTERM + clear state; stale state removed silently · <code>status</code> exits 1 when none</div>
+                <div class="task-desc"><code>stop</code> ends servers cleanly, stale records included; <code>status</code> exits 1 when nothing runs</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:cog" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title"><code>--background</code> · <code>--open</code> · <code>--port</code></div>
-                <div class="task-desc">detached spawn · open the browser · fallback +1 (≤ 20 tries)</div>
+                <div class="task-desc">run detached, open the browser, and fall back to the next port when busy</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Single-instance rule</div>
-                <div class="task-desc">same <code>docsDir</code> → point at its URL · different → error prompting <code>docserve stop</code></div>
+                <div class="task-desc">starting a served folder again just points at its URL; a different folder errors with a hint to <code>docserve stop</code> first</div>
               </div>
             </div>
             <div class="task done">
@@ -635,21 +635,21 @@
               <iconify-icon icon="mdi:needle" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Page injection</div>
-                <div class="task-desc"><code>server/inject.mjs</code> — reload client + copy button before the last <code>&lt;/body&gt;</code> · <code>&lt;</code> → <code>\u003c</code> escaping · iframe early-return</div>
+                <div class="task-desc">served HTML gets a reload client and a copy-path button injected before <code>&lt;/body&gt;</code>; previews inside iframes are skipped</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:connection" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">WS server <code>/__reload</code></div>
-                <div class="task-desc"><code>server/websocket.mjs</code> — handshake · text frames · ping → pong (RFC 6455 subset)</div>
+                <div class="task-desc">a hand-rolled WebSocket endpoint at <code>/__reload</code> broadcasting reload events</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
               <div class="task-text">
-                <div class="task-title">UpdateListener</div>
-                <div class="task-desc"><code>server/watch.mjs</code> — <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code> · 50 ms debounce batch · known-files tracking → <code>contentSetChanged</code></div>
+                <div class="task-title">Folder watch</div>
+                <div class="task-desc">watches the served folder for <code>*.html</code> changes — edits reload their own tab, add/delete refreshes the gallery</div>
               </div>
             </div>
           </div>
@@ -674,14 +674,14 @@
               <iconify-icon icon="mdi:file-multiple-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">File metadata</div>
-                <div class="task-desc"><code>server/files.mjs</code> — recursive <code>*.html</code> listing (exclude <code>index.html</code>) · <code>&lt;title&gt;</code> / <code>created_at</code> extraction (4 KB head → 1 MB fallback) · git date maps cached per repo root · sort by created desc</div>
+                <div class="task-desc">every page's title and date extracted into a <code>/api/files</code> listing (git history as fallback), sorted newest first</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Gallery template</div>
-                <div class="task-desc"><code>cli/index.html</code> — card grid · lazy iframes (<code>rootMargin: 400px</code>, max 3 concurrent) · copy path</div>
+                <div class="task-desc">a card grid with lazy iframe previews and a copy-path button</div>
               </div>
             </div>
           </div>
@@ -706,28 +706,28 @@
               <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Scaffold <code>cli/</code></div>
-                <div class="task-desc"><code>package.json</code> (name, bin, type, files, engines) · <code>bin.mjs</code> stub · <code>server/index.mjs</code></div>
+                <div class="task-desc">the CLI package skeleton with its bin entry and server module</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:folder-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title"><code>docsDir</code> resolution + validation</div>
-                <div class="task-desc">missing → exit 1</div>
+                <div class="task-desc">a missing folder exits with an error</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:file-send-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">URL mapping</div>
-                <div class="task-desc"><code>/</code>, <code>/index.html</code> → gallery template · raw static files · MIME map · <code>400</code> / <code>403</code> / <code>404</code></div>
+                <div class="task-desc"><code>/</code> serves the gallery; other paths serve raw files with correct MIME and status codes (<code>400</code> / <code>403</code> / <code>404</code>)</div>
               </div>
             </div>
             <div class="task done">
               <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Runtime state</div>
-                <div class="task-desc"><code>server/state.mjs</code> — write <code>state.json</code> on bind · remove on SIGINT/SIGTERM · pid liveness + stale self-repair</div>
+                <div class="task-desc">the running server records itself (port, pid) in a state file and cleans it up on exit; stale files self-repair</div>
               </div>
             </div>
           </div>
