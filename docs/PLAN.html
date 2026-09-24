@@ -307,6 +307,53 @@
 
     <div class="timeline">
 
+          <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-10-circle" style="color:var(--purple)" noobserver></iconify-icon>
+              Phase 10 — Dev sandbox
+            </span>
+            <span class="step-meta">P2</span>
+          </div>
+          <div class="step-body">
+            Run a dev instance next to the installed app with zero configuration: an unpackaged app (<code>app.isPackaged === false</code>) auto-detects dev mode — separate userData (own instance lock), docserve home at <code>~/.docserve-dev/</code> (<code>state/</code> and <code>desktop.json</code> inside), and the CLI symlink untouched.
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Auto dev mode</div>
+                <div class="task-desc">in main, when <code>!app.isPackaged</code>: <code>app.setPath("userData", …-dev)</code> before the lock + set <code>DOCSERVE_HOME=~/.docserve-dev</code> → two menu bar icons coexist</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Sandbox <code>desktop.json</code></div>
+                <div class="task-desc">place it in <code>dirname(STATES_DIR)</code> (unchanged location by default) → recent/resume never touch the production file</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:link-off" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Skip symlink in dev</div>
+                <div class="task-desc"><code>ensureCliSymlink()</code> does nothing when <code>DOCSERVE_HOME</code> is set</div>
+              </div>
+            </div>
+            <div class="task done">
+              <iconify-icon icon="mdi:image-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Dev tray icon</div>
+                <div class="task-desc">menu bar icon only; committed <code>-dev</code> PNG variants (ring-cut + accent dot) load when unpackaged</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: installed app + <code>npm -C desktop run start</code> side by side (no env) → two tray icons, separate state, dev boot leaves <code>~/.local/bin/docserve</code> untouched</p>
+        </div>
+      </div>
+
       <div class="timeline-step">
         <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
@@ -326,7 +373,7 @@
               <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Per-instance state</div>
-                <div class="task-desc"><code>state.json</code> → <code>~/.cache/docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name, split on the first <code>-</code>) · <code>listLiveStates()</code> prunes dead pids · <code>findByDir(docsDir)</code> matches on file contents · <code>DOCSERVE_STATE</code> (file path) is <strong>dropped</strong> in favor of <code>DOCSERVE_STATE_DIR</code> (state dir override)</div>
+                <div class="task-desc"><code>state.json</code> → <code>~/.docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name, split on the first <code>-</code>) · <code>listLiveStates()</code> prunes dead pids · <code>findByDir(docsDir)</code> matches on file contents · <code>DOCSERVE_STATE</code> (file path) is <strong>dropped</strong> in favor of <code>DOCSERVE_HOME</code> (docserve home override)</div>
               </div>
             </div>
             <div class="task done">
@@ -354,7 +401,7 @@
               <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Tests</div>
-                <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · bare <code>stop</code> stops all · stale instance file pruned · each run gets a temp <code>DOCSERVE_STATE_DIR</code> (parallel-safe)</div>
+                <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · bare <code>stop</code> stops all · stale instance file pruned · each run gets a temp <code>DOCSERVE_HOME</code> (parallel-safe)</div>
               </div>
             </div>
             <div class="task done">
@@ -502,7 +549,7 @@
               <iconify-icon icon="mdi:eye-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">State watch</div>
-                <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.cache/docserve/</code>)</div>
+                <div class="task-desc"><code>fs.watch</code> + 2 s polling + pid liveness → menu rebuild (watch only <code>~/.docserve/</code>)</div>
               </div>
             </div>
             <div class="task done">

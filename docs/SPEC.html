@@ -447,8 +447,8 @@
 
     <h3><iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>Runtime state</h3>
     <p class="section-desc">
-      Each instance writes its own <code>~/.cache/docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name) once the port is bound and removes it on clean shutdown.
-      Readers verify the PID is alive (<code>kill(pid, 0)</code>) and prune dead-PID files in place; <code>DOCSERVE_STATE_DIR</code> overrides the state dir.
+      Each instance writes its own <code>~/.docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name) once the port is bound and removes it on clean shutdown.
+      Readers verify the PID is alive (<code>kill(pid, 0)</code>) and prune dead-PID files in place; <code>DOCSERVE_HOME</code> overrides the docserve home (<code>~/.docserve</code> by default; it also holds <code>desktop.json</code>).
     </p>
     <div class="table-wrap">
       <table>
@@ -623,7 +623,7 @@
           <tr><td>Instances</td><td>One row per instance (<code>folder — port</code>) with an Open / Stop submenu</td></tr>
           <tr><td>Start / Stop All</td><td><strong>Start Server</strong> (shown while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code></td></tr>
           <tr><td>Add Folder…</td><td><code>dialog.showOpenDialog</code>; starts another instance without stopping the rest — an already-served folder just opens its gallery</td></tr>
-          <tr><td>Recent folders</td><td>Started folders land in <code>~/.cache/docserve/desktop.json</code> (<code>{recentDirs}</code>, max 5), the default for Start Server and Add Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
+          <tr><td>Recent folders</td><td>Started folders land in <code>~/.docserve/desktop.json</code> (<code>{recentDirs}</code>, max 5), the default for Start Server and Add Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
           <tr><td>Quit</td><td>Stops all servers, then <code>app.quit()</code></td></tr>
           <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
         </tbody>

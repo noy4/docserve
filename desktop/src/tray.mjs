@@ -1,8 +1,8 @@
-// The menu bar tray: status, one row per instance (Open / Stop submenu),
-// Add Folder…, Stop All, Quit.
+// The menu bar tray: status, instance rows (Open / Stop), Add Folder…, Quit.
 import os from "node:os"
 import path from "node:path"
 import { Tray, Menu, nativeImage, dialog, shell, app } from "electron"
+import { dev } from "./dev.mjs"
 import { latestRelease, isNewer } from "./update.mjs"
 
 export class TrayController {
@@ -16,10 +16,10 @@ export class TrayController {
 
   boot() {
     this.icons = {
-      running: loadIcon("tray-running"),
-      stopped: loadIcon("tray-stopped"),
-      menuRunning: loadIcon("menu-running", false),
-      menuStopped: loadIcon("menu-stopped", false),
+      running: loadIcon("tray-running", { dev }),
+      stopped: loadIcon("tray-stopped", { dev }),
+      menuRunning: loadIcon("menu-running", { template: false }),
+      menuStopped: loadIcon("menu-stopped", { template: false }),
     }
     this.tray = new Tray(this.icons.stopped)
     this.update()
@@ -121,14 +121,13 @@ export class TrayController {
     this.server.start(dir, { open })
   }
 
-  #quit() {
-    // before-quit snapshots the running set and stops all servers.
-    app.quit()
-  }
+  #quit() { app.quit() }
 }
 
-function loadIcon(name, template = true) {
-  const image = nativeImage.createFromPath(path.join(import.meta.dirname, "assets", `${name}@2x.png`))
+function loadIcon(name, { template = true, dev = false } = {}) {
+  const image = nativeImage.createFromPath(
+    path.join(import.meta.dirname, "assets", `${name}${dev ? "-dev" : ""}@2x.png`),
+  )
   image.setTemplateImage(template)
   return image
 }

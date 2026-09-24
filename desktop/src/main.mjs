@@ -10,9 +10,12 @@
 // │ └─ TrayController menu · icons · Add Folder…           │
 // └────────────────────────────────────────────────────────┘
 import { app, dialog } from "electron"
+import { sandboxDev } from "./dev.mjs"
 import { ServerManager } from "./server.mjs"
 import { TrayController } from "./tray.mjs"
 import { StateWatcher } from "./state.mjs"
+
+sandboxDev()
 
 const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) {
@@ -33,8 +36,7 @@ class App {
 
   start() {
     app.on("second-instance", () => this.tray.update())
-    // Snapshot the running set before stopping, so the next launch resumes
-    // exactly the folders that were serving at quit.
+    // Snapshot before stopping; the next launch resumes this set.
     app.on("before-quit", () => {
       this.server.snapshotRunningDirs()
       this.server.stopSync()
@@ -52,9 +54,7 @@ class App {
     this.#resume()
   }
 
-  // Auto-resume: bring back the folders that were serving at quit; without a
-  // snapshot (first run / crash), fall back to the most recent folder, or ask.
-  // Running servers are never disturbed.
+  // Resume the quit-time set; without a snapshot, the most recent folder, or ask.
   #resume() {
     if (this.server.getStates().length) return
     const resumeDirs = this.server.readResumeDirs()

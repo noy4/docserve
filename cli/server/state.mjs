@@ -1,9 +1,9 @@
 // Per-instance state files + pid liveness.
 //
-// Each server owns one file: ~/.cache/docserve/state/<port>-<name>.json
+// Each server owns one file: ~/.docserve/state/<port>-<name>.json
 // (name = sanitized folder name), written once the port is bound and removed
 // on clean shutdown. Readers verify the PID is alive and treat dead-PID state
-// as stale (removed in place). DOCSERVE_STATE_DIR overrides the state dir
+// as stale (removed in place). DOCSERVE_HOME overrides the docserve home
 // (test isolation).
 import fs from "node:fs"
 import os from "node:os"
@@ -11,9 +11,13 @@ import path from "node:path"
 
 let ownFile = null // file written by this process, removed by clearState()
 
-// DOCSERVE_STATE_DIR overrides the state dir (test isolation).
+// DOCSERVE_HOME overrides the docserve home (test isolation).
+export function homeDir() {
+  return process.env.DOCSERVE_HOME || path.join(os.homedir(), ".docserve")
+}
+
 export function stateDir() {
-  return process.env.DOCSERVE_STATE_DIR || path.join(os.homedir(), ".cache", "docserve", "state")
+  return path.join(homeDir(), "state")
 }
 
 // <port>-<name>.json, e.g. 4242-reports.json. The port prefix keeps files

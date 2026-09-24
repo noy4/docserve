@@ -1,21 +1,27 @@
-// Spawns the CLI and derives the tray state from the CLI's state files.
-//
-// The CLI writes one file per instance — ~/.cache/docserve/state/<port>-<name>.json
-// {pid, port, url, docsDir} — once the port is bound and removes it on clean
-// shutdown; liveness is verified with kill(pid, 0).
+// Spawns the CLI and derives the tray state from ~/.docserve/state files.
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
 import { spawn, spawnSync } from "node:child_process"
+import { dev } from "./dev.mjs"
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..")
-const CACHE_ROOT = path.join(os.homedir(), ".cache", "docserve")
-const STATES_DIR = process.env.DOCSERVE_STATE_DIR || path.join(CACHE_ROOT, "state")
-const DESKTOP_FILE = path.join(CACHE_ROOT, "desktop.json")
+
+function homeDir() {
+  return process.env.DOCSERVE_HOME || path.join(os.homedir(), ".docserve")
+}
+
+function stateDir() {
+  return path.join(homeDir(), "state")
+}
+
+function desktopFile() {
+  return path.join(homeDir(), "desktop.json")
+}
+
 const MAX_RECENT_DIRS = 5
 
-// CLI candidates: dev layout, then the packaged asarUnpack / extraResources
-// locations. Falls back to a docserve binary on PATH when none resolve.
+// CLI candidates: dev layout, packaged asarUnpack / extraResources, PATH.
 function resolveCliEntry() {
   const candidates = [
     path.join(ROOT, "cli", "bin.mjs"),
@@ -94,20 +100,21 @@ export class ServerManager {
     }
   }
 
-  // Remember which folders are serving right now, so the next launch can
-  // resume exactly this set (called on before-quit, before stopping).
+  // Called on before-quit; the next launch resumes exactly this set.
   snapshotRunningDirs() {
     const dirs = this.getStates().map((state) => state.docsDir)
     try {
-      fs.mkdirSync(CACHE_ROOT, { recursive: true })
+      fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
       fs.writeFileSync(
-        DESKTOP_FILE,
+        desktopFile(),
         JSON.stringify({ recentDirs: this.readRecentDirs(), resumeDirs: dirs }, null, 2) + "\n",
       )
-    } catch {}
+    } catch { }
   }
 
   ensureCliSymlink() {
+    // The installed app owns ~/.local/bin/docserve.
+    if (dev) return
     const binDir = path.join(os.homedir(), ".local", "bin")
     const link = path.join(binDir, "docserve")
     try {
@@ -117,7 +124,7 @@ export class ServerManager {
       let current = null
       try {
         current = fs.readlinkSync(link)
-      } catch {}
+      } catch { }
       if (current) {
         if (path.resolve(path.dirname(link), current) === target) return
         fs.rmSync(link, { force: true })
@@ -134,26 +141,26 @@ export class ServerManager {
   }
 
   readRecentDirs() {
-    const data = readJson(DESKTOP_FILE)
+    const data = readJson(desktopFile())
     if (Array.isArray(data?.recentDirs)) return data.recentDirs.filter((d) => typeof d === "string")
     return typeof data?.lastDir === "string" ? [data.lastDir] : []
   }
 
   readResumeDirs() {
-    const data = readJson(DESKTOP_FILE)
+    const data = readJson(desktopFile())
     return Array.isArray(data?.resumeDirs) ? data.resumeDirs.filter((d) => typeof d === "string") : null
   }
 
   pushRecentDir(dir) {
     const dirs = [dir, ...this.readRecentDirs().filter((d) => d !== dir)].slice(0, MAX_RECENT_DIRS)
     try {
-      fs.mkdirSync(CACHE_ROOT, { recursive: true })
-      fs.writeFileSync(DESKTOP_FILE, JSON.stringify({ recentDirs: dirs }, null, 2) + "\n")
-    } catch {}
+      fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
+      fs.writeFileSync(desktopFile(), JSON.stringify({ recentDirs: dirs }, null, 2) + "\n")
+    } catch { }
   }
 
   watchPaths() {
-    return [CACHE_ROOT, STATES_DIR]
+    return [homeDir(), stateDir()]
   }
 
   #changed() {
@@ -200,18 +207,18 @@ export class ServerManager {
   }
 }
 
-// Raw instance states from the state dir, sorted by port. Files with a dead
-// pid are filtered by getStates(); the CLI prunes them on its own reads.
+// Instance states from the state dir, sorted by port (dead pids are
+// filtered by getStates()).
 function readStates() {
   let entries = []
   try {
-    entries = fs.readdirSync(STATES_DIR)
-  } catch {}
+    entries = fs.readdirSync(stateDir())
+  } catch { }
   const states = []
   for (const entry of entries) {
     if (!entry.endsWith(".json")) continue
     try {
-      const state = JSON.parse(fs.readFileSync(path.join(STATES_DIR, entry), "utf8"))
+      const state = JSON.parse(fs.readFileSync(path.join(stateDir(), entry), "utf8"))
       if (
         typeof state?.pid === "number" &&
         typeof state?.port === "number" &&
@@ -220,7 +227,7 @@ function readStates() {
       ) {
         states.push(state)
       }
-    } catch {}
+    } catch { }
   }
   return states.sort((a, b) => a.port - b.port)
 }

@@ -2,8 +2,8 @@
 // folders and exercise injection, the /__reload broadcast, HTTP status codes,
 // and the CLI lifecycle.
 //
-// Isolation: a random --port per run and DOCSERVE_STATE_DIR pointing at a temp
-// state dir keep runs parallel-safe.
+// Isolation: a random --port per run and DOCSERVE_HOME pointing at a temp
+// docserve home keep runs parallel-safe.
 import { describe, it, before, after } from "node:test"
 import assert from "node:assert/strict"
 import { spawn, spawnSync } from "node:child_process"
@@ -88,23 +88,23 @@ describe("docserve server", () => {
   let child
   let port
   let content
-  let stateDir
+  let home
   let otherDir
   let env
 
   before(async () => {
     content = mkdtempSync(join(tmpdir(), "docserve-content-"))
-    stateDir = mkdtempSync(join(tmpdir(), "docserve-state-"))
+    home = mkdtempSync(join(tmpdir(), "docserve-home-"))
     otherDir = mkdtempSync(join(tmpdir(), "docserve-other-"))
-    env = { ...process.env, DOCSERVE_STATE_DIR: stateDir }
+    env = { ...process.env, DOCSERVE_HOME: home }
     child = spawn(process.execPath, [CLI, content, "--port", String(PORT)], { stdio: "ignore", env })
-    const state = await waitForState(stateDir)
+    const state = await waitForState(join(home, "state"))
     port = state.port
   })
 
   after(() => {
     child?.kill("SIGTERM")
-    for (const dir of [content, stateDir, otherDir]) rmSync(dir, { recursive: true, force: true })
+    for (const dir of [content, home, otherDir]) rmSync(dir, { recursive: true, force: true })
   })
 
   it("injects a reload client with a per-file page ID", async () => {
@@ -215,7 +215,7 @@ describe("docserve server", () => {
 })
 
 describe("docserve multi-instance", () => {
-  let stateDir
+  let home
   let dirA
   let dirB
   let env
@@ -227,14 +227,14 @@ describe("docserve multi-instance", () => {
   before(async () => {
     dirA = mkdtempSync(join(tmpdir(), "docserve-multi-a-"))
     dirB = mkdtempSync(join(tmpdir(), "docserve-multi-b-"))
-    stateDir = mkdtempSync(join(tmpdir(), "docserve-multi-state-"))
+    home = mkdtempSync(join(tmpdir(), "docserve-multi-home-"))
     writeFileSync(join(dirA, "a.html"), "<html><body>A</body></html>")
     writeFileSync(join(dirB, "b.html"), "<html><body>B</body></html>")
-    env = { ...process.env, DOCSERVE_STATE_DIR: stateDir }
+    env = { ...process.env, DOCSERVE_HOME: home }
     // Same requested port for both: the second one must fall back +1.
     childA = spawn(process.execPath, [CLI, dirA, "--port", String(PORT)], { stdio: "ignore", env })
     childB = spawn(process.execPath, [CLI, dirB, "--port", String(PORT)], { stdio: "ignore", env })
-    const states = await waitForStates(stateDir, 2)
+    const states = await waitForStates(join(home, "state"), 2)
     portA = states.find((state) => state.docsDir === dirA).port
     portB = states.find((state) => state.docsDir === dirB).port
   })
@@ -242,7 +242,7 @@ describe("docserve multi-instance", () => {
   after(() => {
     childA?.kill("SIGTERM")
     childB?.kill("SIGTERM")
-    for (const dir of [dirA, dirB, stateDir]) rmSync(dir, { recursive: true, force: true })
+    for (const dir of [dirA, dirB, home]) rmSync(dir, { recursive: true, force: true })
   })
 
   it("serves two folders concurrently on distinct ports", async () => {
@@ -299,7 +299,7 @@ describe("docserve multi-instance", () => {
   })
 
   it("prunes stale instance files with dead pids", () => {
-    const stale = join(stateDir, "99999-stale.json")
+    const stale = join(home, "state", "99999-stale.json")
     writeFileSync(
       stale,
       JSON.stringify({ pid: 999999999, port: 99999, url: "http://localhost:99999/", docsDir: "/gone" }),
