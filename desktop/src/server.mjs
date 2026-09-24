@@ -12,6 +12,7 @@ const ROOT = path.resolve(import.meta.dirname, "..", "..")
 const CACHE_ROOT = path.join(os.homedir(), ".cache", "docserve")
 const STATES_DIR = process.env.DOCSERVE_STATE_DIR || path.join(CACHE_ROOT, "state")
 const DESKTOP_FILE = path.join(CACHE_ROOT, "desktop.json")
+const MAX_RECENT_DIRS = 5
 
 // CLI candidates: dev layout, then the packaged asarUnpack / extraResources
 // locations. Falls back to a docserve binary on PATH when none resolve.
@@ -35,26 +36,21 @@ export class ServerManager {
     this.onStartError = null
   }
 
-  getState() {
-    const state = readStates()[0] ?? null
-    const running = Boolean(state && isProcessAlive(state.pid))
-    if (running) this.#clearStarting()
-    return {
-      status: running ? "running" : this.starting ? "starting" : "idle",
-      running,
-      url: running ? state.url : null,
-      docsDir: state?.docsDir ?? null,
-    }
+  // Live instances, sorted by port. Any live instance clears the starting flag.
+  getStates() {
+    const states = readStates().filter((state) => isProcessAlive(state.pid))
+    if (states.length) this.#clearStarting()
+    return states
   }
 
-  isRunning() {
-    return this.getState().running
+  isStarting() {
+    return this.starting !== null
   }
 
   start(dir, { open = false, silent = false } = {}) {
-    if (!dir || this.isRunning() || this.starting) return
+    if (!dir || this.starting) return
     this.starting = { dir, timer: setTimeout(() => this.#clearStarting(), START_TIMEOUT_MS) }
-    this.writeLastDir(dir)
+    this.pushRecentDir(dir)
     this.#changed()
     console.log(`[docserve-desktop] start: ${dir}${open ? " (open)" : ""}${silent ? " (silent)" : ""}`)
 
@@ -78,20 +74,18 @@ export class ServerManager {
   }
 
   stop() {
-    console.log("[docserve-desktop] stop")
-    return new Promise((resolve) => {
-      const { command, args, env } = this.#cliCommand(["stop"])
-      const child = spawn(command, args, { env, stdio: "ignore" })
-      child.on("exit", () => {
-        this.#changed()
-        resolve()
-      })
-    })
+    console.log("[docserve-desktop] stop all")
+    return this.#runCli(["stop"])
+  }
+
+  stopDir(dir) {
+    console.log(`[docserve-desktop] stop: ${dir}`)
+    return this.#runCli([dir, "stop"])
   }
 
   stopSync() {
     this.#clearStarting()
-    if (this.isRunning()) {
+    if (this.getStates().length) {
       const { command, args, env } = this.#cliCommand(["stop"])
       spawnSync(command, args, { env, stdio: "ignore" })
     }
@@ -123,15 +117,17 @@ export class ServerManager {
     }
   }
 
-  readLastDir() {
+  readRecentDirs() {
     const data = readJson(DESKTOP_FILE)
-    return typeof data?.lastDir === "string" ? data.lastDir : null
+    if (Array.isArray(data?.recentDirs)) return data.recentDirs.filter((d) => typeof d === "string")
+    return typeof data?.lastDir === "string" ? [data.lastDir] : []
   }
 
-  writeLastDir(dir) {
+  pushRecentDir(dir) {
+    const dirs = [dir, ...this.readRecentDirs().filter((d) => d !== dir)].slice(0, MAX_RECENT_DIRS)
     try {
       fs.mkdirSync(CACHE_ROOT, { recursive: true })
-      fs.writeFileSync(DESKTOP_FILE, JSON.stringify({ lastDir: dir }, null, 2) + "\n")
+      fs.writeFileSync(DESKTOP_FILE, JSON.stringify({ recentDirs: dirs }, null, 2) + "\n")
     } catch {}
   }
 
@@ -146,6 +142,17 @@ export class ServerManager {
   #clearStarting() {
     if (this.starting?.timer) clearTimeout(this.starting.timer)
     this.starting = null
+  }
+
+  #runCli(args) {
+    return new Promise((resolve) => {
+      const { command, args: cliArgs, env } = this.#cliCommand(args)
+      const child = spawn(command, cliArgs, { env, stdio: "ignore" })
+      child.on("exit", () => {
+        this.#changed()
+        resolve()
+      })
+    })
   }
 
   #cliCommand(args) {
@@ -164,8 +171,8 @@ export class ServerManager {
   }
 }
 
-// Live instance states from the state dir, sorted by port. Files with a dead
-// pid are ignored (the CLI prunes them on its own reads).
+// Raw instance states from the state dir, sorted by port. Files with a dead
+// pid are filtered by getStates(); the CLI prunes them on its own reads.
 function readStates() {
   let entries = []
   try {

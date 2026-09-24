@@ -7,7 +7,7 @@
 // │ App                                                    │
 // │ ├─ ServerManager  spawn/stop CLI · state files         │
 // │ ├─ StateWatcher   fs.watch + 2 s polling → update()    │
-// │ └─ TrayController menu · icons · Change Folder…        │
+// │ └─ TrayController menu · icons · Add Folder…           │
 // └────────────────────────────────────────────────────────┘
 import { app, dialog } from "electron"
 import { ServerManager } from "./server.mjs"
@@ -47,14 +47,15 @@ class App {
     this.#resume()
   }
 
-  // Auto-resume: restart the last folder silently; without one, ask for a
-  // folder and open the gallery. A running server is never disturbed.
+  // Auto-resume: restart the most recent folder silently; without one, ask
+  // for a folder and open the gallery. Running servers are never disturbed.
   #resume() {
-    const dir = this.server.readLastDir()
+    if (this.server.getStates().length) return
+    const dir = this.server.readRecentDirs()[0]
     if (dir) {
       this.server.start(dir, { silent: true })
     } else {
-      this.tray.changeFolder(true)
+      this.tray.addFolder(true)
     }
   }
 }

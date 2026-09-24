@@ -1,4 +1,5 @@
-// The menu bar tray: status item, Open, Stop Server, Change Folder…, Quit.
+// The menu bar tray: status, one row per instance (Open / Stop submenu),
+// Add Folder…, Stop All, Quit.
 import os from "node:os"
 import path from "node:path"
 import { Tray, Menu, nativeImage, dialog, shell, app } from "electron"
@@ -39,70 +40,67 @@ export class TrayController {
 
   update() {
     if (!this.tray) return
-    const state = this.server.getState()
-    this.tray.setImage(state.status === "running" ? this.icons.running : this.icons.stopped)
-    this.tray.setToolTip(`docserve — ${state.running ? state.url : "stopped"}`)
-    this.tray.setContextMenu(this.#buildMenu(state))
-    if (state.status !== this.lastStatus) {
-      this.lastStatus = state.status
-      console.log(`[docserve-desktop] tray: ${state.status}`)
+    const states = this.server.getStates()
+    const status = states.length ? "running" : this.server.isStarting() ? "starting" : "stopped"
+    this.tray.setImage(status === "running" ? this.icons.running : this.icons.stopped)
+    this.tray.setToolTip('docserve')
+    this.tray.setContextMenu(this.#buildMenu(states, status))
+    if (status !== this.lastStatus) {
+      this.lastStatus = status
+      console.log(`[docserve-desktop] tray: ${status}`)
     }
   }
 
-  #buildMenu(state) {
-    const port = state.running ? safePort(state.url) : null
+  #buildMenu(states, status) {
     return Menu.buildFromTemplate([
       {
         label:
-          state.status === "running"
-            ? "Running"
-            : state.status === "starting"
+          status === "running"
+            ? `Running (${states.length})`
+            : status === "starting"
               ? "Starting…"
               : "Stopped",
-        icon: state.status === "running" ? this.icons.menuRunning : this.icons.menuStopped,
+        icon: status === "running" ? this.icons.menuRunning : this.icons.menuStopped,
         enabled: false,
       },
-      {
-        label: state.running ? `Open (localhost:${port})` : "Open (Start Server)",
-        click: () => state.running
-          ? shell.openExternal(state.url)
-          : this.#start(),
-      },
-      {
-        label: "Stop Server",
-        enabled: state.running,
-        click: () => this.server.stop(),
-      },
+      ...states.map((state) => ({
+        label: `${path.basename(state.docsDir)} — ${safePort(state.url)}`,
+        submenu: [
+          {
+            label: `Open (localhost:${safePort(state.url)})`,
+            click: () => shell.openExternal(state.url),
+          },
+          { label: "Stop", click: () => this.server.stopDir(state.docsDir) },
+        ],
+      })),
       { type: "separator" },
-      {
-        label: `Serving: ${state.docsDir ?? this.server.readLastDir() ?? "—"}`,
-        enabled: false,
-      },
-      { label: "Change Folder...", click: () => this.changeFolder(true) },
+      ...(states.length ? [] : [{ label: "Start Server", click: () => this.#start() }]),
+      { label: "Add Folder...", click: () => this.addFolder(true) },
+      { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
       { type: "separator" },
       ...(this.updateAvailable
         ? [
-            {
-              label: `New version available — v${this.updateAvailable.version}`,
-              click: () => shell.openExternal(this.updateAvailable.url),
-            },
-            { type: "separator" },
-          ]
+          {
+            label: `New version available — v${this.updateAvailable.version}`,
+            click: () => shell.openExternal(this.updateAvailable.url),
+          },
+          { type: "separator" },
+        ]
         : []),
       { label: "Quit docserve", click: () => this.#quit() },
     ])
   }
 
   #start() {
-    const dir = this.server.readLastDir()
+    const dir = this.server.readRecentDirs()[0]
     if (dir) {
       this.server.start(dir, { open: true })
     } else {
-      this.changeFolder(true)
+      this.addFolder(true)
     }
   }
 
-  async changeFolder(open = false) {
+  async addFolder(open = false) {
     // LSUIElement app: without stealing focus the dialog opens behind Finder.
     if (process.platform === "darwin") {
       app.focus({ steal: true })
@@ -110,17 +108,21 @@ export class TrayController {
     }
     const result = await dialog.showOpenDialog({
       title: "docserve — Choose a folder to serve",
-      defaultPath: this.server.readLastDir() || os.homedir(),
+      defaultPath: this.server.readRecentDirs()[0] || os.homedir(),
       properties: ["openDirectory"],
     })
     const dir = result.filePaths[0]
     if (result.canceled || !dir) return
-    if (this.server.isRunning()) await this.server.stop()
+    const existing = this.server.getStates().find((state) => state.docsDir === dir)
+    if (existing) {
+      if (open) shell.openExternal(existing.url)
+      return
+    }
     this.server.start(dir, { open })
   }
 
   async #quit() {
-    if (this.server.isRunning()) await this.server.stop()
+    await this.server.stop()
     app.quit()
   }
 }
