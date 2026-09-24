@@ -1,11 +1,11 @@
 // docserve desktop — a macOS menu bar client with zero windows.
 //
-// The Electron main process only spawns the CLI and watches state.json; all
-// serving stays in the CLI process.
+// The Electron main process only spawns the CLI and watches the CLI's state
+// files; all serving stays in the CLI process.
 //
 // ┌────────────────────────────────────────────────────────┐
 // │ App                                                    │
-// │ ├─ ServerManager  spawn/stop CLI · state.json          │
+// │ ├─ ServerManager  spawn/stop CLI · state files         │
 // │ ├─ StateWatcher   fs.watch + 2 s polling → update()    │
 // │ └─ TrayController menu · icons · Change Folder…        │
 // └────────────────────────────────────────────────────────┘

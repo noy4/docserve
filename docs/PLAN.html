@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -306,6 +306,68 @@
     <h2><iconify-icon icon="mdi:format-list-numbered" width="24" noobserver></iconify-icon>Roadmap</h2>
 
     <div class="timeline">
+
+      <div class="timeline-step">
+        <iconify-icon class="step-check" icon="mdi:circle-outline" style="color:var(--muted)" noobserver></iconify-icon>
+        <div class="step-content">
+          <div class="step-head">
+            <span class="step-title">
+              <iconify-icon icon="mdi:numeric-9-circle" style="color:var(--cyan)" noobserver></iconify-icon>
+              Phase 9 — Multiple folders
+            </span>
+            <span class="step-meta">P1</span>
+          </div>
+          <div class="step-body">
+            Serve several folders at once with <strong>one process (and one port) per folder</strong>. The server core stays unchanged; only the state file, CLI lifecycle, and tray become multi-instance.
+            Separate processes keep root-relative links (<code>/style.css</code>) working because every folder owns <code>/</code> on its own port — a single process with <code>/&lt;name&gt;/</code> prefixes would break them. It also gives crash isolation and a trivial per-folder <code>stop</code>. Cost: one Node process (~40 MB) per folder, acceptable for a handful.
+          </div>
+          <div class="tasks">
+            <div class="task done">
+              <iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Per-instance state</div>
+                <div class="task-desc"><code>state.json</code> → <code>~/.cache/docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name, split on the first <code>-</code>) · <code>listLiveStates()</code> prunes dead pids · <code>findByDir(docsDir)</code> matches on file contents · <code>DOCSERVE_STATE</code> (file path) is <strong>dropped</strong> in favor of <code>DOCSERVE_STATE_DIR</code> (state dir override)</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Single-instance rule per folder</div>
+                <div class="task-desc">same <code>docsDir</code> → point at its URL (unchanged) · different <code>docsDir</code> → start a new instance instead of erroring · port fallback +1 already avoids collisions</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:console" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title"><code>stop</code> / <code>status</code></div>
+                <div class="task-desc"><code>docserve [dir] stop</code> stops that folder · <code>stop --all</code> stops every instance · <code>status</code> lists all (url + docsDir), exit 1 when none</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Tray: folder list</div>
+                <div class="task-desc">watch the <code>state/</code> dir · one row per instance (Open / Stop submenu) · "Add Folder…" starts another · "Stop All" · <code>desktop.json</code> → <code>{recentDirs}</code> · filled icon when ≥ 1 running · Quit stops all</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:test-tube" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">Tests</div>
+                <div class="task-desc">two folders concurrently → distinct ports · reload broadcasts stay per-folder · <code>stop &lt;dir&gt;</code> leaves the other alive · <code>stop --all</code> · stale instance file pruned · each run gets a temp <code>DOCSERVE_STATE_DIR</code> (parallel-safe)</div>
+              </div>
+            </div>
+            <div class="task">
+              <iconify-icon icon="mdi:pencil-outline" noobserver></iconify-icon>
+              <div class="task-text">
+                <div class="task-title">SPEC update</div>
+                <div class="task-desc">Runtime state table · single-instance callout · CLI table · Desktop menu mock</div>
+              </div>
+            </div>
+          </div>
+          <p class="verify"><iconify-icon icon="mdi:flask-outline" noobserver></iconify-icon>Verify: <code>docserve ~/a --background</code> + <code>docserve ~/b --background</code> → <code>status</code> lists both on 4242/4243 · editing in <code>~/a</code> doesn't touch <code>~/b</code> tabs · tray stops one without the other</p>
+        </div>
+      </div>
 
       <div class="timeline-step">
         <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>

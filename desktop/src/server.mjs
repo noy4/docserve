@@ -1,7 +1,8 @@
-// Spawns the CLI and derives the tray state from ~/.cache/docserve/state.json.
+// Spawns the CLI and derives the tray state from the CLI's state files.
 //
-// The CLI writes state.json {pid, port, url, docsDir} once the port is bound and
-// removes it on clean shutdown; liveness is verified with kill(pid, 0).
+// The CLI writes one file per instance — ~/.cache/docserve/state/<port>-<name>.json
+// {pid, port, url, docsDir} — once the port is bound and removes it on clean
+// shutdown; liveness is verified with kill(pid, 0).
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
@@ -9,7 +10,7 @@ import { spawn, spawnSync } from "node:child_process"
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..")
 const CACHE_ROOT = path.join(os.homedir(), ".cache", "docserve")
-const STATE_FILE = path.join(CACHE_ROOT, "state.json")
+const STATES_DIR = process.env.DOCSERVE_STATE_DIR || path.join(CACHE_ROOT, "state")
 const DESKTOP_FILE = path.join(CACHE_ROOT, "desktop.json")
 
 // CLI candidates: dev layout, then the packaged asarUnpack / extraResources
@@ -35,8 +36,8 @@ export class ServerManager {
   }
 
   getState() {
-    const state = readJson(STATE_FILE)
-    const running = Boolean(state && typeof state.pid === "number" && isProcessAlive(state.pid))
+    const state = readStates()[0] ?? null
+    const running = Boolean(state && isProcessAlive(state.pid))
     if (running) this.#clearStarting()
     return {
       status: running ? "running" : this.starting ? "starting" : "idle",
@@ -135,7 +136,7 @@ export class ServerManager {
   }
 
   watchPaths() {
-    return [CACHE_ROOT]
+    return [CACHE_ROOT, STATES_DIR]
   }
 
   #changed() {
@@ -161,6 +162,31 @@ export class ServerManager {
       env: { ...process.env },
     }
   }
+}
+
+// Live instance states from the state dir, sorted by port. Files with a dead
+// pid are ignored (the CLI prunes them on its own reads).
+function readStates() {
+  let entries = []
+  try {
+    entries = fs.readdirSync(STATES_DIR)
+  } catch {}
+  const states = []
+  for (const entry of entries) {
+    if (!entry.endsWith(".json")) continue
+    try {
+      const state = JSON.parse(fs.readFileSync(path.join(STATES_DIR, entry), "utf8"))
+      if (
+        typeof state?.pid === "number" &&
+        typeof state?.port === "number" &&
+        typeof state?.url === "string" &&
+        typeof state?.docsDir === "string"
+      ) {
+        states.push(state)
+      }
+    } catch {}
+  }
+  return states.sort((a, b) => a.port - b.port)
 }
 
 function readJson(file) {

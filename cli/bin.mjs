@@ -4,18 +4,18 @@
 //   docserve [dir] [command] [options]
 //
 // Flow:
-//   parse args ──▶ stop / status ──▶ state.json
+//   parse args ──▶ stop / status ──▶ state files
 //   └─ start
-//      ├─ single-instance check (readLiveState)
-//      ├─ --background ──▶ spawn detached ──▶ wait for state.json
-//      └─ foreground ──▶ runServer() (writes state.json on bind)
+//      ├─ single-instance check (findByDir)
+//      ├─ --background ──▶ spawn detached ──▶ wait for the state file
+//      └─ foreground ──▶ runServer() (writes its state file on bind)
 import fs from "node:fs"
 import path from "node:path"
 import { exec, spawn } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { parseArgs } from "node:util"
 import { runServer } from "./server/index.mjs"
-import { clearState, readLiveState } from "./server/state.mjs"
+import { findByDir, listLiveStates, removeState } from "./server/state.mjs"
 
 const pkg = JSON.parse(fs.readFileSync(new URL("./package.json", import.meta.url), "utf8"))
 const VERSION = pkg.version
@@ -38,7 +38,7 @@ Commands:
 Options:
   --open             Open the gallery in the browser once the port is bound
   --port <number>    Port to bind (default: ${DEFAULT_PORT}); falls back +1 up to 20 tries
-  --background       Start detached; the bound port and pid land in state.json
+  --background       Start detached; the bound port and pid land in the state dir
   -h, --help         Show this help
   -v, --version      Show version
 `
@@ -115,26 +115,30 @@ function parseCliArgs() {
 }
 
 function stopServer() {
-  const state = readLiveState() // stale state (dead pid) is removed silently
-  if (!state) {
+  const states = listLiveStates() // stale state (dead pid) is removed silently
+  if (!states.length) {
     console.log("docserve is not running.")
     return
   }
-  try {
-    process.kill(state.pid, "SIGTERM")
-  } catch {}
-  clearState()
-  console.log(`Stopped docserve (${state.url})`)
+  for (const state of states) {
+    try {
+      process.kill(state.pid, "SIGTERM")
+    } catch {}
+    removeState(state)
+    console.log(`Stopped docserve (${state.url})`)
+  }
 }
 
 function showStatus() {
-  const state = readLiveState()
-  if (!state) {
+  const states = listLiveStates()
+  if (!states.length) {
     console.error("docserve is not running.")
     process.exit(1)
   }
-  console.log(state.url)
-  console.log(`docs : ${state.docsDir}`)
+  for (const state of states) {
+    console.log(state.url)
+    console.log(`docs : ${state.docsDir}`)
+  }
 }
 
 async function startServer(args) {
@@ -146,17 +150,18 @@ async function startServer(args) {
 
   // Single instance: same docsDir just opens its URL; a different docsDir
   // requires docserve stop first.
-  const running = readLiveState()
+  const running = findByDir(docsDir)
   if (running) {
-    if (running.docsDir === docsDir) {
-      if (args.open) openBrowser(running.url)
-      console.log(`docserve is already serving this folder: ${running.url}`)
-      return
-    }
+    if (args.open) openBrowser(running.url)
+    console.log(`docserve is already serving this folder: ${running.url}`)
+    return
+  }
+  const other = listLiveStates().find((state) => state.docsDir !== docsDir)
+  if (other) {
     console.error([
       "[docserve] A server is already running for a different folder.",
-      `  url  : ${running.url}`,
-      `  docs : ${running.docsDir}`,
+      `  url  : ${other.url}`,
+      `  docs : ${other.docsDir}`,
       "Stop it first: docserve stop",
     ].join("\n"))
     process.exit(1)
@@ -192,8 +197,8 @@ async function startBackground(args, docsDir) {
 async function waitForState({ timeoutMs = 10000, intervalMs = 200 } = {}) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
-    const state = readLiveState()
-    if (state) return state
+    const states = listLiveStates()
+    if (states.length) return states[0]
     await new Promise((resolve) => setTimeout(resolve, intervalMs))
   }
   return null

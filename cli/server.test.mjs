@@ -2,13 +2,13 @@
 // folders and exercise injection, the /__reload broadcast, HTTP status codes,
 // and the CLI lifecycle.
 //
-// Isolation: a random --port per run and DOCSERVE_STATE pointing at a temp
-// state file keep runs parallel-safe.
+// Isolation: a random --port per run and DOCSERVE_STATE_DIR pointing at a temp
+// state dir keep runs parallel-safe.
 import { describe, it, before, after } from "node:test"
 import assert from "node:assert/strict"
 import { spawn, spawnSync } from "node:child_process"
 import { once } from "node:events"
-import { readFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import { readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -18,13 +18,16 @@ const PORT = 20000 + Math.floor(Math.random() * 20000)
 const WS_PATH = "/__reload"
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// Resolve once the server reports its bound port via state.json.
-async function waitForState(stateFile, timeoutMs = 5000) {
+// Resolve once the server reports its bound port via a state file in the dir.
+async function waitForState(stateDir, timeoutMs = 5000) {
   const end = Date.now() + timeoutMs
   while (Date.now() < end) {
     try {
-      const state = JSON.parse(readFileSync(stateFile, "utf8"))
-      if (typeof state.port === "number") return state
+      for (const entry of readdirSync(stateDir)) {
+        if (!entry.endsWith(".json")) continue
+        const state = JSON.parse(readFileSync(join(stateDir, entry), "utf8"))
+        if (typeof state.port === "number") return state
+      }
     } catch {}
     await delay(100)
   }
@@ -63,9 +66,9 @@ describe("docserve server", () => {
     content = mkdtempSync(join(tmpdir(), "docserve-content-"))
     stateDir = mkdtempSync(join(tmpdir(), "docserve-state-"))
     otherDir = mkdtempSync(join(tmpdir(), "docserve-other-"))
-    env = { ...process.env, DOCSERVE_STATE: join(stateDir, "state.json") }
+    env = { ...process.env, DOCSERVE_STATE_DIR: stateDir }
     child = spawn(process.execPath, [CLI, content, "--port", String(PORT)], { stdio: "ignore", env })
-    const state = await waitForState(env.DOCSERVE_STATE)
+    const state = await waitForState(stateDir)
     port = state.port
   })
 
