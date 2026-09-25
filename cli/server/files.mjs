@@ -13,23 +13,31 @@ const run = promisify(execFile)
 
 // Walk docsDir recursively and collect .html files; only the root index.html is
 // excluded from the gallery.
-export async function listHtmlFiles(docsDir, out = [], root = docsDir) {
-  let entries
-  try {
-    entries = await readdir(docsDir, { withFileTypes: true })
-  } catch {
-    return out
-  }
-  for (const entry of entries) {
-    const full = join(docsDir, entry.name)
-    if (shouldIgnore(entry.name)) continue
-    if (entry.isDirectory()) {
-      await listHtmlFiles(full, out, root)
-    } else if (entry.name.endsWith(".html") && !(docsDir === root && entry.name === "index.html")) {
-      out.push(full)
+const MAX_DEPTH = 3
+
+export async function listHtmlFiles(docsDir) {
+  const out = []
+  await walk(docsDir, docsDir, 0)
+  return out
+
+  async function walk(dir, root, depth) {
+    if (depth > MAX_DEPTH) return
+    let entries
+    try {
+      entries = await readdir(dir, { withFileTypes: true })
+    } catch {
+      return
+    }
+    for (const entry of entries) {
+      const full = join(dir, entry.name)
+      if (shouldIgnore(entry.name)) continue
+      if (entry.isDirectory()) {
+        await walk(full, root, depth + 1)
+      } else if (entry.name.endsWith(".html") && !(dir === root && entry.name === "index.html")) {
+        out.push(full)
+      }
     }
   }
-  return out
 }
 
 // /api/files payload, sorted by created desc with title/path tiebreaks.
