@@ -11,6 +11,7 @@
 // └────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
 import { readFile } from "node:fs/promises"
+import os from "node:os"
 import { basename, extname, resolve } from "node:path"
 import { exec } from "node:child_process"
 import { clearState, writeState } from "./state.mjs"
@@ -162,11 +163,17 @@ async function galleryResponse(docsDir) {
     let html = await readFile(INDEX_TEMPLATE, "utf8")
     html = html
       .replaceAll("__DOCS_DIR_NAME__", escapeHtml(basename(docsDir) || docsDir))
-      .replaceAll("__DOCS_DIR__", escapeHtml(docsDir))
+      .replaceAll("__DOCS_DIR__", escapeHtml(displayPath(docsDir)))
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
   } catch {
     return new Response("Gallery template missing", { status: 500 })
   }
+}
+
+// Collapse the home directory prefix to ~ for display.
+function displayPath(p) {
+  const home = os.homedir()
+  return p.startsWith(`${home}/`) ? `~${p.slice(home.length)}` : p
 }
 
 function escapeHtml(s) {
