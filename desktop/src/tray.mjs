@@ -53,7 +53,7 @@ export class TrayController {
 
   #buildMenu(states, status) {
     const ___ = { type: "separator" }
-    const recentDirs = this.server.readRecentDirs()
+
     const updateItems = []
     if (this.updateAvailable) {
       updateItems.push({
@@ -61,6 +61,24 @@ export class TrayController {
         click: () => shell.openExternal(this.updateAvailable.url),
       })
       updateItems.push(___)
+    }
+
+    const recentDirs = this.server.readRecentDirs()
+    const recentItem = recentDirs.length && {
+      label: "Open Recent",
+      submenu: recentDirs.map((dir) => {
+        const name = path.basename(dir) || dir
+        // Same basename under a different path: show the full path to disambiguate.
+        const ambiguous = recentDirs.some((other) => other !== dir && (path.basename(other) || other) === name)
+        return {
+          label: ambiguous ? `${name} — ${dir}` : name,
+          click: () => {
+            const running = states.find((state) => state.docsDir === dir)
+            if (running) shell.openExternal(running.url)
+            else this.server.start(dir, { open: true })
+          },
+        }
+      }),
     }
 
     return Menu.buildFromTemplate([
@@ -71,7 +89,7 @@ export class TrayController {
         enabled: false,
       },
       // running servers
-      ...states.map((state) => ({
+      states.map((state) => ({
         label: `${path.basename(state.docsDir)} — ${safePort(state.url)}`,
         submenu: [
           {
@@ -84,30 +102,15 @@ export class TrayController {
       ___,
 
       // actions
-      states.length || { label: "Start Server", click: () => this.#start() },
+      (states.length === 0) && { label: "Start Server", click: () => this.#start() },
       { label: "Open Folder...", click: () => this.openFolder(true) },
-      recentDirs.length && {
-        label: "Open Recent",
-        submenu: recentDirs.map((dir) => {
-          const name = path.basename(dir) || dir
-          // Same basename under a different path: show the full path to disambiguate.
-          const ambiguous = recentDirs.some((other) => other !== dir && (path.basename(other) || other) === name)
-          return {
-            label: ambiguous ? `${name} — ${dir}` : name,
-            click: () => {
-              const running = states.find((state) => state.docsDir === dir)
-              if (running) shell.openExternal(running.url)
-              else this.server.start(dir, { open: true })
-            },
-          }
-        }),
-      },
+      recentItem,
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
       ___,
 
-      ...updateItems,
+      updateItems,
       { label: "Quit docserve", click: () => this.#quit() },
-    ].filter(Boolean))
+    ].flat().filter(Boolean))
   }
 
   #start() {
