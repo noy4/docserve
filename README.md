@@ -30,11 +30,6 @@ npx @noy4/docserve stop               # stop all running servers
 
 Or install globally: `npm install -g @noy4/docserve` — then run `docserve <folder>`.
 
-## 📚 Documentation
-
-- [SPEC.html](./docs/SPEC.html) — design & implementation specification
-- [PLAN.html](./docs/PLAN.html) — implementation roadmap
-
 ## ⚖️ License
 
 [MIT](./LICENSE)
