@@ -85,7 +85,7 @@ export class TrayController {
       },
       // running servers
       states.map((state) => ({
-        label: `${path.basename(state.docsDir)} — ${safePort(state.url)}`,
+        label: `${path.basename(state.docsDir) || state.docsDir} (${tildePath(path.dirname(state.docsDir))})`,
         submenu: [
           {
             label: `Open (localhost:${safePort(state.url)})`,

@@ -19,7 +19,7 @@ function desktopFile() {
   return path.join(homeDir(), "desktop.json")
 }
 
-const MAX_RECENT_DIRS = 5
+const MAX_RECENT_DIRS = 10
 
 // CLI candidates: dev layout, packaged asarUnpack / extraResources, PATH.
 function resolveCliEntry() {
