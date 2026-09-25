@@ -248,14 +248,17 @@ describe("docserve server", () => {
       mkdirSync(join(testDir, "node_modules", "pkg"), { recursive: true })
       mkdirSync(join(testDir, "sub"), { recursive: true })
 
+      writeFileSync(join(testDir, "index.html"), "<html></html>")
       writeFileSync(join(testDir, ".git", "hidden.html"), "<html></html>")
       writeFileSync(join(testDir, ".draft.html"), "<html></html>")
       writeFileSync(join(testDir, "node_modules", "pkg", "vendor.html"), "<html></html>")
       writeFileSync(join(testDir, "sub", "ok.html"), "<html></html>")
+      writeFileSync(join(testDir, "sub", "index.html"), "<html></html>")
 
       const files = await listHtmlFiles(testDir)
-      assert.equal(files.length, 1)
-      assert.ok(files[0].endsWith("sub/ok.html") || files[0].endsWith("sub\\ok.html"))
+      assert.equal(files.length, 2)
+      assert.ok(files.some((file) => file.endsWith("sub/ok.html") || file.endsWith("sub\\ok.html")))
+      assert.ok(files.some((file) => file.endsWith("sub/index.html") || file.endsWith("sub\\index.html")))
     } finally {
       rmSync(testDir, { recursive: true, force: true })
     }

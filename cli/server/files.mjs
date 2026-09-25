@@ -11,9 +11,9 @@ import { promisify } from "node:util"
 
 const run = promisify(execFile)
 
-// Walk docsDir recursively and collect .html files; any index.html is excluded
-// from the gallery.
-export async function listHtmlFiles(docsDir, out = []) {
+// Walk docsDir recursively and collect .html files; only the root index.html is
+// excluded from the gallery.
+export async function listHtmlFiles(docsDir, out = [], root = docsDir) {
   let entries
   try {
     entries = await readdir(docsDir, { withFileTypes: true })
@@ -24,8 +24,8 @@ export async function listHtmlFiles(docsDir, out = []) {
     const full = join(docsDir, entry.name)
     if (shouldIgnore(entry.name)) continue
     if (entry.isDirectory()) {
-      await listHtmlFiles(full, out)
-    } else if (entry.name.endsWith(".html") && entry.name !== "index.html") {
+      await listHtmlFiles(full, out, root)
+    } else if (entry.name.endsWith(".html") && !(docsDir === root && entry.name === "index.html")) {
       out.push(full)
     }
   }
