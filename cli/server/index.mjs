@@ -11,7 +11,7 @@
 // └────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
 import { readFile } from "node:fs/promises"
-import { extname, resolve } from "node:path"
+import { basename, extname, resolve } from "node:path"
 import { exec } from "node:child_process"
 import { clearState, writeState } from "./state.mjs"
 import { apiFiles, isWithin, normalizedRelative } from "./files.mjs"
@@ -156,11 +156,13 @@ function createHandler({ docsDir }) {
 }
 
 // The gallery is an embedded template served at / and /index.html; docsDir's own
-// index.html is shadowed by it. __DOCSERVE_DIR__ is substituted for display.
+// index.html is shadowed by it. Directory markers are substituted for display.
 async function galleryResponse(docsDir) {
   try {
     let html = await readFile(INDEX_TEMPLATE, "utf8")
-    html = html.replaceAll("__DOCSERVE_DIR__", escapeHtml(docsDir))
+    html = html
+      .replaceAll("__DOCSERVE_NAME__", escapeHtml(basename(docsDir) || docsDir))
+      .replaceAll("__DOCSERVE_DIR__", escapeHtml(docsDir))
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
   } catch {
     return new Response("Gallery template missing", { status: 500 })

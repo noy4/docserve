@@ -10,7 +10,7 @@ import { spawn, spawnSync } from "node:child_process"
 import { once } from "node:events"
 import { existsSync, readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join, dirname } from "node:path"
+import { basename, join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 import { runServer } from "./server/index.mjs"
 import { listHtmlFiles, shouldIgnore } from "./server/files.mjs"
@@ -123,8 +123,10 @@ describe("docserve server", () => {
     const gallery = await (await fetch(`http://localhost:${port}/`)).text()
     assert.ok(gallery.includes("contentSetChanged"), "gallery ships its own reload client")
     assert.ok(gallery.includes(content), "docsDir is substituted")
+    assert.ok(gallery.includes(`<title>${basename(content)}</title>`), "gallery title uses the folder name")
+    assert.ok(gallery.includes(`    ${basename(content)}\n  </h1>`), "gallery heading uses the folder name")
     assert.ok(!gallery.includes("const pageId"))
-    assert.ok(!gallery.includes("__DOCSERVE_DIR__"))
+    assert.ok(!gallery.includes("__DOCSERVE_"))
   })
 
   it("lists html files with resolved metadata on /api/files", async () => {
