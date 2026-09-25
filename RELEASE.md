@@ -1,5 +1,9 @@
 # Release
 
+## Quick release (script)
+
+`scripts/release.sh <cli|desktop|both> <major|minor|patch|X.Y.Z>` — bumps, tags, pushes, and watches CI. On failure, see the notes below.
+
 ## Desktop app
 
 1. Bump `version` in `desktop/package.json` — the tray update notice compares this against the latest release tag, so it is the release number
