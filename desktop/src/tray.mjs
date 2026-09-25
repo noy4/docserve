@@ -84,9 +84,9 @@ export class TrayController {
       ___,
 
       // actions
-      ...(states.length ? [] : [{ label: "Start Server", click: () => this.#start() }]),
+      states.length || { label: "Start Server", click: () => this.#start() },
       { label: "Open Folder...", click: () => this.openFolder(true) },
-      ...(recentDirs.length ? [{
+      recentDirs.length && {
         label: "Open Recent",
         submenu: recentDirs.map((dir) => {
           const name = path.basename(dir) || dir
@@ -101,13 +101,13 @@ export class TrayController {
             },
           }
         }),
-      }] : []),
+      },
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
       ___,
 
       ...updateItems,
       { label: "Quit docserve", click: () => this.#quit() },
-    ])
+    ].filter(Boolean))
   }
 
   #start() {
