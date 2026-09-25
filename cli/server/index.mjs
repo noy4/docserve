@@ -161,8 +161,8 @@ async function galleryResponse(docsDir) {
   try {
     let html = await readFile(INDEX_TEMPLATE, "utf8")
     html = html
-      .replaceAll("__DOCSERVE_NAME__", escapeHtml(basename(docsDir) || docsDir))
-      .replaceAll("__DOCSERVE_DIR__", escapeHtml(docsDir))
+      .replaceAll("__DOCS_DIR_NAME__", escapeHtml(basename(docsDir) || docsDir))
+      .replaceAll("__DOCS_DIR__", escapeHtml(docsDir))
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
   } catch {
     return new Response("Gallery template missing", { status: 500 })

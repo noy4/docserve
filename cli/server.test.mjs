@@ -126,7 +126,7 @@ describe("docserve server", () => {
     assert.ok(gallery.includes(`<title>${basename(content)}</title>`), "gallery title uses the folder name")
     assert.ok(gallery.includes(`    ${basename(content)}\n  </h1>`), "gallery heading uses the folder name")
     assert.ok(!gallery.includes("const pageId"))
-    assert.ok(!gallery.includes("__DOCSERVE_"))
+    assert.ok(!gallery.includes("__DOCS_DIR"))
   })
 
   it("lists html files with resolved metadata on /api/files", async () => {
