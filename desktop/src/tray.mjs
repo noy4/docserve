@@ -66,19 +66,14 @@ export class TrayController {
     const recentDirs = this.server.readRecentDirs()
     const recentItem = recentDirs.length && {
       label: "Open Recent",
-      submenu: recentDirs.map((dir) => {
-        const name = path.basename(dir) || dir
-        // Same basename under a different path: show the full path to disambiguate.
-        const ambiguous = recentDirs.some((other) => other !== dir && (path.basename(other) || other) === name)
-        return {
-          label: ambiguous ? `${name} — ${dir}` : name,
-          click: () => {
-            const running = states.find((state) => state.docsDir === dir)
-            if (running) shell.openExternal(running.url)
-            else this.server.start(dir, { open: true })
-          },
-        }
-      }),
+      submenu: recentDirs.map((dir) => ({
+        label: `${path.basename(dir) || dir} (${tildePath(path.dirname(dir))})`,
+        click: () => {
+          const running = states.find((state) => state.docsDir === dir)
+          if (running) shell.openExternal(running.url)
+          else this.server.start(dir, { open: true })
+        },
+      })),
     }
 
     return Menu.buildFromTemplate([
@@ -164,4 +159,10 @@ function safePort(url) {
   } catch {
     return "?"
   }
+}
+
+// Collapse the home directory prefix to ~ for display.
+function tildePath(p) {
+  const home = os.homedir()
+  return p.startsWith(`${home}/`) ? `~${p.slice(home.length)}` : p
 }
