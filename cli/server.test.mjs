@@ -181,12 +181,12 @@ describe("docserve server", () => {
   it("flags content additions and removals for a gallery reload", async () => {
     const ws = new WebSocket(`ws://localhost:${port}${WS_PATH}`)
     await once(ws, "open")
-    const file = join(content, ".tmp-gallery-add.html")
+    const file = join(content, "tmp-gallery-add.html")
     try {
       writeFileSync(file, "<html></html>")
       assert.deepEqual(await waitForChange(ws, (c) => c.contentSetChanged), {
         type: "change",
-        pages: [".tmp-gallery-add.html"],
+        pages: ["tmp-gallery-add.html"],
         contentSetChanged: true,
         templateChanged: false,
       })
@@ -194,7 +194,7 @@ describe("docserve server", () => {
       rmSync(file)
       assert.deepEqual(await waitForChange(ws, (c) => c.contentSetChanged), {
         type: "change",
-        pages: [".tmp-gallery-add.html"],
+        pages: ["tmp-gallery-add.html"],
         contentSetChanged: true,
         templateChanged: false,
       })
