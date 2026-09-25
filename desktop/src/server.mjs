@@ -105,10 +105,7 @@ export class ServerManager {
     const dirs = this.getStates().map((state) => state.docsDir)
     try {
       fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
-      fs.writeFileSync(
-        desktopFile(),
-        JSON.stringify({ recentDirs: this.readRecentDirs(), resumeDirs: dirs }, null, 2) + "\n",
-      )
+      writeJsonAtomic(desktopFile(), { recentDirs: this.readRecentDirs(), resumeDirs: dirs })
     } catch { }
   }
 
@@ -155,7 +152,7 @@ export class ServerManager {
     const dirs = [dir, ...this.readRecentDirs().filter((d) => d !== dir)].slice(0, MAX_RECENT_DIRS)
     try {
       fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
-      fs.writeFileSync(desktopFile(), JSON.stringify({ recentDirs: dirs }, null, 2) + "\n")
+      writeJsonAtomic(desktopFile(), { recentDirs: dirs })
     } catch { }
   }
 
@@ -238,6 +235,13 @@ function readJson(file) {
   } catch {
     return null
   }
+}
+
+// Atomic write: a group-wide Ctrl+C can kill the app mid-write, leaving a truncated file.
+function writeJsonAtomic(file, data) {
+  const tmp = `${file}.${process.pid}.tmp`
+  fs.writeFileSync(tmp, JSON.stringify(data, null, 2) + "\n")
+  fs.renameSync(tmp, file)
 }
 
 function isProcessAlive(pid) {

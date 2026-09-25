@@ -53,6 +53,7 @@ export class TrayController {
 
   #buildMenu(states, status) {
     const ___ = { type: "separator" }
+    const recentDirs = this.server.readRecentDirs()
     const updateItems = []
     if (this.updateAvailable) {
       updateItems.push({
@@ -85,6 +86,22 @@ export class TrayController {
       // actions
       ...(states.length ? [] : [{ label: "Start Server", click: () => this.#start() }]),
       { label: "Open Folder...", click: () => this.openFolder(true) },
+      ...(recentDirs.length ? [{
+        label: "Open Recent",
+        submenu: recentDirs.map((dir) => {
+          const name = path.basename(dir) || dir
+          // Same basename under a different path: show the full path to disambiguate.
+          const ambiguous = recentDirs.some((other) => other !== dir && (path.basename(other) || other) === name)
+          return {
+            label: ambiguous ? `${name} — ${dir}` : name,
+            click: () => {
+              const running = states.find((state) => state.docsDir === dir)
+              if (running) shell.openExternal(running.url)
+              else this.server.start(dir, { open: true })
+            },
+          }
+        }),
+      }] : []),
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
       ___,
 
