@@ -322,6 +322,7 @@
     gap: 6px;
   }
   .task {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -338,6 +339,14 @@
   }
   .task.done { background: transparent; }
   .task.done > iconify-icon { color: var(--green); }
+  .task.done::after {
+    content: '✓';
+    position: absolute;
+    top: 0px;
+    right: 8px;
+    font-family: var(--mono);
+    color: var(--green);
+  }
   .task-title {
     font-size: 0.8rem;
     font-weight: 600;
