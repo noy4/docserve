@@ -501,28 +501,47 @@
 
     <h3><iconify-icon icon="mdi:file-cog-outline" noobserver></iconify-icon>Runtime state</h3>
     <p class="section-desc">
-      Each instance writes its own <code>~/.docserve/state/&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>; name = sanitized folder name) once the port is bound and removes it on clean shutdown.
-      Readers verify the PID is alive (<code>kill(pid, 0)</code>) and prune dead-PID files in place; <code>DOCSERVE_HOME</code> overrides the docserve home (<code>~/.docserve</code> by default; it also holds <code>desktop.json</code>).
+      Each running instance keeps a state file in <code>~/.docserve/state/</code>.
     </p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>pid</code></td><td>number</td><td>Server process. <code>stop</code> sends SIGTERM to it; liveness-checked before use</td></tr>
-          <tr><td><code>port</code></td><td>number</td><td>Actually bound port (starts at <code>4242</code>, falls back +1 on conflict)</td></tr>
-          <tr><td><code>url</code></td><td>string</td><td><code>http://localhost:&lt;port&gt;/</code></td></tr>
-          <tr><td><code>docsDir</code></td><td>string</td><td>Absolute path of the serving folder</td></tr>
-        </tbody>
-      </table>
-    </div>
 
-    <div class="callout">
-      <iconify-icon icon="mdi:information-outline" noobserver></iconify-icon>
-      <strong>One instance per folder:</strong> starting with the same <code>docsDir</code> while its server runs just points at its URL (opens the browser with <code>--open</code>, prints it otherwise).
-      A different <code>docsDir</code> starts its own instance — one process (and one port) per folder; on a port conflict the port falls back +1.
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:file-check-outline" noobserver></iconify-icon>
+          <h4>Lifecycle</h4>
+        </div>
+        <p>Written once the port is bound, removed on clean shutdown.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:heart-pulse" noobserver></iconify-icon>
+          <h4>Liveness</h4>
+        </div>
+        <p>Readers verify the PID is alive (<code>kill(pid, 0)</code>) and prune dead-PID files in place.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:map-marker-path" noobserver></iconify-icon>
+          <h4>Location</h4>
+        </div>
+        <p><code>&lt;port&gt;-&lt;name&gt;.json</code> (e.g. <code>4242-reports.json</code>). <code>DOCSERVE_HOME</code> overrides the home, which also holds <code>desktop.json</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:content-duplicate" noobserver></iconify-icon>
+          <h4>One per folder</h4>
+        </div>
+        <p>Starting with a served <code>docsDir</code> just points at its URL (opens the browser with <code>--open</code>, prints it otherwise); a different one gets its own process and port (+1 on conflict).</p>
+      </div>
     </div>
+    <h3><iconify-icon icon="mdi:code-json" noobserver></iconify-icon>State file</h3>
+
+    <pre>{
+  "pid": 12345,                      <span class="c">// server process — stop sends SIGTERM, liveness-checked</span>
+  "port": 4242,                      <span class="c">// actually bound port (starts at 4242, +1 on conflict)</span>
+  "url": "http://localhost:4242/",
+  "docsDir": "/Users/me/reports"     <span class="c">// absolute path of the serving folder</span>
+}</pre>
   </section>
 
   <!-- --- CLI --- -->
