@@ -6,7 +6,7 @@
 // │ │   ├─ /api/files ──▶ apiFiles()                       │
 // │ │   ├─ /, /index.html ──▶ gallery template             │
 // │ │   └─ other paths ──▶ raw files ──▶ injectIntoHtml()  │
-// │ ├─ WebSocketServer("/__reload") ◀─ UpdateListener      │
+// │ ├─ WebSocketServer("/__reload") ◀─ FileWatcher         │
 // │ └─ listen ──▶ listener.start() + writeState()          │
 // └────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
@@ -18,7 +18,7 @@ import { clearState, writeState } from "./state.mjs"
 import { apiFiles, isWithin, normalizedRelative } from "./files.mjs"
 import { injectIntoHtml, WS_PATH } from "./inject.mjs"
 import { WebSocketServer } from "./websocket.mjs"
-import { UpdateListener } from "./watch.mjs"
+import { FileWatcher } from "./watch.mjs"
 
 const MAX_PORT_TRIES = 20 // on conflict, try the next port up to 20 times
 const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "index.html")
@@ -49,14 +49,14 @@ const MIME = {
 
 export async function runServer({ docsDir, port: initialPort, open = false }) {
   const wss = new WebSocketServer({ path: WS_PATH })
-  const updateListener = new UpdateListener({ wss, docsDir, templatePath: INDEX_TEMPLATE })
+  const fileWatcher = new FileWatcher({ wss, docsDir, templatePath: INDEX_TEMPLATE })
   let port = initialPort
 
   const server = createServer(createNodeServerAdapter(createHandler({ docsDir })))
   wss.attach(server)
 
   const cleanup = () => {
-    updateListener.close()
+    fileWatcher.close()
     wss.close()
     clearState()
     server.closeAllConnections()
@@ -75,13 +75,13 @@ export async function runServer({ docsDir, port: initialPort, open = false }) {
     }
   })
   server.listen(port, "127.0.0.1", async () => {
-    await updateListener.start()
+    await fileWatcher.start()
     const state = { pid: process.pid, port, url: `http://localhost:${port}/`, docsDir }
     writeState(state)
     console.log(state.url)
     if (open && process.platform === "darwin") exec(`open ${state.url}`)
   })
-  return { server, wss, updateListener, close: cleanup }
+  return { server, wss, fileWatcher, close: cleanup }
 }
 
 // --- Node server adapter ---

@@ -1,4 +1,4 @@
-// UpdateListener: watch docsDir recursively for *.html changes and broadcast
+// FileWatcher: watch docsDir recursively for *.html changes and broadcast
 // debounced batches over the reload socket. The gallery template is watched
 // too; its edits set templateChanged so gallery tabs pick them up even though
 // nothing in docsDir changed.
@@ -12,7 +12,7 @@ import { isWithin, listHtmlFiles, normalizedRelative, shouldIgnore } from "./fil
 const DEBOUNCE_MS = 50 // like livePreview.previewDebounceDelay
 const TEMPLATE_TOUCH = "\u0000template" // sentinel: never a real docsDir-relative path
 
-export class UpdateListener {
+export class FileWatcher {
   constructor(options = {}) {
     this.wss = options.wss
     this.docsDir = options.docsDir
