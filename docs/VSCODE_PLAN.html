@@ -531,7 +531,7 @@
       </div>
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -544,21 +544,21 @@
             Read live instances from the state dir — the extension's eyes, independent of how servers were started.
           </div>
           <div class="tasks">
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:code-json" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">State parsing</div>
                 <div class="task-desc">read <code>~/.docserve/state/*.json</code>, validate shape, check pid liveness, ignore stale entries (no pruning — that's the CLI's job)</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:sync" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Watcher + poll</div>
                 <div class="task-desc"><code>fs.watch</code> on the state dir plus a 5s fallback poll; debounced status bar refresh</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:home-switch-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">DOCSERVE_HOME</div>

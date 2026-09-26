@@ -1,16 +1,37 @@
+import * as path from "node:path"
 import * as vscode from "vscode"
+import { DocserveState, findByDir, listLiveStates, watchStateDirSetting, watchStates } from "./state"
 
 const STATUS_IDLE = "$(radio-tower) docserve"
 
 export function activate(context: vscode.ExtensionContext) {
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100)
-  status.text = STATUS_IDLE
-  status.tooltip = "docserve — no servers running"
   status.command = "docserve.list"
   status.show()
-  context.subscriptions.push(status)
+
+  const refresh = () => {
+    const states = listLiveStates()
+    const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
+    const mine = folders.map((dir) => findByDir(states, dir)).find(Boolean) as DocserveState | undefined
+    if (mine) {
+      status.text = `$(radio-tower) :${mine.port}`
+      status.tooltip = `docserve — serving ${mine.docsDir}\n${mine.url}`
+      status.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground")
+    } else {
+      status.text = STATUS_IDLE
+      status.tooltip = states.length
+        ? `docserve — ${states.length} server(s) running elsewhere`
+        : "docserve — no servers running"
+      status.backgroundColor = undefined
+    }
+  }
+  refresh()
 
   context.subscriptions.push(
+    status,
+    watchStates(refresh),
+    watchStateDirSetting(refresh),
+    vscode.workspace.onDidChangeWorkspaceFolders(refresh),
     vscode.commands.registerCommand("docserve.start", async () => {
       const folder = await pickFolder()
       if (!folder) return
@@ -26,7 +47,15 @@ export function activate(context: vscode.ExtensionContext) {
       void vscode.window.showInformationMessage("docserve: stop all servers (not implemented yet)")
     }),
     vscode.commands.registerCommand("docserve.list", () => {
-      void vscode.window.showInformationMessage("docserve: no servers running (not implemented yet)")
+      const states = listLiveStates()
+      if (states.length === 0) {
+        void vscode.window.showInformationMessage("docserve: no servers running")
+        return
+      }
+      void vscode.window.showQuickPick(
+        states.map((s) => ({ label: `$(radio-tower) :${s.port}`, description: s.docsDir, detail: s.url, state: s })),
+        { placeHolder: "docserve servers" },
+      )
     }),
   )
 }

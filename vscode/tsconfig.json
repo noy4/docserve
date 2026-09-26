@@ -8,6 +8,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "isolatedModules": true,
     "rootDir": "src",
     "outDir": "dist"
