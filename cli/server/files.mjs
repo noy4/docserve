@@ -63,7 +63,7 @@ export async function apiFiles(docsDir) {
     files.push({
       title: title ?? basename(full),
       url: `/${rel}`,
-      path: full,
+      filePath: full,
       favicon: favicon ?? undefined,
       created: date ?? created.get(key) ?? Math.floor(st.birthtimeMs / 1000),
       modified: modified.get(key) ?? Math.floor(st.mtimeMs / 1000),

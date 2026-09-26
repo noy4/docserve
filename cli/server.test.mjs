@@ -136,17 +136,17 @@ describe("docserve server", () => {
 
     const files = await (await fetch(`http://localhost:${port}/api/files`)).json()
     assert.ok(Array.isArray(files))
-    const page = files.find((f) => f.path.endsWith("page.html"))
+    const page = files.find((f) => f.filePath.endsWith("page.html"))
     assert.ok(page)
-    assert.deepEqual(Object.keys(page).sort(), ["created", "modified", "path", "title", "url"], "no favicon key when unset")
+    assert.deepEqual(Object.keys(page).sort(), ["created", "filePath", "modified", "title", "url"], "no favicon key when unset")
     assert.equal(page.url, "/page.html")
     assert.equal(page.title, "page.html", "title falls back to the file name")
     assert.equal(typeof page.created, "number")
     assert.equal(typeof page.modified, "number")
 
-    const fav = files.find((f) => f.path.endsWith("fav.html"))
+    const fav = files.find((f) => f.filePath.endsWith("fav.html"))
     assert.equal(fav.favicon, "/favicon.svg", "relative href resolves against the page URL")
-    assert.equal(files.find((f) => f.path.endsWith("escaping.html")).favicon, undefined, "hrefs escaping docsDir are dropped")
+    assert.equal(files.find((f) => f.filePath.endsWith("escaping.html")).favicon, undefined, "hrefs escaping docsDir are dropped")
   })
 
   it("answers 403, 400 and 404 for bad paths", async () => {
