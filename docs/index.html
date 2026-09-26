@@ -258,6 +258,28 @@
     border: none;
     margin: 10px 0 6px;
   }
+  .note-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin: 4px 0;
+  }
+  .note-card iconify-icon {
+    color: var(--accent);
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .note-card p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+  }
 
   /* Desktop steps */
   .step {
@@ -341,7 +363,7 @@
     <h1>docserve</h1>
     <p class="tagline">Serves a folder of HTML as a card gallery with live reload.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" id="download-btn" href="https://github.com/noy4/docserve/releases/latest" rel="noopener">
+      <a class="btn btn-primary js-dmg" href="https://github.com/noy4/docserve/releases/latest" rel="noopener">
         <iconify-icon icon="mdi:tray-arrow-down" noobserver></iconify-icon>
         Download for macOS
       </a>
@@ -374,7 +396,7 @@
           <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
           <h4>Auto reload</h4>
         </div>
-        <p>Add, edit, and delete are pushed to open tabs via WebSocket.</p>
+        <p>Changes appear instantly.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -398,11 +420,15 @@
         </div>
         <div class="step">
           <span class="step-num">1</span>
-          <p><strong>Download</strong> — the DMG for your Mac from the <a href="https://github.com/noy4/docserve/releases" target="_blank" rel="noopener">Releases</a> page (<code>arm64</code> for Apple Silicon)</p>
+          <p><strong><a class="js-dmg" href="https://github.com/noy4/docserve/releases/latest">Download</a></strong></p>
         </div>
         <div class="step">
           <span class="step-num">2</span>
-          <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong>, then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
+          <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong> (not <strong>Move to Trash</strong>), then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
+        </div>
+        <div class="note-card">
+          <iconify-icon icon="mdi:shield-alert" noobserver></iconify-icon>
+          <p>The warning appears because docserve isn't signed with an Apple Developer certificate ($99/year).</p>
         </div>
         <div class="step">
           <span class="step-num">3</span>
@@ -410,7 +436,7 @@
         </div>
         <p class="step-note">
           <iconify-icon icon="mdi:menu" noobserver></iconify-icon>
-          Click the menu bar icon to start, stop, or switch the served folder.
+          Click the menu bar icon to manage the server.
         </p>
       </div>
       <div class="card">
@@ -425,9 +451,10 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
     </div>
   </section>
 
-  <!-- --- DOCUMENTATION --- -->
+  <!-- --- FOR DEVELOPERS --- -->
   <section>
-    <h2><iconify-icon icon="mdi:book-open-variant" width="24" noobserver></iconify-icon>Documentation</h2>
+    <h2><iconify-icon icon="mdi:code-tags" width="24" noobserver></iconify-icon>For developers</h2>
+    <p class="section-desc">How docserve works under the hood.</p>
 
     <div class="grid-2">
       <a class="card" href="./SPEC.html" style="text-decoration:none">
@@ -478,7 +505,7 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
     return 'arm64';
   }
 
-  document.getElementById('download-btn').addEventListener('click', async (e) => {
+  async function downloadDmg(e) {
     const fallback = e.currentTarget.href;
     e.preventDefault();
     try {
@@ -496,7 +523,9 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
     } catch (err) {
       window.location.href = fallback;
     }
-  });
+  }
+
+  document.querySelectorAll('.js-dmg').forEach(el => el.addEventListener('click', downloadDmg));
 </script>
 </body>
 </html>
