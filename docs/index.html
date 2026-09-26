@@ -33,6 +33,7 @@
     --accent: #F08A59;
     --accent-soft: rgba(240, 138, 89, 0.15);
     --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    --shot-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
     color-scheme: dark;
   }
   @media (prefers-color-scheme: light) {
@@ -49,6 +50,7 @@
       --primary-soft: rgba(37, 99, 235, 0.1);
       --accent: #EA580C;
       --accent-soft: rgba(234, 88, 12, 0.1);
+      --shot-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
       color-scheme: light;
     }
   }
@@ -70,12 +72,12 @@
   /* Hero */
   .hero {
     text-align: center;
-    padding: 72px 0 56px;
+    padding: 32px 0 40px;
   }
   .logo {
     width: 128px;
     height: 128px;
-    margin-bottom: 12px;
+    vertical-align: middle;
   }
   h1 {
     font-size: clamp(2.1rem, 6vw, 2.7rem);
@@ -91,46 +93,21 @@
     line-height: 1.65;
     margin-bottom: 28px;
   }
-  .cli-lead {
-    color: var(--muted);
-    font-size: 0.82rem;
-    margin: 24px 0 10px;
-  }
-  .install {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border-strong);
-    border-radius: 12px;
-    padding: 12px 16px;
-  }
-  .install code {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--text-strong);
-    background: none;
-    padding: 0;
-  }
-  .copy-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    font-size: 15px;
-    color: var(--primary);
-    background: var(--primary-soft);
-    border: 1px solid var(--primary);
-    border-radius: 6px;
-    cursor: pointer;
-  }
   .cta-row {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 10px;
   }
+  .hero-shot {
+    max-width: 720px;
+    margin: 40px auto 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shot-shadow);
+  }
+  .hero-shot img { display: block; width: 100%; height: auto; }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -211,7 +188,7 @@
   }
   @media (max-width: 620px) {
     .grid-2 { grid-template-columns: 1fr; }
-    .hero { padding: 48px 0 40px; }
+    .hero { padding: 32px 0 40px; }
     .logo { width: 104px; height: 104px; }
     section { margin-top: 40px; }
     .card pre { font-size: 0.7rem; }
@@ -310,16 +287,13 @@
   .step p strong { color: var(--text); }
   .step a { color: var(--primary); text-decoration: none; font-weight: 600; }
   .step a:hover { text-decoration: underline; }
-  .card .step-note {
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin: 8px 0 0;
-  }
-  .step-note iconify-icon {
-    font-size: 15px;
-    vertical-align: -2px;
-    margin-right: 6px;
-    color: var(--accent);
+  .app-shot {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 10px;
   }
   .card .cli-note {
     color: var(--muted);
@@ -374,13 +348,9 @@
         GitHub
       </a>
     </div>
-    <p class="cli-lead">Or use the CLI:</p>
-    <div class="install">
-      <code>npx @noy4/docserve ~/reports --open</code>
-      <button class="copy-btn" id="copy-btn" type="button" aria-label="Copy install command">
-        <iconify-icon icon="mdi:content-copy" noobserver></iconify-icon>
-      </button>
-    </div>
+    <figure class="hero-shot">
+      <img src="./assets/gallery.webp" alt="docserve gallery — report cards with live previews in the browser" width="1470" height="923" loading="lazy">
+    </figure>
   </header>
 
   <!-- --- FEATURES --- -->
@@ -420,6 +390,7 @@
           <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
           <h4>macOS app</h4>
         </div>
+        <img class="app-shot" src="./assets/menubar.webp" alt="docserve menu bar — running servers with Open and Stop actions" width="900" height="582" loading="lazy">
         <div class="step">
           <span class="step-num">1</span>
           <p><strong><a class="js-dmg" href="https://github.com/noy4/docserve/releases/latest">Download</a></strong></p>
@@ -436,10 +407,6 @@
           <span class="step-num">3</span>
           <p><strong>Pick a folder</strong> — the gallery opens in your browser</p>
         </div>
-        <p class="step-note">
-          <iconify-icon icon="mdi:menu" noobserver></iconify-icon>
-          Click the menu bar icon to manage the server.
-        </p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -490,13 +457,6 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
 
 </div>
 <script>
-  document.getElementById('copy-btn').addEventListener('click', async function () {
-    try { await navigator.clipboard.writeText('npx @noy4/docserve ~/reports --open'); } catch (e) {}
-    const icon = this.querySelector('iconify-icon');
-    icon.setAttribute('icon', 'mdi:check');
-    setTimeout(() => { icon.setAttribute('icon', 'mdi:content-copy'); }, 1200);
-  });
-
   async function detectArch() {
     try {
       if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
