@@ -620,10 +620,11 @@
         </thead>
         <tbody>
           <tr><td>Tray icon</td><td>Outline when stopped, filled when ≥ 1 instance is running</td></tr>
-          <tr><td>Instances</td><td>One row per instance (<code>folder — port</code>) with an Open / Stop submenu</td></tr>
+          <tr><td>Instances</td><td>One row per instance (<code>folder (parent dir)</code>) with an Open (<code>localhost:port</code>) / Stop submenu</td></tr>
           <tr><td>Start / Stop All</td><td><strong>Start Server</strong> (shown while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code></td></tr>
           <tr><td>Open Folder…</td><td><code>dialog.showOpenDialog</code>; starts another instance and opens its gallery without stopping the rest — an already-served folder just opens its gallery</td></tr>
-          <tr><td>Recent folders</td><td>Started folders land in <code>~/.docserve/desktop.json</code> (<code>{recentDirs}</code>, max 5), the default for Start Server and Open Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
+          <tr><td>Recent folders</td><td>Started folders land in <code>~/.docserve/desktop.json</code> (<code>{recentDirs}</code>, max 10), listed under <strong>Open Recent</strong> and used as the default for Start Server and Open Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
+          <tr><td>Update notice</td><td>Checked at launch and every 12 h; a newer release adds <strong>New version available — vX.Y.Z</strong>, which opens the release page</td></tr>
           <tr><td>Quit</td><td>Stops all servers, then <code>app.quit()</code></td></tr>
           <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
         </tbody>
@@ -631,17 +632,24 @@
     </div>
 
     <pre>● Running (2)                 <span class="c"># status item (disabled)</span>
-▸ reports — 4242              <span class="c"># one row per instance (submenu: Open (localhost:4242) / Stop)</span>
-▸ notes — 4243
+▸ reports (~)                 <span class="c"># one row per instance — submenu:</span>
+▸ notes (~/work)              <span class="c"># Open (localhost:4242) / Stop</span>
 ─────────────────────────────
-Open Folder…                  <span class="c"># starts another instance</span>
+Open Folder...                <span class="c"># starts another instance</span>
+Open Recent                   <span class="c"># submenu: recent folders (max 10)</span>
 Stop All                      <span class="c"># bare docserve stop</span>
 ─────────────────────────────
+New version available — v0.4.0
 Quit docserve
 
 ○ Stopped
 ─────────────────────────────
 Start Server                  <span class="c"># docserve &lt;recentDir&gt; --background --open</span>
+Open Folder...
+Open Recent
+Stop All                      <span class="c"># disabled — nothing running</span>
+─────────────────────────────
+Quit docserve</pre>
   </section>
 
   <footer>

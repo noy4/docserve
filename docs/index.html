@@ -205,6 +205,7 @@
     gap: 12px;
     margin: 16px 0;
   }
+  .grid-2 > *, .grid-3 > * { min-width: 0; }
   @media (min-width: 524px) and (max-width: 775px) {
     .grid-3 .card:last-child { grid-column: 1 / -1; }
   }
@@ -213,6 +214,7 @@
     .hero { padding: 48px 0 40px; }
     .logo { width: 104px; height: 104px; }
     section { margin-top: 40px; }
+    .card pre { font-size: 0.7rem; }
   }
   .card {
     background: var(--surface);
