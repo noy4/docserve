@@ -554,15 +554,43 @@
   <section>
     <h2><iconify-icon icon="mdi:refresh-circle" width="24" noobserver></iconify-icon>Reload protocol</h2>
     <p class="section-desc">
-      Open tabs stay current through a WebSocket at <code>/__reload</code>. File events are batched for 50 ms and broadcast as one message.
+      Open tabs stay current through a WebSocket at <code>/__reload</code>.
     </p>
 
-    <pre>{ "type": "change", "pages": ["foo.html", "sub/bar.html"], "contentSetChanged": false, "templateChanged": false }</pre>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:file-eye-outline" noobserver></iconify-icon>
+          <h4>Detection</h4>
+        </div>
+        <p>A single <code>fs.watch(docsDir, { recursive: true })</code>, filtered to <code>*.html</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:broadcast" noobserver></iconify-icon>
+          <h4>Batched broadcast</h4>
+        </div>
+        <p>File events are batched for 50 ms and broadcast as one message.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:restart" noobserver></iconify-icon>
+          <h4>Auto recovery</h4>
+        </div>
+        <p>On socket close, page tabs reload after 1 s and recover once the server is back.</p>
+      </div>
+    </div>
 
-    <p class="section-desc">
-      <code>pages</code> holds the docsDir-relative paths touched in the batch; <code>contentSetChanged</code> is true when a file was added or removed;
-      <code>templateChanged</code> is true when the gallery template itself was edited.
-    </p>
+    <h3><iconify-icon icon="mdi:code-json" noobserver></iconify-icon>Message format</h3>
+
+    <pre>{
+  "type": "change",
+  "pages": ["foo.html", "sub/bar.html"],   <span class="c">// docsDir-relative paths touched in the batch</span>
+  "contentSetChanged": false,              <span class="c">// true when a file was added or removed</span>
+  "templateChanged": false                 <span class="c">// true when the gallery template itself was edited</span>
+}</pre>
+
+    <h3><iconify-icon icon="mdi:tab" noobserver></iconify-icon>Who reloads when</h3>
 
     <div class="table-wrap">
       <table>
@@ -576,10 +604,6 @@
         </tbody>
       </table>
     </div>
-
-    <p class="section-desc">
-      Detection is a single <code>fs.watch(docsDir, { recursive: true })</code> filtered to <code>*.html</code>. On socket close, page tabs reload after 1 s and recover once the server is back.
-    </p>
   </section>
 
   <!-- --- INJECTION --- -->
