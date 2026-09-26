@@ -482,7 +482,7 @@
       <tr><td><code>docserve.cliCommand</code></td><td><code>npx -y @noy4/docserve</code></td><td>Command used to run the CLI, overridable for global installs or custom paths.</td></tr>
       <tr><td><code>docserve.stateDir</code></td><td>empty</td><td>Overrides the state dir (sets <code>DOCSERVE_HOME</code>); mainly for tests.</td></tr>
     </table>
-    <p>Status bar item: <code>$(radio-tower) docserve</code> when idle, <code>$(radio-tower) N</code> with a filled look when servers are running. Click opens <code>docserve.list</code> (start entry included).</p>
+    <p>Status bar item (per workspace): <code>$(radio-tower) docserve</code> when idle, <code>$(radio-tower) :4242</code> filled when this folder is being served. Click opens <code>docserve.list</code> (start entry included).</p>
   </section>
 
   <!-- PHASES -->
@@ -633,7 +633,7 @@
               <iconify-icon icon="mdi:circle-slice-8" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Status bar states</div>
-                <div class="task-desc">idle / running N / starting…, tooltip listing urls, theme-consistent colors</div>
+                <div class="task-desc">per workspace — idle / serving (port shown) / starting…, tooltip listing the url; theme-consistent colors</div>
               </div>
             </div>
             <div class="task">
@@ -767,15 +767,15 @@
     </div>
   </section>
 
-  <!-- OPEN QUESTIONS -->
+  <!-- DECISIONS -->
   <section>
-    <h2><iconify-icon icon="mdi:help-circle-outline" width="24" noobserver></iconify-icon>Open questions</h2>
+    <h2><iconify-icon icon="mdi:check-decagram" width="24" noobserver></iconify-icon>Decisions</h2>
     <table>
-      <tr><th>Question</th><th>Leaning</th></tr>
-      <tr><td>Minimum CLI version?</td><td>Read the state format as-is (v0.3.x); warn when a start fails rather than hard-pinning.</td></tr>
-      <tr><td>Auto-start a server when opening a workspace with <code>index.html</code>?</td><td>Off by default, if ever — surprising actions are worse than one extra click.</td></tr>
-      <tr><td>Per-workspace or global status bar?</td><td>Global count; the QuickPick carries per-folder detail.</td></tr>
-      <tr><td>Version scheme</td><td>Extension starts at <code>0.1.0</code>, independent of the CLI's <code>0.3.x</code>.</td></tr>
+      <tr><th>Question</th><th>Decision</th></tr>
+      <tr><td>Minimum CLI version?</td><td>None. The extension reads the state format as-is and warns on a failed start rather than hard-pinning a version.</td></tr>
+      <tr><td>Auto-start a server when opening a workspace with <code>index.html</code>?</td><td>No — surprising actions are worse than one extra click.</td></tr>
+      <tr><td>Per-workspace or global status bar?</td><td>Per workspace: each window reflects its own folder's state only; the QuickPick carries the full instance list.</td></tr>
+      <tr><td>Version scheme</td><td>The extension starts at <code>0.1.0</code>, independent of the CLI's <code>0.3.x</code>.</td></tr>
     </table>
   </section>
 
