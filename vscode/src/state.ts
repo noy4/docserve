@@ -10,8 +10,7 @@ export interface DocserveState {
   docsDir: string
 }
 
-// Same semantics as the CLI: DOCSERVE_HOME replaces ~/.docserve, and the
-// state dir lives directly under it. docserve.stateDir mirrors the override.
+// Same as the CLI: <DOCSERVE_HOME | ~/.docserve>/state.
 export function stateDir(): string {
   const override = vscode.workspace.getConfiguration("docserve").get<string>("stateDir")?.trim()
   const home = override || path.join(os.homedir(), ".docserve")
@@ -44,8 +43,8 @@ function isProcessAlive(pid: number): boolean {
   }
 }
 
-// Live instances sorted by port. Stale entries (dead pid) are skipped here —
-// pruning them is the CLI's job; the extension is a read-only client.
+// Live instances sorted by port. Stale entries (dead pid) are skipped —
+// pruning is the CLI's job; the extension is a read-only client.
 export function listLiveStates(): DocserveState[] {
   let entries: string[] = []
   try {
@@ -67,23 +66,36 @@ export function findByDir(states: DocserveState[], docsDir: string): DocserveSta
   return states.find((state) => state.docsDir === resolved)
 }
 
-// fs.watch on the state dir plus a 5s poll as a safety net; changes are
-// debounced so a burst of writes triggers one refresh.
+// fs.watch + 5s poll as a safety net, debounced. The watcher re-arms once
+// the dir appears or is recreated.
 export function watchStates(onChange: () => void): vscode.Disposable {
   let timer: NodeJS.Timeout | undefined
+  let watcher: fs.FSWatcher | undefined
+
   const notify = () => {
     clearTimeout(timer)
     timer = setTimeout(onChange, 100)
   }
 
-  let watcher: fs.FSWatcher | undefined
-  try {
-    watcher = fs.watch(stateDir(), notify)
-  } catch {
-    // state dir may not exist yet (no server ever ran); the poll covers it
+  const ensureWatcher = () => {
+    if (watcher) return
+    try {
+      watcher = fs.watch(stateDir(), notify)
+      watcher.on("error", () => {
+        watcher?.close()
+        watcher = undefined
+      })
+    } catch {
+      // dir not there yet; the poll re-arms
+    }
   }
 
-  const poll = setInterval(notify, 5000)
+  ensureWatcher()
+  const poll = setInterval(() => {
+    ensureWatcher()
+    notify()
+  }, 5000)
+
   return new vscode.Disposable(() => {
     watcher?.close()
     clearInterval(poll)
@@ -91,7 +103,7 @@ export function watchStates(onChange: () => void): vscode.Disposable {
   })
 }
 
-// Recreate the watcher when the state dir override changes.
+// Re-run onChange when docserve.stateDir changes.
 export function watchStateDirSetting(onChange: () => void): vscode.Disposable {
   return vscode.workspace.onDidChangeConfiguration((e) => {
     if (e.affectsConfiguration("docserve.stateDir")) onChange()
