@@ -267,6 +267,60 @@
     margin: 0;
   }
   .card p strong { color: var(--text); }
+  .card ul { margin: 0; padding-left: 16px; }
+  .card li { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+  /* Gallery card demo */
+  .gcard {
+    width: 240px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .gcard-preview {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    padding: 12px;
+    background: #fff;
+  }
+  .gcard-copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+  }
+  .sk { height: 6px; border-radius: 4px; background: #E2E8F0; margin-bottom: 8px; }
+  .sk-head { height: 14px; width: 55%; margin-bottom: 12px; background: #CBD5E1; }
+  .sk-short { width: 68%; }
+  .gcard-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .gcard-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .gcard-title iconify-icon { font-size: 16px; color: var(--muted); border-radius: 4px; }
+  .gcard-date { font-size: 0.7rem; color: var(--muted); }
 
   /* Footer */
   footer {
@@ -526,8 +580,26 @@
   <section>
     <h2><iconify-icon icon="mdi:view-grid-outline" width="24" noobserver></iconify-icon>Gallery</h2>
     <p class="section-desc">
-      The gallery lists every <code>*.html</code> under <code>docsDir</code> (recursive, excluding <code>index.html</code>), sorted by created date, newest first. The card list is fetched from <code>/api/files</code> on load.
+      Every <code>*.html</code> under <code>docsDir</code>, recursive.
     </p>
+
+    <div class="gcard">
+      <div class="gcard-preview">
+        <iconify-icon class="gcard-copy" icon="mdi:content-copy" noobserver></iconify-icon>
+        <div class="sk sk-head"></div>
+        <div class="sk"></div>
+        <div class="sk sk-short"></div>
+        <div class="sk"></div>
+        <div class="sk sk-short"></div>
+      </div>
+      <div class="gcard-meta">
+        <div class="gcard-title">
+          <iconify-icon icon="mdi:file-document-outline" noobserver></iconify-icon>
+          Q3 report
+        </div>
+        <div class="gcard-date">2026/09/21</div>
+      </div>
+    </div>
 
     <div class="table-wrap">
       <table>
@@ -535,19 +607,50 @@
           <tr><th>Card</th><th>Source</th></tr>
         </thead>
         <tbody>
-          <tr><td>Title</td><td>Page <code>&lt;title&gt;</code>, falling back to the file name</td></tr>
-          <tr><td>Favicon</td><td>Page <code>&lt;link rel="icon"&gt;</code>, shown before the title; hidden when unset</td></tr>
           <tr><td>Preview</td><td><code>&lt;iframe&gt;</code> of the page, lazy-loaded</td></tr>
+          <tr><td>Favicon</td><td>Page <code>&lt;link rel="icon"&gt;</code>, shown before the title; hidden when unset</td></tr>
+          <tr><td>Title</td><td>Page <code>&lt;title&gt;</code>, falling back to the file name</td></tr>
           <tr><td>Created / Modified</td><td>Date resolution below</td></tr>
           <tr><td>Copy path</td><td>Absolute file path to the clipboard</td></tr>
         </tbody>
       </table>
     </div>
 
-    <p class="section-desc">
-      <strong>Dates:</strong> <code>&lt;meta name="created_at"&gt;</code> &gt; oldest git commit date &gt; file birthtime.
-      <strong>Lazy previews:</strong> <code>IntersectionObserver</code> with <code>rootMargin: 400px</code>, at most 3 iframes loading at once.
-    </p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:api" noobserver></iconify-icon>
+          <h4>Card list</h4>
+        </div>
+        <p>Fetched from <code>/api/files</code> on load — sorted by created date, newest first.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:filter-remove-outline" noobserver></iconify-icon>
+          <h4>Excluded</h4>
+        </div>
+        <ul>
+          <li>Root <code>index.html</code></li>
+          <li>Dot files and dirs</li>
+          <li><code>node_modules</code></li>
+          <li>Paths deeper than 3 levels</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:calendar-outline" noobserver></iconify-icon>
+          <h4>Dates</h4>
+        </div>
+        <p><code>&lt;meta name="created_at"&gt;</code> &gt; oldest git commit date &gt; file birthtime.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:image-multiple-outline" noobserver></iconify-icon>
+          <h4>Lazy previews</h4>
+        </div>
+        <p><code>IntersectionObserver</code> with <code>rootMargin: 400px</code>, at most 3 iframes loading at once.</p>
+      </div>
+    </div>
   </section>
 
   <!-- --- RELOAD --- -->
