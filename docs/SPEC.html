@@ -610,26 +610,55 @@
   <section>
     <h2><iconify-icon icon="mdi:apple" width="24" noobserver></iconify-icon>Desktop app</h2>
     <p class="section-desc">
-      A macOS menu bar client with zero windows — the Electron main process only spawns the CLI and watches the CLI's state files (<code>fs.watch</code> + 2 s polling, pid liveness check).
+      A windowless macOS menu bar client — it spawns the CLI and watches its state files.
     </p>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Behavior</th><th>Detail</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Tray icon</td><td>Outline when stopped, filled when ≥ 1 instance is running</td></tr>
-          <tr><td>Instances</td><td>One row per instance (<code>folder (parent dir)</code>) with an Open (<code>localhost:port</code>) / Stop submenu</td></tr>
-          <tr><td>Start / Stop All</td><td><strong>Start Server</strong> (shown while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code></td></tr>
-          <tr><td>Open Folder…</td><td><code>dialog.showOpenDialog</code>; starts another instance and opens its gallery without stopping the rest — an already-served folder just opens its gallery</td></tr>
-          <tr><td>Recent folders</td><td>Started folders land in <code>~/.docserve/desktop.json</code> (<code>{recentDirs}</code>, max 10), listed under <strong>Open Recent</strong> and used as the default for Start Server and Open Folder…; <code>resumeDirs</code> snapshots the set serving at quit and the next launch resumes exactly that set</td></tr>
-          <tr><td>Update notice</td><td>Checked at launch and every 12 h; a newer release adds <strong>New version available — vX.Y.Z</strong>, which opens the release page</td></tr>
-          <tr><td>Quit</td><td>Stops all servers, then <code>app.quit()</code></td></tr>
-          <tr><td>First launch</td><td>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code></td></tr>
-        </tbody>
-      </table>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:format-list-bulleted" noobserver></iconify-icon>
+          <h4>Instances</h4>
+        </div>
+        <p>One row per instance, e.g. <code>reports (~)</code> — submenu: Open (<code>localhost:4242</code>) / Stop.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:power" noobserver></iconify-icon>
+          <h4>Start &amp; Stop All</h4>
+        </div>
+        <p><strong>Start Server</strong> (while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
+          <h4>Open Folder…</h4>
+        </div>
+        <p><code>dialog.showOpenDialog</code> — starts another instance without stopping the rest; an already-served folder just opens its gallery.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:history" noobserver></iconify-icon>
+          <h4>Recent folders</h4>
+        </div>
+        <p><code>desktop.json</code> keeps <code>{recentDirs}</code> (max 10) for <strong>Open Recent</strong> and the Start Server / Open Folder… defaults; <code>resumeDirs</code> re-serves at launch the set running at quit.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:cloud-download-outline" noobserver></iconify-icon>
+          <h4>Update notice</h4>
+        </div>
+        <p>Checked at launch and every 12 h — a newer release shows <strong>New version available — vX.Y.Z</strong> and opens the release page.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:rocket-launch-outline" noobserver></iconify-icon>
+          <h4>First launch</h4>
+        </div>
+        <p>Symlinks the bundled CLI to <code>~/.local/bin/docserve</code>.</p>
+      </div>
     </div>
+
+    <h3><iconify-icon icon="mdi:menu" noobserver></iconify-icon>Tray menu</h3>
 
     <pre>● Running (2)                 <span class="c"># status item (disabled)</span>
 ▸ reports (~)                 <span class="c"># one row per instance — submenu:</span>
