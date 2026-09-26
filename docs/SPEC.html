@@ -556,6 +556,8 @@
       The gallery is an embedded template served at <code>/</code>; every other file is served raw from <code>docsDir</code>.
     </p>
 
+    <h3><iconify-icon icon="mdi:routes" noobserver></iconify-icon>Routes</h3>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -563,17 +565,46 @@
         </thead>
         <tbody>
           <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched from <code>/api/files</code>; <code>docsDir/index.html</code> is excluded</td></tr>
-          <tr><td><code>/api/files</code></td><td>JSON list: <code>title</code>, <code>url</code> (docsDir-relative link), <code>path</code> (absolute), <code>created</code>, <code>modified</code>, <code>favicon</code> (resolved <code>&lt;link rel="icon"&gt;</code> URL, omitted when unset) per <code>*.html</code></td></tr>
+          <tr><td><code>/api/files</code></td><td>JSON list per <code>*.html</code> — fields below</td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
         </tbody>
       </table>
     </div>
 
+    <h3><iconify-icon icon="mdi:api" noobserver></iconify-icon>GET /api/files</h3>
+
+    <pre>[
+  {
+    "title": "Q3 report",             <span class="c">// page &lt;title&gt;, falling back to the file name</span>
+    "url": "/foo.html",               <span class="c">// docsDir-relative link</span>
+    "path": "/abs/reports/foo.html",  <span class="c">// absolute file path</span>
+    "created": 1758412345,            <span class="c">// unix seconds (see Dates)</span>
+    "modified": 1758498765,           <span class="c">// unix seconds</span>
+    "favicon": "/assets/icon.svg"     <span class="c">// resolved &lt;link rel="icon"&gt; URL, omitted when unset</span>
+  }
+]</pre>
+
     <p class="section-desc">
       Malformed paths respond <code>400</code>, paths escaping <code>docsDir</code> respond <code>403</code>, missing files respond <code>404</code>.
-      <code>text/html</code> responses get the reload client injected (see Injection). The server binds <code>127.0.0.1</code> only.
     </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:needle" noobserver></iconify-icon>
+          <h4>Injection</h4>
+        </div>
+        <p><code>text/html</code> responses get the reload client injected — see Injection.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
+          <h4>Localhost only</h4>
+        </div>
+        <p>The server binds <code>127.0.0.1</code>.</p>
+      </div>
+    </div>
   </section>
 
   <!-- --- GALLERY --- -->
