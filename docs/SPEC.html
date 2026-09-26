@@ -586,24 +586,32 @@
   <section>
     <h2><iconify-icon icon="mdi:needle" width="24" noobserver></iconify-icon>Injection</h2>
     <p class="section-desc">
-      Every <code>text/html</code> response gets one client script before the last <code>&lt;/body&gt;</code> (appended at the end if the tag is missing). The script exits immediately inside iframes, so previews get neither part; the gallery template ships its own client.
+      Every <code>text/html</code> response gets one client script before the last <code>&lt;/body&gt;</code>. Iframes are skipped — the gallery template ships its own client.
     </p>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Injected</th><th>Behavior</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Reload client</td><td>Connects to <code>/__reload</code> and follows the Reload protocol</td></tr>
-          <tr><td>Copy path button</td><td>Fixed at the top-right with a "Copy file path" label; copies the file's absolute path and shows "Copied" for 1.2 s</td></tr>
-        </tbody>
-      </table>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
+          <h4>Reload client</h4>
+        </div>
+        <p>Connects to <code>/__reload</code> and follows the Reload protocol.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:content-copy" noobserver></iconify-icon>
+          <h4>Copy path button</h4>
+        </div>
+        <p>Fixed at the top-right — copies the file's absolute path and shows "Copied" for 1.2 s.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:code-json" noobserver></iconify-icon>
+          <h4>Embedded data</h4>
+        </div>
+        <p><code>pageId</code> and the absolute path are JSON-encoded, with <code>&lt;</code> escaped to <code>\u003c</code> so page content cannot break out of the client.</p>
+      </div>
     </div>
-
-    <p class="section-desc">
-      <code>pageId</code> and the absolute path are embedded JSON-encoded, with <code>&lt;</code> escaped to <code>\u003c</code> so page content cannot break out of the client.
-    </p>
   </section>
 
   <!-- --- DESKTOP --- -->
