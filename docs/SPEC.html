@@ -623,13 +623,6 @@
       </div>
       <div class="card">
         <div class="card-head">
-          <iconify-icon icon="mdi:power" noobserver></iconify-icon>
-          <h4>Start &amp; Stop All</h4>
-        </div>
-        <p><strong>Start Server</strong> (while stopped) runs <code>docserve &lt;recentDir&gt; --background --open</code>; <strong>Stop All</strong> runs bare <code>docserve stop</code>.</p>
-      </div>
-      <div class="card">
-        <div class="card-head">
           <iconify-icon icon="mdi:folder-open-outline" noobserver></iconify-icon>
           <h4>Open Folder…</h4>
         </div>
@@ -640,7 +633,7 @@
           <iconify-icon icon="mdi:history" noobserver></iconify-icon>
           <h4>Recent folders</h4>
         </div>
-        <p><code>desktop.json</code> keeps <code>{recentDirs}</code> (max 10) for <strong>Open Recent</strong> and the Start Server / Open Folder… defaults; <code>resumeDirs</code> re-serves at launch the set running at quit.</p>
+        <p><code>desktop.json</code> keeps <code>{recentDirs}</code> (max 10) for <strong>Open Recent</strong> and the Open Folder… default; <code>resumeDirs</code> re-serves at launch the set running at quit.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -673,7 +666,6 @@ Quit docserve
 
 ○ Stopped
 ─────────────────────────────
-Start Server                  <span class="c"># docserve &lt;recentDir&gt; --background --open</span>
 Open Folder...
 Open Recent
 Stop All                      <span class="c"># disabled — nothing running</span>

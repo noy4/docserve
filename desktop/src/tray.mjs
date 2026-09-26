@@ -97,7 +97,6 @@ export class TrayController {
       ___,
 
       // actions
-      (states.length === 0) && { label: "Start Server", click: () => this.#start() },
       { label: "Open Folder...", click: () => this.openFolder(true) },
       recentItem,
       { label: "Stop All", enabled: states.length > 0, click: () => this.server.stop() },
@@ -106,15 +105,6 @@ export class TrayController {
       updateItems,
       { label: "Quit docserve", click: () => this.#quit() },
     ].flat().filter(Boolean))
-  }
-
-  #start() {
-    const dir = this.server.readRecentDirs()[0]
-    if (dir) {
-      this.server.start(dir, { open: true })
-    } else {
-      this.openFolder(true)
-    }
   }
 
   async openFolder(open = false) {
