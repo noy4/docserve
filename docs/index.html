@@ -166,16 +166,6 @@
     margin-bottom: 8px;
   }
   h2 iconify-icon { color: var(--primary); flex-shrink: 0; }
-  h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--text-strong);
-    margin: 28px 0 10px;
-  }
-  h3 iconify-icon { color: var(--accent); font-size: 18px; flex-shrink: 0; }
   .section-desc {
     color: var(--muted);
     font-size: 0.88rem;
@@ -263,6 +253,11 @@
     margin: 0;
   }
   .card p strong { color: var(--text); }
+  .card pre {
+    background: var(--surface-2);
+    border: none;
+    margin: 10px 0 6px;
+  }
 
   /* Desktop steps */
   .step {
@@ -291,7 +286,7 @@
   .step p strong { color: var(--text); }
   .step a { color: var(--primary); text-decoration: none; font-weight: 600; }
   .step a:hover { text-decoration: underline; }
-  .step-note {
+  .card .step-note {
     color: var(--muted);
     font-size: 0.8rem;
     margin: 8px 0 0;
@@ -302,7 +297,7 @@
     margin-right: 6px;
     color: var(--accent);
   }
-  .cli-note {
+  .card .cli-note {
     color: var(--muted);
     font-size: 0.82rem;
     margin-top: 10px;
@@ -395,28 +390,39 @@
   <section>
     <h2><iconify-icon icon="mdi:download-outline" width="24" noobserver></iconify-icon>Getting started</h2>
 
-    <h3><iconify-icon icon="mdi:apple" noobserver></iconify-icon>macOS app</h3>
-    <div class="step">
-      <span class="step-num">1</span>
-      <p><strong>Download</strong> — the DMG for your Mac from the <a href="https://github.com/noy4/docserve/releases" target="_blank" rel="noopener">Releases</a> page (<code>arm64</code> for Apple Silicon)</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
+          <h4>macOS app</h4>
+        </div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <p><strong>Download</strong> — the DMG for your Mac from the <a href="https://github.com/noy4/docserve/releases" target="_blank" rel="noopener">Releases</a> page (<code>arm64</code> for Apple Silicon)</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong>, then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <p><strong>Pick a folder</strong> — the gallery opens in your browser</p>
+        </div>
+        <p class="step-note">
+          <iconify-icon icon="mdi:menu" noobserver></iconify-icon>
+          Click the menu bar icon to start, stop, or switch the served folder.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:console" noobserver></iconify-icon>
+          <h4>CLI</h4>
+        </div>
+        <pre>npx @noy4/docserve ~/reports --open   <span style="color:var(--muted)"># serve</span>
+npx @noy4/docserve stop               <span style="color:var(--muted)"># stop all</span></pre>
+        <p class="cli-note">Or install globally: <code>npm install -g @noy4/docserve</code> — then run <code>docserve &lt;folder&gt;</code>.</p>
+      </div>
     </div>
-    <div class="step">
-      <span class="step-num">2</span>
-      <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong>, then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
-    </div>
-    <div class="step">
-      <span class="step-num">3</span>
-      <p><strong>Pick a folder</strong> — the gallery opens in your browser</p>
-    </div>
-    <p class="step-note">
-      <iconify-icon icon="mdi:menu" noobserver></iconify-icon>
-      Click the menu bar icon to start, stop, or switch the served folder.
-    </p>
-
-    <h3><iconify-icon icon="mdi:console" noobserver></iconify-icon>For CLI users</h3>
-    <pre>npx @noy4/docserve ~/reports --open   <span style="color:var(--muted)"># serve a folder</span>
-npx @noy4/docserve stop               <span style="color:var(--muted)"># stop all running servers</span></pre>
-    <p class="cli-note">Or install globally: <code>npm install -g @noy4/docserve</code> — then run <code>docserve &lt;folder&gt;</code>.</p>
   </section>
 
   <!-- --- DOCUMENTATION --- -->
@@ -447,11 +453,10 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
       Links
     </div>
     <ul>
-      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/noy4/docserve" target="_blank" rel="noopener">noy4/docserve</a> — source &amp; issue tracker</li>
-      <li><iconify-icon icon="mdi:npm" noobserver></iconify-icon><a href="https://www.npmjs.com/package/@noy4/docserve" target="_blank" rel="noopener">@noy4/docserve</a> — npm package</li>
+      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/noy4/docserve" target="_blank" rel="noopener">noy4/docserve</a> — source</li>
       <li><iconify-icon icon="mdi:scale-balance" noobserver></iconify-icon><a href="https://github.com/noy4/docserve/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
     </ul>
-    <div class="colophon">docserve · published with GitHub Pages · 2026</div>
+    <div class="colophon">docserve · 2026</div>
   </footer>
 
 </div>
