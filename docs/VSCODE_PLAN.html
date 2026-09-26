@@ -492,7 +492,7 @@
     <div class="timeline">
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -505,21 +505,21 @@
             A <code>vscode/</code> package in the monorepo that activates, registers command stubs, and shows a status bar placeholder.
           </div>
           <div class="tasks">
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Monorepo layout</div>
                 <div class="task-desc">vscode/ beside cli/ and desktop/ — package.json, tsconfig, esbuild bundling, npm scripts</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:puzzle-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Contribution points</div>
                 <div class="task-desc">commands, configuration, status bar item; activation on <code>onStartupFinished</code> so status renders immediately</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:image-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Icon &amp; listing assets</div>
@@ -777,6 +777,20 @@
       <tr><td>Per-workspace or global status bar?</td><td>Per workspace: each window reflects its own folder's state only; the QuickPick carries the full instance list.</td></tr>
       <tr><td>Version scheme</td><td>The extension starts at <code>0.1.0</code>, independent of the CLI's <code>0.3.x</code>.</td></tr>
     </table>
+  </section>
+
+  <!-- NOTES -->
+  <section>
+    <h2><iconify-icon icon="mdi:note-edit-outline" width="24" noobserver></iconify-icon>Notes</h2>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:bug-outline" noobserver></iconify-icon>
+          <h4>F5 can hang on this machine</h4>
+        </div>
+        <p><code>localhost</code> resolves to IPv6 first, so js-debug never attaches and the host stops on the first line. Use ⌃F5 (Run Without Debugging) or launch via CLI: <code>code --extensionDevelopmentPath=.../vscode --disable-extensions --new-window</code>.</p>
+      </div>
+    </div>
   </section>
 
   <footer>

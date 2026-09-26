@@ -1,0 +1,91 @@
+{
+  "name": "docserve",
+  "displayName": "docserve",
+  "description": "Serve a folder of HTML as a card gallery with live reload — start/stop docserve from the status bar.",
+  "version": "0.1.0",
+  "publisher": "noy4",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noy4/docserve.git",
+    "directory": "vscode"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "icon": "icon.png",
+  "files": [
+    "dist/**",
+    "icon.png",
+    "LICENSE",
+    "README.md"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "docserve.start",
+        "title": "Serve a folder",
+        "category": "docserve"
+      },
+      {
+        "command": "docserve.open",
+        "title": "Open gallery",
+        "category": "docserve"
+      },
+      {
+        "command": "docserve.stop",
+        "title": "Stop server",
+        "category": "docserve"
+      },
+      {
+        "command": "docserve.stopAll",
+        "title": "Stop all servers",
+        "category": "docserve"
+      },
+      {
+        "command": "docserve.list",
+        "title": "Show running servers",
+        "category": "docserve"
+      }
+    ],
+    "configuration": {
+      "title": "docserve",
+      "properties": {
+        "docserve.port": {
+          "type": "number",
+          "default": 4242,
+          "description": "Preferred port passed to the CLI (falls back +1 on conflict)."
+        },
+        "docserve.cliCommand": {
+          "type": "string",
+          "default": "npx -y @noy4/docserve",
+          "description": "Command used to run the docserve CLI."
+        },
+        "docserve.stateDir": {
+          "type": "string",
+          "default": "",
+          "description": "Overrides the docserve state dir (sets DOCSERVE_HOME). Mainly for tests."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0"
+  }
+}
