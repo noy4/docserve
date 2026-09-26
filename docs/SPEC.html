@@ -7,7 +7,7 @@
 <title>docserve | Spec</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234465DB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M8 13h8M8 17h5'/%3E%3C/svg%3E">
 <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -217,8 +217,8 @@
   .figure .node { fill: var(--surface-2); stroke: var(--border-strong); }
   .figure .node-primary { stroke: var(--primary); }
   .figure .node-accent { fill: var(--accent-soft); stroke: var(--accent); }
-  .figure .tt { fill: var(--text-strong); font-weight: 600; font-size: 11.5px; text-anchor: middle; }
-  .figure .tm { fill: var(--muted); font-size: 8.5px; text-anchor: middle; font-family: var(--mono); }
+  .figure .tt { fill: var(--text-strong); font-weight: 600; font-size: 11.5px; text-anchor: start; font-family: "Geist", sans-serif; }
+  .figure .tm { fill: var(--muted); font-size: 8.5px; text-anchor: start; font-family: var(--mono); }
   .figure .edge { fill: none; stroke: var(--muted); stroke-width: 1.2; marker-end: url(#arch-head-muted); }
   .figure .edge-primary { stroke: var(--primary); stroke-width: 1.5; marker-end: url(#arch-head-primary); }
   .figure .edge-accent { stroke: var(--accent); stroke-width: 1.4; marker-end: url(#arch-head-accent); }
@@ -456,46 +456,53 @@
         <path class="edge" d="M 358,238 V 200"/>
         <path class="edge edge-primary" d="M 148,340 V 300"/>
         <path class="edge" d="M 420,296 V 336"/>
-        <path class="edge" d="M 248,366 H 292"/>
-        <text class="alabel" x="498" y="158">WS /__reload</text>
+        <path class="edge" d="M 248,366 H 276"/>
+        <text class="alabel" x="470" y="158">WS /__reload</text>
         <text class="alabel" x="400" y="210">GET / · /api/files</text>
         <text class="alabel" x="366" y="224">changes</text>
         <text class="alabel" x="156" y="324">spawn · stop</text>
         <text class="alabel" x="428" y="322">writes</text>
-        <text class="alabel" x="270" y="358">reads</text>
+        <text class="alabel" x="250" y="358">reads</text>
 
         <!-- Entry -->
         <rect class="node node-primary" x="268" y="20" width="232" height="44" rx="6"/>
-        <text class="tt" x="384" y="38">docserve &lt;dir&gt; --open</text>
-        <text class="tm" x="384" y="54">CLI entry · bin.mjs</text>
+        <image href="https://api.iconify.design/logos/nodejs-icon.svg?height=18" x="280" y="33" height="18"/>
+        <text class="tt" x="304" y="38" style="font-family: var(--mono);">docserve &lt;dir&gt; --open</text>
+        <text class="tm" x="304" y="54">CLI entry · bin.mjs</text>
 
         <!-- Inside the process -->
         <rect class="node" x="68" y="140" width="180" height="56" rx="6"/>
-        <text class="tt" x="158" y="162">HTTP server</text>
-        <text class="tm" x="158" y="178">static · /api/files</text>
+        <image href="https://api.iconify.design/mdi/server.svg?height=18&color=%237E8A9E" x="80" y="159" width="18" height="18"/>
+        <text class="tt" x="104" y="162">HTTP server</text>
+        <text class="tm" x="104" y="178">static · /api/files</text>
 
         <rect class="node" x="268" y="140" width="180" height="56" rx="6"/>
-        <text class="tt" x="358" y="162">WebSocket server</text>
-        <text class="tm" x="358" y="178">/__reload broadcast</text>
+        <image href="https://api.iconify.design/mdi/broadcast.svg?height=18&color=%237E8A9E" x="280" y="159" width="18" height="18"/>
+        <text class="tt" x="304" y="162">WebSocket server</text>
+        <text class="tm" x="304" y="178">/__reload broadcast</text>
 
         <rect class="node" x="68" y="238" width="380" height="44" rx="6"/>
-        <text class="tt" x="258" y="258">FileWatcher</text>
-        <text class="tm" x="258" y="272">fs.watch(docsDir) · debounce 50 ms</text>
+        <image href="https://api.iconify.design/mdi/file-eye-outline.svg?height=18&color=%237E8A9E" x="80" y="251" width="18" height="18"/>
+        <text class="tt" x="104" y="258">FileWatcher</text>
+        <text class="tm" x="104" y="272">fs.watch(docsDir) · debounce 50 ms</text>
 
         <!-- Browser -->
         <rect class="node node-accent" x="552" y="140" width="184" height="56" rx="6"/>
-        <text class="tt" x="644" y="162">Browser</text>
-        <text class="tm" x="644" y="178">gallery · pages</text>
+        <image href="https://api.iconify.design/mdi/web.svg?height=18&color=%237E8A9E" x="564" y="159" width="18" height="18"/>
+        <text class="tt" x="588" y="162">Browser</text>
+        <text class="tm" x="588" y="178">gallery · pages</text>
 
         <!-- Desktop -->
         <rect class="node" x="48" y="340" width="200" height="52" rx="6"/>
-        <text class="tt" x="148" y="362">Desktop app (Electron)</text>
-        <text class="tm" x="148" y="378">tray · start/stop · add folder</text>
+        <image href="https://api.iconify.design/logos/electron.svg?height=18" x="60" y="357" height="18"/>
+        <text class="tt" x="84" y="362">Desktop app (Electron)</text>
+        <text class="tm" x="84" y="378">tray · start/stop · add folder</text>
 
         <!-- State file -->
-        <rect class="node" x="296" y="340" width="220" height="52" rx="6"/>
-        <text class="tt" x="406" y="362" style="font-family: var(--mono); font-size: 11px;">state/&lt;port&gt;-&lt;name&gt;.json</text>
-        <text class="tm" x="406" y="378">{pid, port, url, docsDir} · one per instance</text>
+        <rect class="node" x="280" y="340" width="256" height="52" rx="6"/>
+        <image href="https://api.iconify.design/mdi/file-cog-outline.svg?height=18&color=%237E8A9E" x="292" y="357" width="18" height="18"/>
+        <text class="tt" x="316" y="362" style="font-family: var(--mono); font-size: 11px;">state/&lt;port&gt;-&lt;name&gt;.json</text>
+        <text class="tm" x="316" y="378">{pid, port, url, docsDir} · per instance</text>
       </svg>
     </div>
 
