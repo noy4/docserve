@@ -22,3 +22,13 @@ Notes:
 3. Tag and push: `git tag -a cli-vX.Y.Z -m "@noy4/docserve X.Y.Z" && git push origin cli-vX.Y.Z` — the `publish-cli` workflow publishes to npm automatically (trusted publishing, provenance included)
 
 Desktop and CLI versions are independent. If the publish fails with auth errors, check the Trusted Publisher on npmjs.com (`noy4` / `docserve` / `publish-cli.yml`).
+
+## VS Code extension
+
+1. Bump `version` in `vscode/package.json`
+2. Commit and push `main`
+3. Publish: `npx vsce package` in `vscode/`, then upload the `.vsix` via the manage portal (More Actions → Update)
+
+Notes:
+
+- The `publish-vscode` workflow (tag `vscode-v*`) is not usable yet — it needs a trusted publishing policy on the publisher page, which isn't available there yet
