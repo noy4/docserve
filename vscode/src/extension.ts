@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Main item: open/start this workspace's server.
   // Adjacent $(list-unordered) item: the instance list.
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
-  status.command = "docserve.start"
+  status.command = "docserve.open"
   status.tooltip = "docserve — start server for this workspace"
   status.show()
 
@@ -24,7 +24,6 @@ export function activate(context: vscode.ExtensionContext) {
     status,
     listButton,
     refreshOnEvents(status),
-    vscode.commands.registerCommand("docserve.start", start),
     vscode.commands.registerCommand("docserve.open", open),
     vscode.commands.registerCommand("docserve.stop", stop),
     vscode.commands.registerCommand("docserve.stopAll", stopAll),
@@ -45,7 +44,7 @@ function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
     } else {
       status.text = STATUS_IDLE
       status.tooltip = "docserve — start server for this workspace"
-      status.command = "docserve.start"
+      status.command = "docserve.open"
     }
   }
   refresh()
@@ -56,21 +55,15 @@ function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
   )
 }
 
-async function start(): Promise<void> {
-  await pickFolder(startServerIn)
-}
-
-// Open this workspace's gallery, starting the server first if needed. Same as
-// clicking the status bar item.
 async function open(): Promise<void> {
   const states = listLiveStates()
   const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
   const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
   if (mine) {
     openGallery(mine)
-  } else {
-    await start()
+    return
   }
+  await pickFolder(startServerIn)
 }
 
 async function stop(): Promise<void> {

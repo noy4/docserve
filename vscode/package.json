@@ -30,11 +30,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "docserve.start",
-        "title": "Serve a Folder",
-        "category": "Docserve"
-      },
-      {
         "command": "docserve.open",
         "title": "Open Gallery",
         "category": "Docserve"
