@@ -6,11 +6,6 @@ import { DocserveState, listLiveStates, watchStateDirSetting, watchStates } from
 
 const STATUS_IDLE = "$(play) docserve"
 
-// All long-running CLI work reports through the status bar spinner.
-function windowProgress<T>(title: string, task: () => Promise<T>): Thenable<T> {
-  return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title }, task)
-}
-
 export function activate(context: vscode.ExtensionContext) {
   // Main item: open/start this workspace's server.
   // Adjacent $(list-unordered) item: the instance list.
@@ -65,22 +60,6 @@ async function start(): Promise<void> {
   await pickFolder(startServerIn)
 }
 
-async function startWithDialog(): Promise<void> {
-  const folder = await pickAnyFolder()
-  if (folder) await startServerIn(folder)
-}
-
-async function startServerIn(folder: string): Promise<void> {
-  const result = await windowProgress(`docserve: starting ${path.basename(folder)}…`, () => startServer(folder))
-  if (result.ok) {
-    openGallery(result.state)
-  } else if (result.reason === "enoent") {
-    showCliMissing()
-  } else {
-    void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
-  }
-}
-
 // Open this workspace's gallery, starting the server first if needed. Same as
 // clicking the status bar item.
 async function open(): Promise<void> {
@@ -104,10 +83,6 @@ async function stop(): Promise<void> {
   const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
   const state = mine ?? (states.length === 1 ? states[0] : await pickRunningServer())
   if (state) await stopWithProgress(state)
-}
-
-async function stopWithProgress(state: DocserveState): Promise<void> {
-  await windowProgress(`docserve: stopping ${path.basename(state.docsDir)}…`, () => stopServer(state.docsDir))
 }
 
 async function stopAll(): Promise<void> {
@@ -142,13 +117,68 @@ async function list(): Promise<void> {
   picked?.run?.()
 }
 
-// "reports (~/repos/research)" — same shape as the desktop tray menu
-function serverLabel(state: DocserveState): string {
-  return `${path.basename(state.docsDir)} (${tildify(path.dirname(state.docsDir))})`
+async function startWithDialog(): Promise<void> {
+  const folder = await pickAnyFolder()
+  if (folder) await startServerIn(folder)
+}
+
+async function startServerIn(folder: string): Promise<void> {
+  const result = await windowProgress(`docserve: starting ${path.basename(folder)}…`, () => startServer(folder))
+  if (result.ok) {
+    openGallery(result.state)
+  } else if (result.reason === "enoent") {
+    showCliMissing()
+  } else {
+    void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
+  }
+}
+
+async function stopWithProgress(state: DocserveState): Promise<void> {
+  await windowProgress(`docserve: stopping ${path.basename(state.docsDir)}…`, () => stopServer(state.docsDir))
+}
+
+async function pickRunningServer(): Promise<DocserveState | undefined> {
+  const states = listLiveStates()
+  if (states.length === 0) {
+    void vscode.window.showInformationMessage("docserve: no servers running")
+    return undefined
+  }
+  if (states.length === 1) return states[0]
+  return vscode.window
+    .showQuickPick(
+      states.map((s) => ({ label: `$(radio-tower) ${serverLabel(s)}`, detail: s.url, state: s })),
+      { placeHolder: "Which server?" },
+    )
+    .then((picked) => picked?.state)
+}
+
+function pickFolder(run: (folder: string) => Promise<void>): Promise<void> {
+  return (async () => {
+    const folders = vscode.workspace.workspaceFolders
+    let folder: string | undefined
+    if (!folders || folders.length === 0) {
+      folder = await pickAnyFolder()
+    } else if (folders.length === 1) {
+      folder = folders[0].uri.fsPath
+    } else {
+      folder = await vscode.window.showQuickPick(folders.map((f) => f.uri.fsPath), { placeHolder: "Which folder?" })
+    }
+    if (folder) await run(folder)
+  })()
+}
+
+async function pickAnyFolder(): Promise<string | undefined> {
+  const picked = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false })
+  return picked?.[0]?.fsPath
 }
 
 function openGallery(state: DocserveState): void {
   void vscode.env.openExternal(vscode.Uri.parse(state.url))
+}
+
+// "reports (~/repos/research)" — same shape as the desktop tray menu
+function serverLabel(state: DocserveState): string {
+  return `${path.basename(state.docsDir)} (${tildify(path.dirname(state.docsDir))})`
 }
 
 function tildify(p: string): string {
@@ -167,39 +197,9 @@ function showCliMissing(): void {
     })
 }
 
-async function pickAnyFolder(): Promise<string | undefined> {
-  const picked = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false })
-  return picked?.[0]?.fsPath
-}
-
-function pickFolder(run: (folder: string) => Promise<void>): Promise<void> {
-  return (async () => {
-    const folders = vscode.workspace.workspaceFolders
-    let folder: string | undefined
-    if (!folders || folders.length === 0) {
-      folder = await pickAnyFolder()
-    } else if (folders.length === 1) {
-      folder = folders[0].uri.fsPath
-    } else {
-      folder = await vscode.window.showQuickPick(folders.map((f) => f.uri.fsPath), { placeHolder: "Which folder?" })
-    }
-    if (folder) await run(folder)
-  })()
-}
-
-async function pickRunningServer(): Promise<DocserveState | undefined> {
-  const states = listLiveStates()
-  if (states.length === 0) {
-    void vscode.window.showInformationMessage("docserve: no servers running")
-    return undefined
-  }
-  if (states.length === 1) return states[0]
-  return vscode.window
-    .showQuickPick(
-      states.map((s) => ({ label: `$(radio-tower) ${serverLabel(s)}`, detail: s.url, state: s })),
-      { placeHolder: "Which server?" },
-    )
-    .then((picked) => picked?.state)
+// All long-running CLI work reports through the status bar spinner.
+function windowProgress<T>(title: string, task: () => Promise<T>): Thenable<T> {
+  return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title }, task)
 }
 
 export function deactivate() { }
