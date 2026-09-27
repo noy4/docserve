@@ -1,7 +1,7 @@
 import * as path from "node:path"
 import * as vscode from "vscode"
 import { disposeLog, startServer, stopAllServers, stopServer } from "./server"
-import { DocserveState, listLiveStates } from "./state"
+import { DocserveState, listLiveStates, watchStateDirSetting, watchStates } from "./state"
 
 const STATUS_IDLE = "$(radio-tower) docserve"
 
@@ -10,6 +10,19 @@ export function activate(context: vscode.ExtensionContext) {
   status.command = "docserve.list"
   status.show()
 
+  context.subscriptions.push(
+    status,
+    refreshOnEvents(status),
+    vscode.commands.registerCommand("docserve.start", start),
+    vscode.commands.registerCommand("docserve.open", open),
+    vscode.commands.registerCommand("docserve.stop", stop),
+    vscode.commands.registerCommand("docserve.stopAll", stopAll),
+    vscode.commands.registerCommand("docserve.list", list),
+    { dispose: disposeLog },
+  )
+}
+
+function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
   const refresh = () => {
     const states = listLiveStates()
     const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
@@ -27,91 +40,85 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
   refresh()
-
-  const start = () =>
-    pickFolder(async (folder) => {
-      const result = await vscode.window.withProgress(
-        { location: vscode.ProgressLocation.Notification, title: `docserve: starting ${path.basename(folder)}…` },
-        () => startServer(folder),
-      )
-      if (result.ok) {
-        const pick = await vscode.window.showInformationMessage(
-          `docserve: serving at ${result.state.url}`,
-          "Open Gallery",
-        )
-        if (pick) openGallery(result.state)
-      } else if (result.reason === "enoent") {
-        showCliMissing()
-      } else {
-        void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
-      }
-    })
-
-  const open = async () => {
-    const state = await pickRunningServer()
-    if (state) openGallery(state)
-  }
-
-  const stop = async () => {
-    const states = listLiveStates()
-    if (states.length === 0) {
-      void vscode.window.showInformationMessage("docserve: no servers running")
-      return
-    }
-    const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
-    const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
-    const state = mine ?? (states.length === 1 ? states[0] : await pickRunningServer())
-    if (state) {
-      stopServer(state.docsDir)
-      void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(state.docsDir)}`)
-    }
-  }
-
-  context.subscriptions.push(
-    status,
-    vscode.commands.registerCommand("docserve.start", start),
-    vscode.commands.registerCommand("docserve.open", open),
-    vscode.commands.registerCommand("docserve.stop", stop),
-    vscode.commands.registerCommand("docserve.stopAll", () => {
-      stopAllServers()
-      void vscode.window.showInformationMessage("docserve: stopping all servers")
-    }),
-    vscode.commands.registerCommand("docserve.list", async () => {
-      const states = listLiveStates()
-      const items: (vscode.QuickPickItem & { run?: () => void })[] = []
-      for (const s of states) {
-        const name = path.basename(s.docsDir)
-        items.push({
-          label: `$(link-external) Open :${s.port}`,
-          description: name,
-          detail: s.url,
-          run: () => openGallery(s),
-        })
-        items.push({
-          label: `$(stop-circle) Stop :${s.port}`,
-          description: name,
-          run: () => {
-            stopServer(s.docsDir)
-            void vscode.window.showInformationMessage(`docserve: stopping ${name}`)
-          },
-        })
-      }
-      items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
-      items.push({ label: "$(play) Start server…", run: start })
-      if (states.length > 0) {
-        items.push({
-          label: "$(circle-slash) Stop all",
-          run: () => {
-            stopAllServers()
-            void vscode.window.showInformationMessage("docserve: stopping all servers")
-          },
-        })
-      }
-      const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve servers" })
-      picked?.run?.()
-    }),
-    { dispose: disposeLog },
+  return vscode.Disposable.from(
+    watchStates(refresh),
+    watchStateDirSetting(refresh),
+    vscode.workspace.onDidChangeWorkspaceFolders(refresh),
   )
+}
+
+async function start(): Promise<void> {
+  await pickFolder(async (folder) => {
+    const result = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: `docserve: starting ${path.basename(folder)}…` },
+      () => startServer(folder),
+    )
+    if (result.ok) {
+      const pick = await vscode.window.showInformationMessage(
+        `docserve: serving at ${result.state.url}`,
+        "Open Gallery",
+      )
+      if (pick) openGallery(result.state)
+    } else if (result.reason === "enoent") {
+      showCliMissing()
+    } else {
+      void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
+    }
+  })
+}
+
+async function open(): Promise<void> {
+  const state = await pickRunningServer()
+  if (state) openGallery(state)
+}
+
+async function stop(): Promise<void> {
+  const states = listLiveStates()
+  if (states.length === 0) {
+    void vscode.window.showInformationMessage("docserve: no servers running")
+    return
+  }
+  const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
+  const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
+  const state = mine ?? (states.length === 1 ? states[0] : await pickRunningServer())
+  if (state) {
+    stopServer(state.docsDir)
+    void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(state.docsDir)}`)
+  }
+}
+
+function stopAll(): void {
+  stopAllServers()
+  void vscode.window.showInformationMessage("docserve: stopping all servers")
+}
+
+async function list(): Promise<void> {
+  const states = listLiveStates()
+  const items: (vscode.QuickPickItem & { run?: () => void })[] = []
+  for (const s of states) {
+    const name = path.basename(s.docsDir)
+    items.push({
+      label: `$(link-external) Open :${s.port}`,
+      description: name,
+      detail: s.url,
+      run: () => openGallery(s),
+    })
+    items.push({
+      label: `$(stop-circle) Stop :${s.port}`,
+      description: name,
+      run: () => {
+        stopServer(s.docsDir)
+        void vscode.window.showInformationMessage(`docserve: stopping ${name}`)
+      },
+    })
+  }
+  items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
+  items.push({ label: "$(play) Start server…", run: () => void start() })
+  if (states.length > 0) {
+    items.push({ label: "$(circle-slash) Stop all", run: stopAll })
+  }
+  const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve servers" })
+  picked?.run?.()
 }
 
 function openGallery(state: DocserveState): void {
@@ -129,8 +136,8 @@ function showCliMissing(): void {
     })
 }
 
-function pickFolder(run: (folder: string) => Promise<void>): void {
-  void (async () => {
+function pickFolder(run: (folder: string) => Promise<void>): Promise<void> {
+  return (async () => {
     const folders = vscode.workspace.workspaceFolders
     let folder: string | undefined
     if (!folders || folders.length === 0) {
@@ -152,10 +159,12 @@ async function pickRunningServer(): Promise<DocserveState | undefined> {
     return undefined
   }
   if (states.length === 1) return states[0]
-  return vscode.window.showQuickPick(
-    states.map((s) => ({ label: `$(radio-tower) :${s.port}`, description: path.basename(s.docsDir), detail: s.url, state: s })),
-    { placeHolder: "Which server?" },
-  ).then((picked) => picked?.state)
+  return vscode.window
+    .showQuickPick(
+      states.map((s) => ({ label: `$(radio-tower) :${s.port}`, description: path.basename(s.docsDir), detail: s.url, state: s })),
+      { placeHolder: "Which server?" },
+    )
+    .then((picked) => picked?.state)
 }
 
 export function deactivate() { }
