@@ -4,7 +4,7 @@
 
 Serves a folder of HTML as a card gallery with live reload.
 
-<img src="./docs/assets/gallery.webp" width="600" alt="docserve gallery">
+<img src="./docs/assets/gallery-card.webp" width="600" alt="docserve gallery">
 
 [Homepage](https://noy4.github.io/docserve/)
 
@@ -16,7 +16,7 @@ Serves a folder of HTML as a card gallery with live reload.
 
 ## 🖥️ Desktop app
 
-<img src="./docs/assets/menubar.webp" width="300" alt="docserve menu bar">
+<img src="./docs/assets/menubar-card.webp" width="300" alt="docserve menu bar">
 
 1. **Download** — the DMG for your Mac from [Releases](../../releases) (`arm64` for Apple Silicon)
 2. **Launch** — on the security warning, click **Done** (not **Move to Trash**), then approve via **Open Anyway** in `System Settings → Privacy & Security`
@@ -31,6 +31,10 @@ npx @noy4/docserve stop               # stop all running servers
 ```
 
 Or install globally: `npm install -g @noy4/docserve` — then run `docserve <folder>`.
+
+## 🧩 VS Code extension
+
+[docserve - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=noy4.docserve) — manage docserve from VSCode.
 
 ## ⚖️ License
 
