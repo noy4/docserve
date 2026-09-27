@@ -729,33 +729,17 @@
       </div>
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:minus-circle-outline" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
               <iconify-icon icon="mdi:test-tube" style="color:var(--purple)" noobserver></iconify-icon>
               Phase 6 — Tests
             </span>
-            <span class="step-meta">P2</span>
+            <span class="step-meta">dropped</span>
           </div>
           <div class="step-body">
-            Same rigor as the CLI: pure logic unit-tested, flows integration-tested.
-          </div>
-          <div class="tasks">
-            <div class="task">
-              <iconify-icon icon="mdi:code-tags-check" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Unit tests</div>
-                <div class="task-desc">state parsing, pid liveness, runner resolution — plain <code>node --test</code></div>
-              </div>
-            </div>
-            <div class="task">
-              <iconify-icon icon="mdi:electron-framework" noobserver></iconify-icon>
-              <div class="task-text">
-                <div class="task-title">Integration tests</div>
-                <div class="task-desc"><code>@vscode/test-electron</code> runs commands against a fake CLI script with <code>DOCSERVE_HOME</code> isolation</div>
-              </div>
-            </div>
+            Dropped for v1 — the extension is a thin client over the CLI, and unit coverage would mostly restate the state-file contract. Flows are verified in the dev host (⌃F5). Revisit if state parsing or runner resolution grows.
           </div>
         </div>
       </div>
@@ -811,6 +795,7 @@
       <tr><td>Auto-start a server when opening a workspace with <code>index.html</code>?</td><td>No — surprising actions are worse than one extra click.</td></tr>
       <tr><td>Per-workspace or global status bar?</td><td>Per workspace: each window reflects its own folder's state only; the QuickPick carries the full instance list.</td></tr>
       <tr><td>Version scheme</td><td>The extension starts at <code>0.1.0</code>, independent of the CLI's <code>0.3.x</code>.</td></tr>
+      <tr><td>Unit tests for the extension?</td><td>Dropped for v1. A thin client over the CLI; behavior is verified in the dev host. Revisit if state parsing grows.</td></tr>
     </table>
   </section>
 
@@ -837,7 +822,7 @@
       <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/noy4/docserve" target="_blank" rel="noopener">noy4/docserve</a> — source</li>
       <li><iconify-icon icon="mdi:scale-balance" noobserver></iconify-icon><a href="https://github.com/noy4/docserve/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
     </ul>
-    <div class="colophon">docserve · vscode extension plan · 2026-09-26</div>
+    <div class="colophon">docserve · vscode extension plan · created 2026-09-26</div>
   </footer>
 
 </div>
