@@ -45,7 +45,6 @@
     }
   }
 
-  html { scroll-behavior: smooth; }
   section { scroll-margin-top: 24px; }
   body {
     background: var(--bg);
@@ -936,6 +935,12 @@ Quit docserve</pre>
     a.innerHTML = h.innerHTML
     a.querySelector("iconify-icon")?.removeAttribute("width")
     if (h.tagName === "H3") a.className = "toc-h3"
+    a.addEventListener("click", (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+      e.preventDefault()
+      h.scrollIntoView({ behavior: "smooth" })
+      history.replaceState(null, "", `#${h.id}`)
+    })
     toc.append(a)
   }
   const links = new Map([...toc.querySelectorAll("a")].map((a) => [a.getAttribute("href").slice(1), a]))

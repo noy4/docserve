@@ -476,6 +476,7 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
 
   async function downloadDmg(e) {
     const fallback = e.currentTarget.href;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     try {
       const res = await fetch('https://api.github.com/repos/noy4/docserve/releases/latest', {
