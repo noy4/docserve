@@ -41,7 +41,7 @@ function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
     const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
     if (mine) {
       status.text = `$(radio-tower) :${mine.port}`
-      status.tooltip = `docserve ${tildify(mine.docsDir)}\nOpen ${mine.url}`
+      status.tooltip = `docserve\nOpen ${mine.url}`
       status.command = "docserve.openCurrent"
     } else {
       status.text = STATUS_IDLE
@@ -116,21 +116,23 @@ async function list(): Promise<void> {
   const states = listLiveStates()
   const items: (vscode.QuickPickItem & { run?: () => void })[] = []
   for (const s of states) {
-    const name = path.basename(s.docsDir)
     items.push({
-      label: `$(link-external) Open :${s.port}`,
-      description: name,
-      detail: s.url,
+      label: `$(link-external) Open ${serverLabel(s)}`,
+      description: s.url,
       run: () => openGallery(s),
     })
-    items.push({
-      label: `$(stop-circle) Stop :${s.port}`,
-      description: name,
-      run: () => {
-        stopServer(s.docsDir)
-        void vscode.window.showInformationMessage(`docserve: stopping ${name}`)
-      },
-    })
+  }
+  if (states.length > 0) {
+    items.push({ kind: vscode.QuickPickItemKind.Separator, label: "stop" })
+    for (const s of states) {
+      items.push({
+        label: `$(stop-circle) Stop ${serverLabel(s)}`,
+        run: () => {
+          stopServer(s.docsDir)
+          void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(s.docsDir)}`)
+        },
+      })
+    }
   }
   items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
   items.push({ label: "$(play) Start server…", run: () => void start() })
@@ -139,6 +141,11 @@ async function list(): Promise<void> {
   }
   const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve servers" })
   picked?.run?.()
+}
+
+// "reports (~/repos/research)" — same shape as the desktop tray menu
+function serverLabel(state: DocserveState): string {
+  return `${path.basename(state.docsDir)} (${tildify(path.dirname(state.docsDir))})`
 }
 
 function openGallery(state: DocserveState): void {
@@ -186,7 +193,7 @@ async function pickRunningServer(): Promise<DocserveState | undefined> {
   if (states.length === 1) return states[0]
   return vscode.window
     .showQuickPick(
-      states.map((s) => ({ label: `$(radio-tower) :${s.port}`, description: path.basename(s.docsDir), detail: s.url, state: s })),
+      states.map((s) => ({ label: `$(radio-tower) ${serverLabel(s)}`, detail: s.url, state: s })),
       { placeHolder: "Which server?" },
     )
     .then((picked) => picked?.state)
