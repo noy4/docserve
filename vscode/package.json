@@ -1,7 +1,7 @@
 {
   "name": "docserve",
-  "displayName": "docserve",
-  "description": "Serve a folder of HTML as a card gallery with live reload — start/stop docserve from the status bar.",
+  "displayName": "Docserve",
+  "description": "Serve a folder of HTML as a card gallery with live reload.",
   "version": "0.1.0",
   "publisher": "noy4",
   "license": "MIT",

@@ -1,0 +1,38 @@
+# Publishes the VS Code extension (noy4.docserve) to the Marketplace on
+# vscode-v* tags via OIDC trusted publishing (no PAT stored).
+#
+# Setup once on the Marketplace publisher page
+# (marketplace.visualstudio.com/manage → publisher → settings): add a trusted
+# publishing policy pointing at this repository and this workflow filename.
+name: publish-vscode
+on:
+  push:
+    tags: ["vscode-v*"]
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vscode/package-lock.json
+      - run: npm ci
+        working-directory: vscode
+      - name: Check tag matches package version
+        run: |
+          node -e "const v=require('./package.json').version;const t=process.env.REF_NAME.replace(/^vscode-v/,'');if(v!==t)throw new Error('tag '+t+' but package is '+v)"
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        working-directory: vscode
+      - run: npx tsc --noEmit
+        working-directory: vscode
+      - run: node esbuild.mjs
+        working-directory: vscode
+      - run: npx @vscode/vsce publish --oidc
+        working-directory: vscode
