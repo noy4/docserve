@@ -4,12 +4,10 @@ import { listLiveStates, watchStateDirSetting, watchStates } from "./state"
 
 const STATUS_IDLE = "$(play) docserve"
 
-// Main item: open/start this workspace's server.
-// Adjacent $(list-unordered) item: the instance list.
+// status: open/start this workspace. listButton: list all servers.
 export function createStatusBar(): vscode.Disposable {
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
   status.command = "docserve.open"
-  status.tooltip = "docserve — start server for this workspace"
   status.show()
 
   const listButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99)
@@ -25,11 +23,9 @@ export function createStatusBar(): vscode.Disposable {
     if (mine) {
       status.text = `$(radio-tower) :${mine.port}`
       status.tooltip = `docserve\nOpen ${mine.url}`
-      status.command = "docserve.open"
     } else {
       status.text = STATUS_IDLE
-      status.tooltip = "docserve — start server for this workspace"
-      status.command = "docserve.open"
+      status.tooltip = "docserve — open gallery"
     }
   }
   refresh()
