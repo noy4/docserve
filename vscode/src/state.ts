@@ -13,8 +13,12 @@ export interface DocserveState {
 // Same as the CLI: <DOCSERVE_HOME | ~/.docserve>/state.
 export function stateDir(): string {
   const override = vscode.workspace.getConfiguration("docserve").get<string>("stateDir")?.trim()
-  const home = override || path.join(os.homedir(), ".docserve")
-  return path.join(home, "state")
+  return stateDirPath(os.homedir(), override)
+}
+
+// Pure counterpart of stateDir() for tests.
+export function stateDirPath(home: string, override?: string): string {
+  return path.join(override || path.join(home, ".docserve"), "state")
 }
 
 function readStateFile(file: string): DocserveState | null {
