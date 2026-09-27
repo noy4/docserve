@@ -34,7 +34,7 @@ Or install globally: `npm install -g @noy4/docserve` — then run `docserve <fol
 
 ## 🧩 VS Code extension
 
-<img src="./vscode/media/status-bar.webp" width="120" alt="docserve status bar">
+<img src="./docs/assets/status-bar-card.webp" width="120" alt="docserve status bar">
 
 [Docserve - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=noy4.docserve) — manage docserve from VSCode.
 

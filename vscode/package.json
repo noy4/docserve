@@ -21,8 +21,7 @@
     "dist/**",
     "icon.png",
     "LICENSE",
-    "README.md",
-    "media/**"
+    "README.md"
   ],
   "activationEvents": [
     "onStartupFinished"
