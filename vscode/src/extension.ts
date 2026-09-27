@@ -26,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
     refreshOnEvents(status),
     vscode.commands.registerCommand("docserve.start", start),
     vscode.commands.registerCommand("docserve.open", open),
-    vscode.commands.registerCommand("docserve.openCurrent", openCurrent),
     vscode.commands.registerCommand("docserve.stop", stop),
     vscode.commands.registerCommand("docserve.stopAll", stopAll),
     vscode.commands.registerCommand("docserve.list", list),
@@ -41,13 +40,11 @@ function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
     const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
     if (mine) {
       status.text = `$(radio-tower) :${mine.port}`
-      status.tooltip = `docserve\nOpen ${mine.url}`
-      status.command = "docserve.openCurrent"
+      status.tooltip = `docserve — Open ${mine.url}`
+      status.command = "docserve.open"
     } else {
       status.text = STATUS_IDLE
-      status.tooltip = states.length
-        ? `docserve — start server for this workspace (${states.length} running elsewhere)`
-        : "docserve — start server for this workspace"
+      status.tooltip = "docserve — start server for this workspace"
       status.command = "docserve.start"
     }
   }
@@ -82,13 +79,9 @@ async function startServerIn(folder: string): Promise<void> {
   }
 }
 
+// Open this workspace's gallery, starting the server first if needed. Same as
+// clicking the status bar item.
 async function open(): Promise<void> {
-  const state = await pickRunningServer()
-  if (state) openGallery(state)
-}
-
-// Status bar main item: open this workspace's gallery, starting it first if needed.
-async function openCurrent(): Promise<void> {
   const states = listLiveStates()
   const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
   const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
@@ -145,7 +138,7 @@ async function list(): Promise<void> {
   }
   items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
   items.push({ label: "$(folder-opened) Open Folder…", run: () => void startWithDialog() })
-  items.push({ label: "$(circle-slash) Stop all", run: stopAll })
+  items.push({ label: "$(circle-slash) Stop All", run: stopAll })
   const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve servers" })
   picked?.run?.()
 }

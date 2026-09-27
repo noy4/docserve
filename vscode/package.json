@@ -31,32 +31,32 @@
     "commands": [
       {
         "command": "docserve.start",
-        "title": "Serve a folder",
-        "category": "docserve"
+        "title": "Serve a Folder",
+        "category": "Docserve"
       },
       {
         "command": "docserve.open",
-        "title": "Open gallery",
-        "category": "docserve"
+        "title": "Open Gallery",
+        "category": "Docserve"
       },
       {
         "command": "docserve.stop",
-        "title": "Stop server",
-        "category": "docserve"
+        "title": "Stop Server",
+        "category": "Docserve"
       },
       {
         "command": "docserve.stopAll",
-        "title": "Stop all servers",
-        "category": "docserve"
+        "title": "Stop All Servers",
+        "category": "Docserve"
       },
       {
         "command": "docserve.list",
-        "title": "Show running servers",
-        "category": "docserve"
+        "title": "Show Running Servers",
+        "category": "Docserve"
       }
     ],
     "configuration": {
-      "title": "docserve",
+      "title": "Docserve",
       "properties": {
         "docserve.port": {
           "type": "number",
