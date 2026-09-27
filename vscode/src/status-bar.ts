@@ -2,8 +2,6 @@ import * as path from "node:path"
 import * as vscode from "vscode"
 import { listLiveStates, watchStateDirSetting, watchStates } from "./state"
 
-const STATUS_IDLE = "$(play) docserve"
-
 // status: open/start this workspace. listButton: list all servers.
 export function createStatusBar(): vscode.Disposable {
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
@@ -24,7 +22,7 @@ export function createStatusBar(): vscode.Disposable {
       status.text = `$(radio-tower) :${mine.port}`
       status.tooltip = `docserve\nOpen ${mine.url}`
     } else {
-      status.text = STATUS_IDLE
+      status.text = "$(multiple-windows) Open Gallery"
       status.tooltip = "docserve — open gallery"
     }
   }
