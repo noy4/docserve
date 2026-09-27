@@ -478,11 +478,11 @@
     <h2><iconify-icon icon="mdi:slash-forward-box" width="24" noobserver></iconify-icon>Commands &amp; settings</h2>
     <table>
       <tr><th>Command</th><th>Behavior</th></tr>
-      <tr><td><code>docserve.start</code></td><td>Serve a folder (current workspace folder, folder picker on conflict/none). Waits for the state file, then offers to open the gallery.</td></tr>
-      <tr><td><code>docserve.open</code></td><td>Open the gallery URL of the picked running server in the browser.</td></tr>
-      <tr><td><code>docserve.stop</code></td><td>Stop a server (QuickPick lists running ones; scoped to the workspace folder first).</td></tr>
+      <tr><td><code>docserve.start</code></td><td>Serve a folder (current workspace folder, folder picker on conflict/none). Waits for the state file, then opens the gallery right away.</td></tr>
+      <tr><td><code>docserve.open</code></td><td>Open this workspace's gallery — starting the server first if needed. Same as clicking the status bar item.</td></tr>
+      <tr><td><code>docserve.stop</code></td><td>Stop a server (this workspace's first; QuickPick lists running ones when ambiguous).</td></tr>
       <tr><td><code>docserve.stopAll</code></td><td>Stop every running docserve server.</td></tr>
-      <tr><td><code>docserve.list</code></td><td>Show running servers (QuickPick: open / stop rows, one per instance).</td></tr>
+      <tr><td><code>docserve.list</code></td><td>Show running servers (QuickPick: all Open rows, then all Stop rows, then Open Folder… / Stop all).</td></tr>
     </table>
     <table>
       <tr><th>Setting</th><th>Default</th><th>Description</th></tr>
@@ -490,7 +490,34 @@
       <tr><td><code>docserve.cliCommand</code></td><td><code>npx -y @noy4/docserve</code></td><td>Command used to run the CLI, overridable for global installs or custom paths.</td></tr>
       <tr><td><code>docserve.stateDir</code></td><td>empty</td><td>Overrides the state dir (sets <code>DOCSERVE_HOME</code>); mainly for tests.</td></tr>
     </table>
-    <p>Status bar item (per workspace): <code>$(radio-tower) docserve</code> when idle, <code>$(radio-tower) :4242</code> filled when this folder is being served. Click opens <code>docserve.list</code> (start entry included).</p>
+  </section>
+
+  <!-- STATUS BAR -->
+  <section>
+    <h2><iconify-icon icon="mdi:dock-bottom" width="24" noobserver></iconify-icon>Status bar</h2>
+    <p class="section-desc">Two items on the right side.</p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:radio-tower" noobserver></iconify-icon>
+          <h4>Main item — this workspace</h4>
+        </div>
+        <p>
+          Idle: <code>$(play) docserve</code> — click starts the server.
+          Serving: <code>$(radio-tower) :4242</code> — click opens this workspace's gallery right away.
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:format-list-bulleted" noobserver></iconify-icon>
+          <h4>List button — every instance</h4>
+        </div>
+        <p>
+          <code>$(list-unordered)</code> — opens the instance list (Open rows, Stop rows, Open Folder…, Stop all).
+          Arbitrary folders start via <strong>Open Folder…</strong> (desktop parity).
+        </p>
+      </div>
+    </div>
   </section>
 
   <!-- PHASES -->
@@ -676,25 +703,25 @@
             Configuration surface and the small comforts.
           </div>
           <div class="tasks">
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:cog-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Settings</div>
                 <div class="task-desc"><code>docserve.port</code>, <code>docserve.cliCommand</code>, <code>docserve.stateDir</code> wired through</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:console-line" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Output channel</div>
-                <div class="task-desc">subprocess stdout/stderr logged to a "docserve" output channel for diagnosis</div>
+                <div class="task-desc">CLI invocations (start / stop) and spawn errors logged to a "docserve" output channel for diagnosis</div>
               </div>
             </div>
             <div class="task">
               <iconify-icon icon="mdi:alert-circle-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Error UX</div>
-                <div class="task-desc">actionable messages: Node missing, port exhausted, CLI older than state format</div>
+                <div class="task-desc">Node missing / startup timeout done; remaining: port exhausted, CLI older than state format</div>
               </div>
             </div>
           </div>
