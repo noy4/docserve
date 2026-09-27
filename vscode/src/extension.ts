@@ -1,3 +1,4 @@
+import * as os from "node:os"
 import * as path from "node:path"
 import * as vscode from "vscode"
 import { disposeLog, startServer, stopAllServers, stopServer } from "./server"
@@ -6,6 +7,8 @@ import { DocserveState, listLiveStates, watchStateDirSetting, watchStates } from
 const STATUS_IDLE = "$(play) docserve"
 
 export function activate(context: vscode.ExtensionContext) {
+  // Main item: open/start this workspace's server.
+  // Adjacent $(list-unordered) item: the instance list.
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
   status.command = "docserve.start"
   status.tooltip = "docserve — start server for this workspace"
@@ -20,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     status,
     listButton,
-    refreshOnEvents(status, listButton),
+    refreshOnEvents(status),
     vscode.commands.registerCommand("docserve.start", start),
     vscode.commands.registerCommand("docserve.open", open),
     vscode.commands.registerCommand("docserve.openCurrent", openCurrent),
@@ -31,19 +34,14 @@ export function activate(context: vscode.ExtensionContext) {
   )
 }
 
-// A StatusBarItem can hold a single command, so the segmented look ("left:
-// start/open, right: list") is two items with consecutive priorities sharing
-// one background color while serving.
-function refreshOnEvents(status: vscode.StatusBarItem, listButton: vscode.StatusBarItem): vscode.Disposable {
+function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
   const refresh = () => {
     const states = listLiveStates()
     const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
     const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
-    const serving = Boolean(mine)
-    const background = serving ? new vscode.ThemeColor("statusBarItem.warningBackground") : undefined
     if (mine) {
       status.text = `$(radio-tower) :${mine.port}`
-      status.tooltip = `docserve — serving ${mine.docsDir}\n${mine.url}`
+      status.tooltip = `docserve ${tildify(mine.docsDir)}\nOpen ${mine.url}`
       status.command = "docserve.openCurrent"
     } else {
       status.text = STATUS_IDLE
@@ -52,8 +50,6 @@ function refreshOnEvents(status: vscode.StatusBarItem, listButton: vscode.Status
         : "docserve — start server for this workspace"
       status.command = "docserve.start"
     }
-    status.backgroundColor = background
-    listButton.backgroundColor = background
   }
   refresh()
   return vscode.Disposable.from(
@@ -147,6 +143,11 @@ async function list(): Promise<void> {
 
 function openGallery(state: DocserveState): void {
   void vscode.env.openExternal(vscode.Uri.parse(state.url))
+}
+
+function tildify(p: string): string {
+  const home = os.homedir()
+  return p.startsWith(home) ? `~${p.slice(home.length)}` : p
 }
 
 function showCliMissing(): void {
