@@ -13,38 +13,7 @@ export interface DocserveState {
 // Same as the CLI: <DOCSERVE_HOME | ~/.docserve>/state.
 export function stateDir(): string {
   const override = vscode.workspace.getConfiguration("docserve").get<string>("stateDir")?.trim()
-  return stateDirPath(os.homedir(), override)
-}
-
-// Pure counterpart of stateDir() for tests.
-export function stateDirPath(home: string, override?: string): string {
-  return path.join(override || path.join(home, ".docserve"), "state")
-}
-
-function readStateFile(file: string): DocserveState | null {
-  try {
-    const state = JSON.parse(fs.readFileSync(file, "utf8"))
-    if (
-      typeof state?.pid === "number" &&
-      typeof state?.port === "number" &&
-      typeof state?.url === "string" &&
-      typeof state?.docsDir === "string"
-    ) {
-      return state
-    }
-    return null
-  } catch {
-    return null
-  }
-}
-
-function isProcessAlive(pid: number): boolean {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch {
-    return false
-  }
+  return path.join(override || path.join(os.homedir(), ".docserve"), "state")
 }
 
 // Live instances sorted by port. Stale entries (dead pid) are skipped —
@@ -63,11 +32,6 @@ export function listLiveStates(): DocserveState[] {
     if (state && isProcessAlive(state.pid)) states.push(state)
   }
   return states.sort((a, b) => a.port - b.port)
-}
-
-export function findByDir(states: DocserveState[], docsDir: string): DocserveState | undefined {
-  const resolved = path.resolve(docsDir)
-  return states.find((state) => state.docsDir === resolved)
 }
 
 // fs.watch + 5s poll as a safety net, debounced. The watcher re-arms once
@@ -112,4 +76,35 @@ export function watchStateDirSetting(onChange: () => void): vscode.Disposable {
   return vscode.workspace.onDidChangeConfiguration((e) => {
     if (e.affectsConfiguration("docserve.stateDir")) onChange()
   })
+}
+
+export function findByDir(states: DocserveState[], docsDir: string): DocserveState | undefined {
+  const resolved = path.resolve(docsDir)
+  return states.find((state) => state.docsDir === resolved)
+}
+
+function readStateFile(file: string): DocserveState | null {
+  try {
+    const state = JSON.parse(fs.readFileSync(file, "utf8"))
+    if (
+      typeof state?.pid === "number" &&
+      typeof state?.port === "number" &&
+      typeof state?.url === "string" &&
+      typeof state?.docsDir === "string"
+    ) {
+      return state
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+function isProcessAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
 }
