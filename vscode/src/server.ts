@@ -50,20 +50,24 @@ export async function startServer(folder: string): Promise<StartResult> {
   return { ok: false, reason: "timeout" }
 }
 
-function runCli(args: string[]): void {
-  const runner = getRunner()
-  channel().appendLine(`[cli] ${runner.display} ${args.join(" ")}`)
-  const child = spawn(runner.command, [...runner.args, ...args], { stdio: "ignore" })
-  child.on("error", (err) => {
-    channel().appendLine(`[error] ${err.message}`)
-    void vscode.window.showErrorMessage(`docserve: failed to run CLI — ${err.message}`)
+function runCli(args: string[]): Promise<void> {
+  return new Promise((resolve) => {
+    const runner = getRunner()
+    channel().appendLine(`[cli] ${runner.display} ${args.join(" ")}`)
+    const child = spawn(runner.command, [...runner.args, ...args], { stdio: "ignore" })
+    child.on("error", (err) => {
+      channel().appendLine(`[error] ${err.message}`)
+      void vscode.window.showErrorMessage(`docserve: failed to run CLI — ${err.message}`)
+      resolve()
+    })
+    child.on("close", () => resolve())
   })
 }
 
-export function stopServer(folder: string): void {
-  runCli([path.resolve(folder), "stop"])
+export function stopServer(folder: string): Promise<void> {
+  return runCli([path.resolve(folder), "stop"])
 }
 
-export function stopAllServers(): void {
-  runCli(["stop"])
+export function stopAllServers(): Promise<void> {
+  return runCli(["stop"])
 }

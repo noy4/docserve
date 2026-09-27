@@ -6,6 +6,11 @@ import { DocserveState, listLiveStates, watchStateDirSetting, watchStates } from
 
 const STATUS_IDLE = "$(play) docserve"
 
+// All long-running CLI work reports through the status bar spinner.
+function windowProgress<T>(title: string, task: () => Promise<T>): Thenable<T> {
+  return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title }, task)
+}
+
 export function activate(context: vscode.ExtensionContext) {
   // Main item: open/start this workspace's server.
   // Adjacent $(list-unordered) item: the instance list.
@@ -66,10 +71,7 @@ async function startWithDialog(): Promise<void> {
 }
 
 async function startServerIn(folder: string): Promise<void> {
-  const result = await vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: `docserve: starting ${path.basename(folder)}…` },
-    () => startServer(folder),
-  )
+  const result = await windowProgress(`docserve: starting ${path.basename(folder)}…`, () => startServer(folder))
   if (result.ok) {
     openGallery(result.state)
   } else if (result.reason === "enoent") {
@@ -101,15 +103,15 @@ async function stop(): Promise<void> {
   const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
   const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
   const state = mine ?? (states.length === 1 ? states[0] : await pickRunningServer())
-  if (state) {
-    stopServer(state.docsDir)
-    void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(state.docsDir)}`)
-  }
+  if (state) await stopWithProgress(state)
 }
 
-function stopAll(): void {
-  stopAllServers()
-  void vscode.window.showInformationMessage("docserve: stopping all servers")
+async function stopWithProgress(state: DocserveState): Promise<void> {
+  await windowProgress(`docserve: stopping ${path.basename(state.docsDir)}…`, () => stopServer(state.docsDir))
+}
+
+async function stopAll(): Promise<void> {
+  await windowProgress("docserve: stopping all servers…", stopAllServers)
 }
 
 async function list(): Promise<void> {
@@ -130,10 +132,7 @@ async function list(): Promise<void> {
   for (const s of states) {
     items.push({
       label: `$(stop-circle) Stop ${serverLabel(s)}`,
-      run: () => {
-        stopServer(s.docsDir)
-        void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(s.docsDir)}`)
-      },
+      run: () => void stopWithProgress(s),
     })
   }
   items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
