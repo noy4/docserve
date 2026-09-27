@@ -3,18 +3,27 @@ import * as vscode from "vscode"
 import { disposeLog, startServer, stopAllServers, stopServer } from "./server"
 import { DocserveState, listLiveStates, watchStateDirSetting, watchStates } from "./state"
 
-const STATUS_IDLE = "$(radio-tower) docserve"
+const STATUS_IDLE = "$(play) docserve"
 
 export function activate(context: vscode.ExtensionContext) {
-  const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100)
-  status.command = "docserve.list"
+  const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
+  status.command = "docserve.start"
+  status.tooltip = "docserve — start server for this workspace"
   status.show()
+
+  const listButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99)
+  listButton.text = "$(list-unordered)"
+  listButton.tooltip = "docserve — running servers"
+  listButton.command = "docserve.list"
+  listButton.show()
 
   context.subscriptions.push(
     status,
-    refreshOnEvents(status),
+    listButton,
+    refreshOnEvents(status, listButton),
     vscode.commands.registerCommand("docserve.start", start),
     vscode.commands.registerCommand("docserve.open", open),
+    vscode.commands.registerCommand("docserve.openCurrent", openCurrent),
     vscode.commands.registerCommand("docserve.stop", stop),
     vscode.commands.registerCommand("docserve.stopAll", stopAll),
     vscode.commands.registerCommand("docserve.list", list),
@@ -22,22 +31,29 @@ export function activate(context: vscode.ExtensionContext) {
   )
 }
 
-function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
+// A StatusBarItem can hold a single command, so the segmented look ("left:
+// start/open, right: list") is two items with consecutive priorities sharing
+// one background color while serving.
+function refreshOnEvents(status: vscode.StatusBarItem, listButton: vscode.StatusBarItem): vscode.Disposable {
   const refresh = () => {
     const states = listLiveStates()
     const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
     const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
+    const serving = Boolean(mine)
+    const background = serving ? new vscode.ThemeColor("statusBarItem.warningBackground") : undefined
     if (mine) {
       status.text = `$(radio-tower) :${mine.port}`
       status.tooltip = `docserve — serving ${mine.docsDir}\n${mine.url}`
-      status.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground")
+      status.command = "docserve.openCurrent"
     } else {
       status.text = STATUS_IDLE
       status.tooltip = states.length
-        ? `docserve — ${states.length} server(s) running elsewhere`
-        : "docserve — no servers running"
-      status.backgroundColor = undefined
+        ? `docserve — start server for this workspace (${states.length} running elsewhere)`
+        : "docserve — start server for this workspace"
+      status.command = "docserve.start"
     }
+    status.backgroundColor = background
+    listButton.backgroundColor = background
   }
   refresh()
   return vscode.Disposable.from(
@@ -54,11 +70,7 @@ async function start(): Promise<void> {
       () => startServer(folder),
     )
     if (result.ok) {
-      const pick = await vscode.window.showInformationMessage(
-        `docserve: serving at ${result.state.url}`,
-        "Open Gallery",
-      )
-      if (pick) openGallery(result.state)
+      openGallery(result.state)
     } else if (result.reason === "enoent") {
       showCliMissing()
     } else {
@@ -70,6 +82,18 @@ async function start(): Promise<void> {
 async function open(): Promise<void> {
   const state = await pickRunningServer()
   if (state) openGallery(state)
+}
+
+// Status bar main item: open this workspace's gallery, starting it first if needed.
+async function openCurrent(): Promise<void> {
+  const states = listLiveStates()
+  const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
+  const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
+  if (mine) {
+    openGallery(mine)
+  } else {
+    await start()
+  }
 }
 
 async function stop(): Promise<void> {
