@@ -60,19 +60,26 @@ function refreshOnEvents(status: vscode.StatusBarItem): vscode.Disposable {
 }
 
 async function start(): Promise<void> {
-  await pickFolder(async (folder) => {
-    const result = await vscode.window.withProgress(
-      { location: vscode.ProgressLocation.Notification, title: `docserve: starting ${path.basename(folder)}…` },
-      () => startServer(folder),
-    )
-    if (result.ok) {
-      openGallery(result.state)
-    } else if (result.reason === "enoent") {
-      showCliMissing()
-    } else {
-      void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
-    }
-  })
+  await pickFolder(startServerIn)
+}
+
+async function startWithDialog(): Promise<void> {
+  const folder = await pickAnyFolder()
+  if (folder) await startServerIn(folder)
+}
+
+async function startServerIn(folder: string): Promise<void> {
+  const result = await vscode.window.withProgress(
+    { location: vscode.ProgressLocation.Notification, title: `docserve: starting ${path.basename(folder)}…` },
+    () => startServer(folder),
+  )
+  if (result.ok) {
+    openGallery(result.state)
+  } else if (result.reason === "enoent") {
+    showCliMissing()
+  } else {
+    void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
+  }
 }
 
 async function open(): Promise<void> {
@@ -114,6 +121,10 @@ function stopAll(): void {
 
 async function list(): Promise<void> {
   const states = listLiveStates()
+  if (states.length === 0) {
+    void vscode.window.showInformationMessage("docserve: no servers running")
+    return
+  }
   const items: (vscode.QuickPickItem & { run?: () => void })[] = []
   for (const s of states) {
     items.push({
@@ -122,23 +133,19 @@ async function list(): Promise<void> {
       run: () => openGallery(s),
     })
   }
-  if (states.length > 0) {
-    items.push({ kind: vscode.QuickPickItemKind.Separator, label: "stop" })
-    for (const s of states) {
-      items.push({
-        label: `$(stop-circle) Stop ${serverLabel(s)}`,
-        run: () => {
-          stopServer(s.docsDir)
-          void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(s.docsDir)}`)
-        },
-      })
-    }
+  items.push({ kind: vscode.QuickPickItemKind.Separator, label: "stop" })
+  for (const s of states) {
+    items.push({
+      label: `$(stop-circle) Stop ${serverLabel(s)}`,
+      run: () => {
+        stopServer(s.docsDir)
+        void vscode.window.showInformationMessage(`docserve: stopping ${path.basename(s.docsDir)}`)
+      },
+    })
   }
   items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
-  items.push({ label: "$(play) Start server…", run: () => void start() })
-  if (states.length > 0) {
-    items.push({ label: "$(circle-slash) Stop all", run: stopAll })
-  }
+  items.push({ label: "$(folder-opened) Open Folder…", run: () => void startWithDialog() })
+  items.push({ label: "$(circle-slash) Stop all", run: stopAll })
   const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve servers" })
   picked?.run?.()
 }
@@ -168,13 +175,17 @@ function showCliMissing(): void {
     })
 }
 
+async function pickAnyFolder(): Promise<string | undefined> {
+  const picked = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false })
+  return picked?.[0]?.fsPath
+}
+
 function pickFolder(run: (folder: string) => Promise<void>): Promise<void> {
   return (async () => {
     const folders = vscode.workspace.workspaceFolders
     let folder: string | undefined
     if (!folders || folders.length === 0) {
-      const picked = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false })
-      folder = picked?.[0]?.fsPath
+      folder = await pickAnyFolder()
     } else if (folders.length === 1) {
       folder = folders[0].uri.fsPath
     } else {
