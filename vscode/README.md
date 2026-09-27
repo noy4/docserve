@@ -2,12 +2,13 @@
 
 Serve a folder of HTML as a card gallery with live reload — control [docserve](https://github.com/noy4/docserve) from VS Code.
 
+<img src="./media/gallery-card.webp" width="600" alt="docserve card gallery">
+<img src="./media/status-bar.webp" width="120" alt="docserve status bar — Open Gallery and the server list">
+
 ## Features
 
 - 🖼️ **Open the gallery** — start the server, then open the card grid in your browser
 - 👀 **Manage servers** — see what's running, open the gallery or stop one
-
-The extension is a thin client over the [docserve CLI](https://www.npmjs.com/package/@noy4/docserve): servers started from the terminal or the macOS menu bar app show up here too.
 
 ## Commands
 
