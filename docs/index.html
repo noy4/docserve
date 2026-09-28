@@ -237,6 +237,40 @@
     border: none;
     margin: 10px 0 6px;
   }
+  /* Feature cards (gallery-card style) */
+  .feature-card { padding: 0; overflow: hidden; }
+  .feature-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 140px;
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border-bottom: 1px solid var(--border);
+  }
+  .feature-preview iconify-icon {
+    font-size: 56px;
+    color: var(--primary);
+    filter: drop-shadow(0 6px 14px rgba(68, 101, 219, 0.25));
+  }
+  @media (prefers-color-scheme: light) {
+    .feature-preview iconify-icon {
+      filter: drop-shadow(0 6px 14px rgba(37, 99, 235, 0.18));
+    }
+  }
+  .feature-body { padding: 14px 16px 16px; }
+  .feature-body h4 {
+    font-size: 0.95rem;
+    color: var(--text-strong);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .feature-body p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
   .note-card {
     display: flex;
     align-items: flex-start;
@@ -357,26 +391,32 @@
   <!-- FEATURES -->
   <section>
     <div class="grid-3">
-      <div class="card">
-        <div class="card-head">
+      <div class="card feature-card">
+        <div class="feature-preview">
           <iconify-icon icon="mdi:view-grid-outline" noobserver></iconify-icon>
+        </div>
+        <div class="feature-body">
           <h4>Gallery</h4>
+          <p>Card grid, iframe previews, copy-path button.</p>
         </div>
-        <p>Card grid, iframe previews, copy-path button.</p>
       </div>
-      <div class="card">
-        <div class="card-head">
+      <div class="card feature-card">
+        <div class="feature-preview">
           <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
+        </div>
+        <div class="feature-body">
           <h4>Auto reload</h4>
+          <p>Changes appear instantly.</p>
         </div>
-        <p>Changes appear instantly.</p>
       </div>
-      <div class="card">
-        <div class="card-head">
+      <div class="card feature-card">
+        <div class="feature-preview">
           <iconify-icon icon="mdi:tray" noobserver></iconify-icon>
-          <h4>Desktop &amp; CLI</h4>
         </div>
-        <p>Control it from the menu bar or the terminal.</p>
+        <div class="feature-body">
+          <h4>Desktop &amp; CLI</h4>
+          <p>Control it from the menu bar or the terminal.</p>
+        </div>
       </div>
     </div>
   </section>
