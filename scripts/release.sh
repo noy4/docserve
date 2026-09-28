@@ -174,7 +174,7 @@ watch_workflow() {
   local workflow=$1 tag=$2 id
   for _ in $(seq 1 24); do
     id=$(gh run list --workflow="$workflow" --event push --limit 10 \
-      --json databaseId,headBranch,createdAt \
+      --json databaseId,headBranch,createdAt,event \
       --jq "[.[] | select(.headBranch==\"$tag\") | select(.event==\"push\")] | sort_by(.createdAt) | last | .databaseId" 2>/dev/null || true)
     if [[ -n "$id" && "$id" != "null" ]]; then
       echo "$id"
