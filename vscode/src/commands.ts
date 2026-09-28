@@ -8,7 +8,7 @@ import { DocserveState, listLiveStates } from "./state"
 
 /**
  * Open this workspace's gallery in the browser, starting the server first if
- * needed. Same as clicking the status bar item.
+ * needed. Command-palette shortcut; the status bar item opens the servers menu.
  */
 export async function open(): Promise<void> {
   const states = listLiveStates()
@@ -45,32 +45,61 @@ export async function stopAll(): Promise<void> {
   })
 }
 
-/** Show all running servers as a picker with open/stop rows plus actions. */
+/**
+ * Servers menu shown by the status bar item: this workspace's folder first
+ * (open, or start-and-open), then each running server, then actions.
+ */
 export async function list(): Promise<void> {
   const states = listLiveStates()
-  if (states.length === 0) {
-    void vscode.window.showInformationMessage("docserve: no servers running")
-    return
-  }
+  const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
+  const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
+
   const items: (vscode.QuickPickItem & { run?: () => void })[] = []
-  for (const s of states) {
+
+  if (mine) {
     items.push({
-      label: `$(link-external) Open ${serverLabel(s)}`,
-      description: s.url,
-      run: () => openGallery(s),
+      label: "$(link-external) Open Gallery",
+      description: mine.url,
+      run: () => openGallery(mine),
+    })
+    items.push({
+      label: "$(stop-circle) Stop Gallery",
+      run: () => void stopWithProgress(mine),
+    })
+  } else if (folders.length > 0) {
+    items.push({
+      label: "$(play) Start & Open Gallery",
+      description: folders.length === 1 ? tildify(folders[0]) : "choose folder…",
+      run: () => void pickFolder(startServerIn),
     })
   }
-  items.push({ kind: vscode.QuickPickItemKind.Separator, label: "stop" })
-  for (const s of states) {
-    items.push({
-      label: `$(stop-circle) Stop ${serverLabel(s)}`,
-      run: () => void stopWithProgress(s),
-    })
+
+  if (states.length > 0) {
+    items.push({ kind: vscode.QuickPickItemKind.Separator, label: "servers" })
+    for (const s of states) {
+      items.push({
+        label: `$(link-external) Open ${serverLabel(s)}`,
+        description: s.url,
+        run: () => openGallery(s),
+      })
+    }
+    items.push({ kind: vscode.QuickPickItemKind.Separator, label: "stop" })
+    for (const s of states) {
+      items.push({
+        label: `$(stop-circle) Stop ${serverLabel(s)}`,
+        run: () => void stopWithProgress(s),
+      })
+    }
   }
-  items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
-  items.push({ label: "$(folder-opened) Open Folder…", run: () => void startWithDialog() })
-  items.push({ label: "$(circle-slash) Stop All", run: stopAll })
-  const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve servers" })
+
+  const actions: (vscode.QuickPickItem & { run?: () => void })[] = [
+    { label: "$(folder-opened) Open Folder…", run: () => void startWithDialog() },
+  ]
+  if (states.length > 0) actions.push({ label: "$(circle-slash) Stop All", run: stopAll })
+  if (items.length > 0) items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
+  items.push(...actions)
+
+  const picked = await vscode.window.showQuickPick(items, { placeHolder: "docserve" })
   picked?.run?.()
 }
 

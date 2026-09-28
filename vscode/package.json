@@ -2,7 +2,7 @@
   "name": "docserve",
   "displayName": "Docserve",
   "description": "Serve a folder of HTML as a card gallery with live reload.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "noy4",
   "license": "MIT",
   "repository": {

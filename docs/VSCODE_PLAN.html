@@ -505,27 +505,28 @@
   <!-- STATUS BAR -->
   <section>
     <h2><iconify-icon icon="mdi:dock-bottom" width="24" noobserver></iconify-icon>Status bar</h2>
-    <p class="section-desc">Two items on the right side.</p>
+    <p class="section-desc">A single item on the right side.</p>
     <div class="grid-2">
       <div class="card">
         <div class="card-head">
           <iconify-icon icon="mdi:radio-tower" noobserver></iconify-icon>
-          <h4>Main item — this workspace</h4>
+          <h4>Item — this workspace's state</h4>
         </div>
         <p>
-          Idle: <code>$(play) docserve</code> — click starts the server.
-          Serving: <code>$(radio-tower) :4242</code> — click opens this workspace's gallery right away.
-          Both run <code>docserve.open</code> (start-if-needed → open).
+          Idle: <code>$(multiple-windows) docserve</code>.
+          Serving: <code>$(multiple-windows) :4242</code> with the gallery URL in the tooltip.
+          State follows the state dir watcher.
         </p>
       </div>
       <div class="card">
         <div class="card-head">
           <iconify-icon icon="mdi:format-list-bulleted" noobserver></iconify-icon>
-          <h4>List button — every instance</h4>
+          <h4>Click — servers menu</h4>
         </div>
         <p>
-          <code>$(list-unordered)</code> — opens the instance list (Open rows, Stop rows, Open Folder…, Stop all).
-          Arbitrary folders start via <strong>Open Folder…</strong> (desktop parity).
+          Always opens <code>docserve.list</code>: Open gallery / Start &amp; open gallery (this workspace first),
+          per-server Open &amp; Stop rows, Open Folder…, Stop All — parity with the desktop app's tray menu.
+          Shown even when nothing is running.
         </p>
       </div>
     </div>
