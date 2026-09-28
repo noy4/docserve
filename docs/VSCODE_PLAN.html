@@ -738,7 +738,7 @@
       </div>
 
       <div class="timeline-step">
-        <iconify-icon class="step-check" icon="mdi:circle-outline" noobserver></iconify-icon>
+        <iconify-icon class="step-check" icon="mdi:check-circle" noobserver></iconify-icon>
         <div class="step-content">
           <div class="step-head">
             <span class="step-title">
@@ -748,28 +748,28 @@
             <span class="step-meta">P2</span>
           </div>
           <div class="step-body">
-            <code>noy4.docserve</code> on the VS Code Marketplace, published from CI.
+            <code>noy4.docserve</code> is live on the VS Code Marketplace (published via the manage portal). CI publishing lands when the Marketplace ships trusted-publishing policy UI.
           </div>
           <div class="tasks">
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:package-variant" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Packaging</div>
                 <div class="task-desc"><code>vsce package</code> with bundled extension (esbuild), icon, license, repository links</div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:tag-outline" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Release workflow</div>
-                <div class="task-desc">tagging <code>vscode-v*</code> publishes via <code>@vscode/vsce publish --oidc</code> (trusted publishing, no PAT — global PATs retire 2026-12-01), mirroring the <code>cli-v*</code> npm flow</div>
+                <div class="task-desc"><code>publish-vscode.yml</code> runs <code>vsce publish --oidc</code> on <code>vscode-v*</code> tags, but is parked until the Marketplace offers trusted-publishing setup; until then, manual portal upload per <code>docs/RELEASE.md</code></div>
               </div>
             </div>
-            <div class="task">
+            <div class="task done">
               <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Docs wiring</div>
-                <div class="task-desc">landing page and README get an install link (<code>ext install noy4.docserve</code>)</div>
+                <div class="task-desc">install link + status bar shot in READMEs, VS Code card on the landing page; extension README uses absolute image URLs (relative paths don't resolve on the Marketplace)</div>
               </div>
             </div>
           </div>
