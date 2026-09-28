@@ -184,7 +184,7 @@
   }
   .grid-2 > *, .grid-3 > * { min-width: 0; }
   @media (min-width: 524px) and (max-width: 775px) {
-    .grid-3 .card:last-child { grid-column: 1 / -1; }
+    .grid-3 .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
   }
   @media (max-width: 620px) {
     .grid-2 { grid-template-columns: 1fr; }
@@ -490,7 +490,7 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
       </div>
       <div class="card feature-card">
         <div class="feature-preview">
-          <img class="preview-img" src="./assets/status-bar-card.webp" alt="docserve status bar item — click for the servers menu" loading="lazy">
+          <img class="preview-img" src="./assets/status-bar.webp" alt="docserve status bar" loading="lazy">
         </div>
         <div class="feature-body">
           <h4><iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>VS Code extension</h4>
@@ -532,6 +532,15 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
         <div class="feature-body">
           <h4><iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>VSCODE_PLAN.html</h4>
           <p>The VS Code extension roadmap — state reader, server control, status bar UX, tests, marketplace.</p>
+        </div>
+      </a>
+      <a class="card feature-card" href="./DEV.html" style="text-decoration:none">
+        <div class="feature-preview">
+          <iframe class="feature-iframe" src="./DEV.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="DEV.html preview"></iframe>
+        </div>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:hammer-wrench" noobserver></iconify-icon>DEV.html</h4>
+          <p>Repository recipes — screenshot asset conventions and the cardify bake script.</p>
         </div>
       </a>
     </div>

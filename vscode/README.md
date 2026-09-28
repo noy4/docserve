@@ -4,7 +4,7 @@ Serve a folder of HTML as a card gallery with live reload — control [docserve]
 
 <img src="https://raw.githubusercontent.com/noy4/docserve/main/docs/assets/gallery-card.webp" width="600" alt="docserve card gallery">
 
-<img src="https://raw.githubusercontent.com/noy4/docserve/main/docs/assets/status-bar-card.webp" width="120" alt="docserve status bar item — click for the servers menu">
+<img src="https://raw.githubusercontent.com/noy4/docserve/main/docs/assets/status-bar-card.webp" width="120" alt="docserve status bar">
 
 ## Features
 

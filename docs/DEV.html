@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="created_at" content="2026-09-29T05:30:00+09:00">
+<title>docserve | Dev notes</title>
+<link rel="icon" href="https://api.iconify.design/mdi/file-document-edit-outline.svg?color=%234465DB">
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0B0E14;
+    --surface: #151A23;
+    --surface-2: #21252F;
+    --border: #2C313F;
+    --border-strong: #383F50;
+    --text: #C3CDDC;
+    --text-strong: #F7F9FC;
+    --muted: #7E8A9E;
+    --primary: #4465DB;
+    --primary-soft: rgba(68, 101, 219, 0.15);
+    --accent: #F08A59;
+    --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-2: #F1F5F9;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #334155;
+      --text-strong: #0F172A;
+      --muted: #64748B;
+      --primary: #2563EB;
+      --primary-soft: rgba(37, 99, 235, 0.1);
+      --accent: #EA580C;
+      color-scheme: light;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 0 16px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 0 80px;
+  }
+
+  .hero { padding-bottom: 24px; border-bottom: 1px solid var(--border-strong); }
+  .badge-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h1 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  section { margin-top: 48px; }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  h2 iconify-icon { color: var(--primary); flex-shrink: 0; }
+  p { margin-bottom: 12px; }
+  p strong { color: var(--text); }
+  .section-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    color: var(--text);
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 0.77rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 14px 0;
+  }
+
+  .table-wrap { overflow-x: auto; margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+    background: var(--surface);
+  }
+  td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    background: var(--surface);
+  }
+  tr:last-child td { border-bottom: none; }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-strong);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  footer ul { list-style: none; }
+  footer li { padding: 2px 0; }
+  footer li iconify-icon { color: var(--muted); font-size: 14px; vertical-align: -2px; margin-right: 6px; }
+  footer a { color: var(--primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .f-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .f-title iconify-icon { color: var(--primary); }
+  .colophon {
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div class="badge-top">
+      <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
+      DEV NOTES
+    </div>
+    <h1><iconify-icon icon="mdi:hammer-wrench" width="30" noobserver></iconify-icon>docserve Dev notes</h1>
+    <p class="tagline">Repository-specific recipes that are easy to forget.</p>
+  </header>
+
+  <!-- SCREENSHOT ASSETS -->
+  <section>
+    <h2><iconify-icon icon="mdi:image-outline" width="24" noobserver></iconify-icon>Screenshot assets</h2>
+    <p class="section-desc">
+      Bake a screenshot into the README assets.
+    </p>
+
+    <pre>scripts/cardify.sh &lt;input.png&gt; &lt;output.webp&gt; [radius] [border-color]</pre>
+
+    <p class="section-desc">
+      Each screenshot has two flavors — the script produces the <code>-card</code> one; the site uses a plain encode of the same shot.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>File</th><th>Used by</th><th>Frame</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>foo.webp</code></td><td><code>docs/index.html</code></td><td>None — the site's CSS draws its own frame</td></tr>
+          <tr><td><code>foo-card.webp</code></td><td><code>README.md</code>, <code>vscode/README.md</code></td><td>Rounded corners + 1px border baked in — GitHub renders <code>&lt;img&gt;</code> without CSS</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ul style="margin:0;padding-left:20px;color:var(--muted);font-size:0.88rem;">
+      <li>Border color <code>#30363d</code> — GitHub dark-theme border gray, works on light too (an earlier <code>#8b949e</code> + <code>&lt;picture&gt;</code> theme switch was dropped: dark-only variants with the original names won)</li>
+      <li>Radius ≈ 12px at display size (e.g. radius 8 on a ~166px-wide shot shown at 120px)</li>
+      <li>Everything outside the rounded corner is transparent</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="f-title">
+      <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
+      Related
+    </div>
+    <ul>
+      <li><iconify-icon icon="mdi:home-outline" noobserver></iconify-icon><a href="./index.html">docserve — homepage</a></li>
+      <li><iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon><a href="./SPEC.html">SPEC.html</a> · <a href="./PLAN.html">PLAN.html</a> · <a href="./VSCODE_PLAN.html">VSCODE_PLAN.html</a></li>
+    </ul>
+    <div class="colophon">docserve DEV · created 2026-09-29</div>
+  </footer>
+</div>
+</body>
+</html>
