@@ -3,12 +3,16 @@ import * as vscode from "vscode"
 import { listLiveStates, watchStateDirSetting, watchStates } from "./state"
 
 // status: open/start this workspace. listButton: list all servers.
+// Same priority so the pair stays adjacent: ties sort by hash(id), and anything
+// landing between the two ids' hashes is practically impossible.
 export function createStatusBar(): vscode.Disposable {
-  const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100)
+  const status = vscode.window.createStatusBarItem("main", vscode.StatusBarAlignment.Right, 100)
+  status.name = "docserve gallery"
   status.command = "docserve.open"
   status.show()
 
-  const listButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99)
+  const listButton = vscode.window.createStatusBarItem("list", vscode.StatusBarAlignment.Right, 100)
+  listButton.name = "docserve servers"
   listButton.text = "$(list-unordered)"
   listButton.tooltip = "docserve — running servers"
   listButton.command = "docserve.list"
@@ -20,7 +24,7 @@ export function createStatusBar(): vscode.Disposable {
     const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
     if (mine) {
       status.text = `$(multiple-windows) :${mine.port}`
-      status.tooltip = `docserve\nOpen ${mine.url}`
+      status.tooltip = `docserve — Open ${mine.url}`
     } else {
       status.text = "$(multiple-windows) Open Gallery"
       status.tooltip = "docserve — open gallery"
