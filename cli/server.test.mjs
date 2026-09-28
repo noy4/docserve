@@ -127,6 +127,8 @@ describe("docserve server", () => {
     assert.ok(gallery.includes(`    ${basename(content)}\n  </h1>`), "gallery heading uses the folder name")
     assert.ok(!gallery.includes("const pageId"))
     assert.ok(!gallery.includes("__DOCS_DIR"))
+    assert.ok(!gallery.includes("__FAVICON_HUE__"), "favicon hue is substituted")
+    assert.ok(gallery.includes("hsl("), "folder favicon gets a path-derived hue")
   })
 
   it("lists html files with resolved metadata on /api/files", async () => {

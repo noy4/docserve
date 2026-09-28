@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>__DOCS_DIR_NAME__</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20width='64'%20height='64'%20viewBox='244.5%20242.5%20546%20546'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient%20id='frontFill'%20x1='0%25'%20y1='0%25'%20x2='0%25'%20y2='100%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23223047'/%3E%3Cstop%20offset='55%25'%20stop-color='%23141C2B'/%3E%3Cstop%20offset='100%25'%20stop-color='%230F1520'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg%20transform='rotate(-6%20462%20452)'%3E%3Crect%20x='262'%20y='312'%20width='400'%20height='280'%20rx='34'%20fill='%234C5FD6'%20stroke='%23818CF8'%20stroke-width='8'/%3E%3C/g%3E%3Cg%20transform='rotate(5%20575%20440)'%3E%3Crect%20x='375'%20y='300'%20width='400'%20height='280'%20rx='34'%20fill='%233E76C9'%20stroke='%235B8DEF'%20stroke-width='8'/%3E%3C/g%3E%3Cg%20transform='rotate(6%20562%20588)'%3E%3Crect%20x='362'%20y='448'%20width='400'%20height='280'%20rx='34'%20fill='%232E93C4'%20stroke='%2338BDF8'%20stroke-width='8'/%3E%3C/g%3E%3Cg%20transform='rotate(-6%20512%20536)'%3E%3Crect%20x='280'%20y='375'%20width='464'%20height='322'%20rx='38'%20fill='url(%23frontFill)'%20stroke='%2338BDF8'%20stroke-width='8'/%3E%3Cg%20stroke='%23EAF8FF'%20stroke-width='10'%20stroke-linecap='round'%20stroke-opacity='0.62'%3E%3Cline%20x1='334'%20y1='578'%20x2='690'%20y2='578'/%3E%3Cline%20x1='334'%20y1='628'%20x2='548'%20y2='628'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='hsl(__FAVICON_HUE__ 70%25 52%)'%3E%3Cpath d='M6.1 10L4 18V8h17a2 2 0 0 0-2-2h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h15c.9 0 1.7-.6 1.9-1.5l2.3-8.5zM19 18H6l1.6-6h13z'/%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0f1117;
@@ -15,6 +15,7 @@
     --accent: #6c8cff;
     --green: #4ade80;
     --btn-bg: rgba(15, 17, 23, 0.82);
+    --folder-hue: __FAVICON_HUE__;
   }
   @media (prefers-color-scheme: light) {
     :root {
@@ -45,7 +46,7 @@
     font-size: 1.6rem;
     margin-bottom: 8px;
   }
-  h1 svg { width: 26px; height: 26px; color: var(--accent); flex-shrink: 0; }
+  h1 svg { width: 26px; height: 26px; color: hsl(var(--folder-hue) 70% 52%); flex-shrink: 0; }
   .sub { color: var(--muted); margin-bottom: 32px; font-size: 0.9rem; }
   .sub b { color: var(--green); }
 

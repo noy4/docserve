@@ -164,6 +164,7 @@ async function galleryResponse(docsDir) {
     html = html
       .replaceAll("__DOCS_DIR_NAME__", escapeHtml(basename(docsDir) || docsDir))
       .replaceAll("__DOCS_DIR__", escapeHtml(displayPath(docsDir)))
+      .replaceAll("__FAVICON_HUE__", String(faviconHue(docsDir)))
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
   } catch {
     return new Response("Gallery template missing", { status: 500 })
@@ -174,6 +175,13 @@ async function galleryResponse(docsDir) {
 function displayPath(p) {
   const home = os.homedir()
   return p.startsWith(`${home}/`) ? `~${p.slice(home.length)}` : p
+}
+
+// Deterministic hue for the folder favicon: the same path always yields the same color.
+function faviconHue(s) {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0
+  return ((h % 360) + 360) % 360
 }
 
 function escapeHtml(s) {
