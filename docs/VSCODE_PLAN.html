@@ -183,6 +183,17 @@
     color: var(--text);
     margin: 14px 0;
   }
+  blockquote {
+    margin: 10px 0;
+    padding: 8px 14px;
+    border-left: 2px solid var(--primary);
+    background: var(--surface-2);
+    border-radius: 0 8px 8px 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+  blockquote a { color: var(--primary); }
 
   /* Decision cards */
   .grid-2 {
@@ -769,7 +780,7 @@
               <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
               <div class="task-text">
                 <div class="task-title">Docs wiring</div>
-                <div class="task-desc">install link + status bar shot in READMEs, VS Code card on the landing page; extension README uses absolute image URLs (relative paths don't resolve on the Marketplace)</div>
+                <div class="task-desc">install link + status bar shot in READMEs, VS Code card on the landing page; extension README uses absolute image URLs (see Notes)</div>
               </div>
             </div>
           </div>
@@ -808,7 +819,16 @@
           <iconify-icon icon="mdi:shield-check-outline" noobserver></iconify-icon>
           <h4>Verified publisher (parked)</h4>
         </div>
-        <p>The badge needs a verified <strong>custom domain</strong> — <code>*.github.io</code> subdomains are not eligible — plus the publisher staying in good standing on the Marketplace for 6+ months (not "published for 6 months"). Flow: add a TXT record → Marketplace validates the domain → team review (~5 business days). Skip for now: <code>noy4</code> was created 2026-09 and we don't own an eligible domain.</p>
+        <p>Needs a verified <strong>custom domain</strong> (<code>*.github.io</code> not eligible) plus 6+ months of good standing on the Marketplace:</p>
+        <blockquote>Publishers can verify (blue check mark) their identity by proving domain ownership. It shows that the publisher has proven domain-name ownership to the Marketplace. It also shows that the Marketplace has verified both the existence of the domain and the good standing of the publisher on the Marketplace for at least six months.</blockquote>
+        <p>Flow: TXT record → domain validation → team review (~5 days). Parked: <code>noy4</code> is from 2026-09 and we own no eligible domain. <a href="https://learn.microsoft.com/en-us/visualstudio/ide/finding-and-using-visual-studio-extensions?view=vs-2022#marketplace-protections" target="_blank" rel="noopener">Source</a>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:image-multiple-outline" noobserver></iconify-icon>
+          <h4>Extension README images stay absolute</h4>
+        </div>
+        <p>vsce rewrites relative README paths against the <strong>repo root</strong> and ignores <code>repository.directory</code>, while GitHub resolves them against the README's own folder — no relative form satisfies both (<code>docs/…</code> breaks on GitHub, <code>../docs/…</code> breaks on the Marketplace, silently). Absolute <code>raw.githubusercontent.com</code> URLs work everywhere, so the README keeps those.</p>
       </div>
     </div>
   </section>
