@@ -19,7 +19,7 @@ export function createStatusBar(): vscode.Disposable {
     const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
     const mine = folders.map((dir) => states.find((s) => s.docsDir === dir)).find(Boolean)
     if (mine) {
-      status.text = `$(radio-tower) :${mine.port}`
+      status.text = `$(multiple-windows) :${mine.port}`
       status.tooltip = `docserve\nOpen ${mine.url}`
     } else {
       status.text = "$(multiple-windows) Open Gallery"
