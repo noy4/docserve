@@ -239,30 +239,47 @@
   }
   /* Feature cards (gallery-card style) */
   .feature-card { padding: 0; overflow: hidden; }
+  a.feature-card { transition: border-color 0.15s ease; }
+  a.feature-card:hover { border-color: var(--primary); }
   .feature-preview {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 140px;
     background: linear-gradient(180deg, var(--surface-2), var(--surface));
     border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .feature-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300%;
+    height: 300%;
+    border: 0;
+    transform: scale(0.3333);
+    transform-origin: 0 0;
+    pointer-events: none;
+    background: var(--surface);
   }
   .feature-preview iconify-icon {
     font-size: 56px;
     color: var(--primary);
-    filter: drop-shadow(0 6px 14px rgba(68, 101, 219, 0.25));
-  }
-  @media (prefers-color-scheme: light) {
-    .feature-preview iconify-icon {
-      filter: drop-shadow(0 6px 14px rgba(37, 99, 235, 0.18));
-    }
   }
   .feature-body { padding: 14px 16px 16px; }
   .feature-body h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.95rem;
     color: var(--text-strong);
     font-weight: 600;
     margin-bottom: 4px;
+  }
+  .feature-body h4 iconify-icon {
+    font-size: 15px;
+    color: var(--primary);
   }
   .feature-body p {
     font-size: 0.82rem;
@@ -478,26 +495,32 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
     <p class="section-desc">How docserve works under the hood.</p>
 
     <div class="grid-3">
-      <a class="card" href="./SPEC.html" style="text-decoration:none">
-        <div class="card-head">
-          <iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>
-          <h4>SPEC.html</h4>
+      <a class="card feature-card" href="./SPEC.html" style="text-decoration:none">
+        <div class="feature-preview">
+          <iframe class="feature-iframe" src="./SPEC.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="SPEC.html preview"></iframe>
         </div>
-        <p>Design &amp; implementation specification — serving, gallery, reload protocol, injection.</p>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>SPEC.html</h4>
+          <p>Design &amp; implementation specification — serving, gallery, reload protocol, injection.</p>
+        </div>
       </a>
-      <a class="card" href="./PLAN.html" style="text-decoration:none">
-        <div class="card-head">
-          <iconify-icon icon="mdi:flag-checkered" noobserver></iconify-icon>
-          <h4>PLAN.html</h4>
+      <a class="card feature-card" href="./PLAN.html" style="text-decoration:none">
+        <div class="feature-preview">
+          <iframe class="feature-iframe" src="./PLAN.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="PLAN.html preview"></iframe>
         </div>
-        <p>The implementation roadmap — server core, live reload, CLI, tests, distribution, npm.</p>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:flag-checkered" noobserver></iconify-icon>PLAN.html</h4>
+          <p>The implementation roadmap — server core, live reload, CLI, tests, distribution, npm.</p>
+        </div>
       </a>
-      <a class="card" href="./VSCODE_PLAN.html" style="text-decoration:none">
-        <div class="card-head">
-          <iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>
-          <h4>VSCODE_PLAN.html</h4>
+      <a class="card feature-card" href="./VSCODE_PLAN.html" style="text-decoration:none">
+        <div class="feature-preview">
+          <iframe class="feature-iframe" src="./VSCODE_PLAN.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="VSCODE_PLAN.html preview"></iframe>
         </div>
-        <p>The VS Code extension roadmap — state reader, server control, status bar UX, tests, marketplace.</p>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>VSCODE_PLAN.html</h4>
+          <p>The VS Code extension roadmap — state reader, server control, status bar UX, tests, marketplace.</p>
+        </div>
       </a>
     </div>
   </section>
