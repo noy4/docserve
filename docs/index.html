@@ -267,6 +267,31 @@
     font-size: 56px;
     color: var(--primary);
   }
+  .feature-preview .preview-img {
+    max-width: 86%;
+    max-height: 116px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .feature-preview.tall { height: 184px; }
+  .feature-preview.tall .preview-img {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    object-fit: cover;
+    object-position: top;
+  }
+  .feature-preview pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 0;
+    font-size: 0.68rem;
+  }
   .feature-body { padding: 14px 16px 16px; }
   .feature-body h4 {
     display: flex;
@@ -338,20 +363,6 @@
   .step p strong { color: var(--text); }
   .step a { color: var(--primary); text-decoration: none; font-weight: 600; }
   .step a:hover { text-decoration: underline; }
-  .app-shot {
-    display: block;
-    width: 100%;
-    height: auto;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-top: 10px;
-  }
-  .vscode-shot { width: 160px; height: auto; }
-  .card .cli-note {
-    color: var(--muted);
-    font-size: 0.82rem;
-    margin-top: 10px;
-  }
 
   /* Footer */
   footer {
@@ -443,46 +454,47 @@
     <h2><iconify-icon icon="mdi:download-outline" width="24" noobserver></iconify-icon>Getting started</h2>
 
     <div class="grid-2">
-      <div class="card" style="grid-row: 1 / 3">
-        <div class="card-head">
-          <iconify-icon icon="mdi:apple" noobserver></iconify-icon>
-          <h4>macOS app</h4>
+      <div class="card feature-card" style="grid-row: 1 / 3">
+        <div class="feature-preview tall">
+          <img class="preview-img" src="./assets/menubar.webp" alt="docserve menu bar — running servers with Open and Stop actions" loading="lazy">
         </div>
-        <img class="app-shot" src="./assets/menubar.webp" alt="docserve menu bar — running servers with Open and Stop actions" width="900" height="582" loading="lazy">
-        <div class="step">
-          <span class="step-num">1</span>
-          <p><strong><a class="js-dmg" href="https://github.com/noy4/docserve/releases/latest">Download</a></strong></p>
-        </div>
-        <div class="step">
-          <span class="step-num">2</span>
-          <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong> (not <strong>Move to Trash</strong>), then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
-        </div>
-        <div class="note-card">
-          <iconify-icon icon="mdi:shield-alert" noobserver></iconify-icon>
-          <p>The warning appears because docserve isn't signed with an Apple Developer certificate ($99/year).</p>
-        </div>
-        <div class="step">
-          <span class="step-num">3</span>
-          <p><strong>Pick a folder</strong> — the gallery opens in your browser</p>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:apple" noobserver></iconify-icon>macOS app</h4>
+          <div class="step">
+            <span class="step-num">1</span>
+            <p><strong><a class="js-dmg" href="https://github.com/noy4/docserve/releases/latest">Download</a></strong></p>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <p><strong>Launch</strong> — on the security warning, click <strong>Done</strong> (not <strong>Move to Trash</strong>), then approve via <strong>Open Anyway</strong> in <code>System Settings → Privacy &amp; Security</code></p>
+          </div>
+          <div class="note-card">
+            <iconify-icon icon="mdi:shield-alert" noobserver></iconify-icon>
+            <p>The warning appears because docserve isn't signed with an Apple Developer certificate ($99/year).</p>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <p><strong>Pick a folder</strong> — the gallery opens in your browser</p>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-head">
-          <iconify-icon icon="mdi:console" noobserver></iconify-icon>
-          <h4>CLI</h4>
-        </div>
-        <pre>npx @noy4/docserve ~/reports --open   <span style="color:var(--muted)"># serve</span>
+      <div class="card feature-card">
+        <div class="feature-preview">
+          <pre>npx @noy4/docserve ~/reports --open   <span style="color:var(--muted)"># serve</span>
 npx @noy4/docserve stop               <span style="color:var(--muted)"># stop all</span></pre>
-        <p class="cli-note">Or install globally: <code>npm install -g @noy4/docserve</code> — then run <code>docserve &lt;folder&gt;</code>.</p>
-      </div>
-      <div class="card">
-        <div class="card-head">
-          <iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>
-          <h4>VS Code extension</h4>
         </div>
-        <div style="display: flex; align-items: center; gap: 18px; margin-top: 10px; flex-wrap: wrap;">
-          <img class="vscode-shot" src="./assets/status-bar-card.webp" alt="docserve status bar — Open Gallery and the server list" width="288" height="88" loading="lazy">
-          <p style="font-size: 0.86rem; color: var(--muted); line-height: 1.65; margin: 0;">Manage docserve servers from VSCode.<br>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:console" noobserver></iconify-icon>CLI</h4>
+          <p>Or install globally: <code>npm install -g @noy4/docserve</code> — then run <code>docserve &lt;folder&gt;</code>.</p>
+        </div>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-preview">
+          <img class="preview-img" src="./assets/status-bar-card.webp" alt="docserve status bar — Open Gallery and the server list" loading="lazy">
+        </div>
+        <div class="feature-body">
+          <h4><iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>VS Code extension</h4>
+          <p>Manage docserve servers from VSCode.<br>
           <a href="https://marketplace.visualstudio.com/items?itemName=noy4.docserve" style="color: var(--primary); text-decoration: none; font-weight: 600;">Install from the Marketplace</a></p>
         </div>
       </div>
