@@ -108,6 +108,14 @@
     box-shadow: var(--shot-shadow);
   }
   .hero-shot img { display: block; width: 100%; height: auto; }
+  .hero-video { margin-top: 16px; }
+  .hero-video iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+  }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -412,6 +420,9 @@
     </div>
     <figure class="hero-shot">
       <img src="./assets/gallery.webp" alt="docserve gallery — report cards with live previews in the browser" width="1470" height="923" loading="lazy">
+    </figure>
+    <figure class="hero-shot hero-video">
+      <iframe src="https://www.youtube-nocookie.com/embed/DClpq3JmIIE" title="docserve — Your AI writes HTML. Lots of it. Turn the folder into a live gallery." loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </figure>
   </header>
 
