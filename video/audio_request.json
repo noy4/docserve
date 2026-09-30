@@ -1,0 +1,13 @@
+{
+  "lang": "en",
+  "style": "confident, warm product narration; steady pace, clean studio delivery",
+  "lines": [
+    { "id": "f1", "text": "Your AI writes HTML. Lots of it." },
+    { "id": "f2", "text": "docserve — serve a folder of HTML as a card gallery." },
+    { "id": "f3", "text": "Pick a folder — and there's your gallery." },
+    { "id": "f4", "text": "Every edit shows up on the page — instantly." },
+    { "id": "f5", "text": "You can use docserve as a macOS app, a CLI, or a VS Code extension." },
+    { "id": "f6", "text": "Try docserve. It's free and open-source." }
+  ],
+  "bgm": { "mode": "retrieve", "query": "confident minimal tech underscore, clean, modern, driving" }
+}

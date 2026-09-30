@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>docserve promo — 03 pick a folder</title></head>
+<body>
+<template>
+<style>
+@font-face{
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+#root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: inline-size;
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  color: #C3CDDC;
+  background:
+    linear-gradient(rgba(68, 101, 219, 0.10) 1px, transparent 1px) 0 0 / 50px 50px,
+    linear-gradient(90deg, rgba(68, 101, 219, 0.10) 1px, transparent 1px) 0 0 / 50px 50px,
+    #0B0E14;
+}
+
+.f03-picker {
+  position: absolute; left: 130px; top: 130px; width: 770px; height: 470px;
+  background: #151A23; border: 1px solid #383F50; border-radius: 16px;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55); overflow: hidden; will-change: transform;
+}
+.f03-ptitle { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid #2C313F; color: #7E8A9E; font-size: 19px; }
+.f03-ptitle i { width: 14px; height: 14px; border-radius: 50%; background: #383F50; }
+.f03-pbody { display: flex; height: 300px; }
+.f03-pside { width: 160px; border-right: 1px solid #2C313F; padding: 16px 0; }
+.f03-pside .cap { letter-spacing: 0.16em; font-size: 13px; text-transform: uppercase; padding: 8px 20px; color: #7E8A9E; }
+.f03-pside div.it { font-size: 17px; color: #7E8A9E; padding: 8px 20px; }
+.f03-pmain { flex: 1; padding: 16px 16px 0; position: relative; }
+.f03-prow { position: relative; display: flex; align-items: center; gap: 12px; font-size: 20px; color: #C3CDDC; padding: 13px 18px; border-radius: 9px; }
+.f03-prow .hl { position: absolute; inset: 0; background: rgba(68, 101, 219, 0.32); border-radius: 9px; transform: scaleX(0); transform-origin: left center; }
+.f03-prow.sel { color: #F7F9FC; font-weight: 600; }
+.f03-pbtn {
+  position: absolute; right: 26px; bottom: 22px; border: 1px solid #4465DB; border-radius: 9px;
+  padding: 9px 30px; font-size: 19px; color: #F7F9FC; background: rgba(68, 101, 219, 0.2);
+  will-change: transform;
+}
+.f03-cursor { position: absolute; left: 0; top: 0; width: 40px; will-change: transform; opacity: 0; z-index: 30; }
+
+.f03-folder {
+  position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px;
+  will-change: transform; opacity: 0; z-index: 10;
+}
+.f03-gallery {
+  position: absolute; left: 985px; top: 118px; width: 870px; height: 692px;
+  background: #0f1117; border: 1px solid #2a2e3d; border-radius: 18px; overflow: hidden; opacity: 0;
+}
+.f03-ghead { padding: 26px 30px 22px; border-bottom: 1px solid #2a2e3d; }
+.f03-ghead .t { display: flex; align-items: center; gap: 16px; font-size: 32px; font-weight: 600; color: #e6e8ee; }
+.f03-ghead .t svg { width: 34px; height: 34px; }
+.f03-ghead .s { font-size: 19px; color: #9aa0b0; margin-top: 8px; }
+.f03-ghead .s code { font-family: 'Geist Mono', ui-monospace, monospace; background: #1a1d27; border: 1px solid #2a2e3d; border-radius: 8px; padding: 2px 14px; color: #e6e8ee; }
+.f03-ghead .s b { color: #4ade80; font-weight: 400; }
+.f03-gcard { position: absolute; width: 262px; height: 250px; background: #1a1d27; border: 1px solid #2a2e3d; border-radius: 18px; overflow: hidden; will-change: transform; opacity: 0; }
+.f03-gprev { position: relative; height: 160px; background: #0f1117; }
+.f03-gprev .pt { position: absolute; left: 18px; top: 26px; font-size: 17px; color: #e6e8ee; font-weight: 600; white-space: pre; }
+.f03-gprev .pv { position: absolute; left: 18px; top: 58px; font-size: 29px; font-weight: 700; white-space: pre; }
+.f03-gmeta { border-top: 1px solid #2a2e3d; padding: 14px 18px; height: 90px; display: flex; flex-direction: column; justify-content: space-between; }
+.f03-gmeta .r { display: block; line-height: 1.45; }
+.f03-gmeta .fav { display: inline-block; width: 19px; height: 19px; border-radius: 5px; vertical-align: -3px; margin-right: 10px; }
+.f03-gmeta .nm { display: inline; font-size: 17px; color: #e6e8ee; font-weight: 600; }
+.f03-gmeta .dt { font-size: 14px; color: #9aa0b0; }
+.f03-gslot { position: absolute; width: 262px; height: 250px; border: 1px dashed #383F50; border-radius: 18px; display: grid; place-items: center; color: #8C99AF; font-size: 28px; opacity: 0; }
+.f03-headline { position: absolute; left: 130px; bottom: 96px; font-size: 68px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.14; color: #F7F9FC; }
+.f03-headline .w { display: inline-block; margin-right: 0.26em; will-change: transform; }
+.f03-headline .acc { color: #F08A59; }
+</style>
+<div data-hf-id="hf-f0lh" id="root" data-composition-id="03-pick" data-width="1920" data-height="1080" data-duration="6.1">
+
+  <div data-hf-id="hf-payi" class="f03-picker" id="f03-picker">
+    <div data-hf-id="hf-87as" class="f03-ptitle"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i><span data-hf-id="hf-aeil" style="margin-left:14px">Choose a folder</span></div>
+    <div data-hf-id="hf-9dc2" class="f03-pbody">
+      <div data-hf-id="hf-t897" class="f03-pside">
+        <div data-hf-id="hf-nazh" class="cap">Favorites</div>
+        <div data-hf-id="hf-yicd" class="it">Desktop</div>
+        <div data-hf-id="hf-h6r7" class="it">Documents</div>
+        <div data-hf-id="hf-hcqf" class="it" style="color:#F7F9FC">reports</div>
+        <div data-hf-id="hf-hlt2" class="it">www</div>
+      </div>
+      <div data-hf-id="hf-du6x" class="f03-pmain">
+        <div data-hf-id="hf-fs80" class="f03-prow" style="margin-top:0"><span data-hf-id="hf-6fc0" style="color:#7E8A9E">~/</span>ai-output</div>
+        <div data-hf-id="hf-uody" class="f03-prow sel" style="margin-top:10px"><span data-hf-id="hf-4dmt" class="hl" id="f03-hl"></span><span data-hf-id="hf-yg0u" style="opacity:0.6">~/</span>reports</div>
+        <div data-hf-id="hf-rmwh" class="f03-prow" style="margin-top:10px"><span data-hf-id="hf-whhe" style="opacity:0.6">~/</span>sites</div>
+        <div data-hf-id="hf-jndu" class="f03-prow" style="margin-top:10px"><span data-hf-id="hf-wvsf" style="opacity:0.6">~/</span>www</div>
+      </div>
+    </div>
+    <div data-hf-id="hf-pr4w" class="f03-pbtn" id="f03-choose">Choose</div>
+  </div>
+
+  <svg data-hf-id="hf-mu5g" class="f03-cursor" id="f03-cursor" viewBox="0 0 28 40"><path data-hf-id="hf-ksp7" d="M2 1 L2 31 L10 24.5 L15.5 38 L22 35 L16.5 22 L26 21 Z" fill="#F7F9FC" stroke="#0B0E14" stroke-width="2" /></svg>
+
+  <svg data-hf-id="hf-hdr2" class="f03-folder" id="f03-folder" viewBox="0 0 24 24"><path data-hf-id="hf-6tpb" fill="#4465DB" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" /></svg>
+
+  <div data-hf-id="hf-c242" class="f03-gallery" id="f03-gallery">
+    <div data-hf-id="hf-d1sr" class="f03-ghead">
+      <div data-hf-id="hf-b6rr" class="t"><svg data-hf-id="hf-ulu9" viewBox="0 0 24 24"><path data-hf-id="hf-70f4" fill="#6c8cff" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" /></svg>reports</div>
+      <div data-hf-id="hf-pi60" class="s"><code data-hf-id="hf-pzhe">~/reports</code> — <b data-hf-id="hf-tx92">7</b> files</div>
+    </div>
+  </div>
+  <div data-hf-id="hf-e4x2" class="f03-gcard" id="f03-c1" style="left:1011px;top:250px">
+    <div data-hf-id="hf-edea" class="f03-gprev"><span data-hf-id="hf-9a1y" class="pt">Incident — API outage</span><span data-hf-id="hf-1tku" class="pv" style="color:#F08A59">Investigating</span></div>
+    <div data-hf-id="hf-yoq2" class="f03-gmeta"><div data-hf-id="hf-1rbm" class="r"><span data-hf-id="hf-m6ls" class="fav" style="background:#F08A59"></span><span data-hf-id="hf-sks6" class="nm">incident-review.html</span></div><div data-hf-id="hf-o6tn" class="dt">2026/09/28</div></div>
+  </div>
+  <div data-hf-id="hf-5gzl" class="f03-gcard" id="f03-c2" style="left:1297px;top:250px">
+    <div data-hf-id="hf-ouja" class="f03-gprev"><span data-hf-id="hf-xwdz" class="pt">What changed</span><span data-hf-id="hf-o4kb" class="pv" style="color:#e6e8ee">v1.3.0</span></div>
+    <div data-hf-id="hf-3zou" class="f03-gmeta"><div data-hf-id="hf-nr2u" class="r"><span data-hf-id="hf-crs8" class="fav" style="background:#4465DB"></span><span data-hf-id="hf-kj87" class="nm">changelog.html</span></div><div data-hf-id="hf-pdqq" class="dt">2026/09/27</div></div>
+  </div>
+  <div data-hf-id="hf-yfg0" class="f03-gcard" id="f03-c3" style="left:1583px;top:250px">
+    <div data-hf-id="hf-p8ub" class="f03-gprev"><span data-hf-id="hf-p4m3" class="pt">Weekly digest — W39</span><span data-hf-id="hf-xq88" class="pv" style="color:#9aa0b0">17 pages</span></div>
+    <div data-hf-id="hf-4dzv" class="f03-gmeta"><div data-hf-id="hf-o5dv" class="r"><span data-hf-id="hf-9jmo" class="fav" style="background:#4465DB"></span><span data-hf-id="hf-0at7" class="nm">report.html</span></div><div data-hf-id="hf-ozfp" class="dt">2026/09/26</div></div>
+  </div>
+  <div data-hf-id="hf-bz0s" class="f03-gcard" id="f03-c4" style="left:1011px;top:532px">
+    <div data-hf-id="hf-pn5c" class="f03-gprev"><span data-hf-id="hf-xmk6" class="pt">API reference</span><span data-hf-id="hf-mcui" class="pv" style="color:#4ade80">GET /v1/users</span></div>
+    <div data-hf-id="hf-4saw" class="f03-gmeta"><div data-hf-id="hf-ojow" class="r"><span data-hf-id="hf-ei7l" class="fav" style="background:#4ade80"></span><span data-hf-id="hf-33cx" class="nm">api-docs.html</span></div><div data-hf-id="hf-q6cs" class="dt">2026/09/25</div></div>
+  </div>
+  <div data-hf-id="hf-oly9" class="f03-gcard" id="f03-c5" style="left:1297px;top:532px">
+    <div data-hf-id="hf-mv05" class="f03-gprev"><span data-hf-id="hf-50zo" class="pt">Checkout v0.9</span><span data-hf-id="hf-faua" class="pv" style="color:#9aa0b0">wireframe</span></div>
+    <div data-hf-id="hf-205p" class="f03-gmeta"><div data-hf-id="hf-lrjp" class="r"><span data-hf-id="hf-8cpl" class="fav" style="background:#4465DB"></span><span data-hf-id="hf-2lmj" class="nm">prototype.html</span></div><div data-hf-id="hf-ps1r" class="dt">2026/09/24</div></div>
+  </div>
+  <div data-hf-id="hf-zzoo" class="f03-gslot" id="f03-slot" style="left:1583px;top:532px">7</div>
+
+  <div data-hf-id="hf-cumu" class="f03-headline">
+    <div data-hf-id="hf-yeow"><span data-hf-id="hf-i175" class="w">Pick</span><span data-hf-id="hf-b7a3" class="w">a</span><span data-hf-id="hf-kjna" class="w">folder.</span></div>
+    <div data-hf-id="hf-y7yw"><span data-hf-id="hf-f84o" class="w acc">It's</span><span data-hf-id="hf-xa52" class="w acc">a</span><span data-hf-id="hf-zjk3" class="w acc">gallery.</span></div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script>
+var tl = gsap.timeline();
+
+// picker springs in (slightly after the handoff mark starts its dive)
+tl.fromTo("#f03-picker", { y: -18, scale: 0.97, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.15);
+
+// cursor enters and travels to ~/reports
+var cursor = document.getElementById("f03-cursor");
+tl.set(cursor, { opacity: 0, x: 880, y: 760 }, 0);
+tl.fromTo(cursor, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, 0.35);
+tl.fromTo(cursor, { x: 880, y: 760 }, { x: 596, y: 268, duration: 0.9, ease: "power2.inOut" }, 0.4);
+// highlight sweep on the selected row
+tl.to("#f03-hl", { scaleX: 1, duration: 0.35, ease: "power2.out" }, 1.35);
+// cursor to Choose
+tl.to(cursor, { x: 800, y: 540, duration: 0.4, ease: "power2.inOut" }, 1.75);
+// press + release
+tl.to("#f03-choose", { scale: 0.94, duration: 0.12, ease: "power1.in" }, 2.1);
+tl.to("#f03-choose", { scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 2.22);
+tl.to(cursor, { opacity: 0, duration: 0.3, ease: "power1.in" }, 2.5);
+// dialog slides away
+tl.to("#f03-picker", { x: -70, opacity: 0, duration: 0.4, ease: "power2.in" }, 2.5);
+
+// folder drops to center, then hands off to the burst
+tl.fromTo("#f03-folder", { y: -170, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 2.45);
+tl.to("#f03-folder", { scale: 0.4, opacity: 0, duration: 0.3, ease: "power2.in" }, 2.92);
+
+// gallery chrome builds first
+tl.to("#f03-gallery", { opacity: 1, duration: 0.3, ease: "power1.out" }, 2.9);
+tl.fromTo("#f03-gallery .f03-ghead", { y: -18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 2.95);
+
+// cards burst from stage center into their grid slots
+var CX = 960, CY = 540;
+["#f03-c1", "#f03-c2", "#f03-c3", "#f03-c4", "#f03-c5"].forEach(function (sel, i) {
+  var el = document.querySelector(sel);
+  var sx = CX - (el.offsetLeft + el.offsetWidth / 2);
+  var sy = CY - (el.offsetTop + el.offsetHeight / 2);
+  var t0 = 3.0 + i * 0.14;
+  tl.fromTo(el, { x: sx, y: sy, scale: 0.45, opacity: 0 }, { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.85, ease: "power3.out" }, t0);
+  tl.fromTo(el.querySelector(".f03-gprev"), { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.out" }, t0 + 0.42);
+});
+tl.fromTo("#f03-slot", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 3.72);
+
+// kinetic line lands with its VO beats: "Pick a folder." as the dialog springs in,
+// "It's a gallery." on the VO's "gallery." — before the card burst (single focal event)
+var w1 = document.querySelectorAll("#root .f03-headline div:first-child .w");
+w1.forEach(function (el, i) {
+  tl.fromTo(el, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 0.45 + i * 0.13);
+});
+var w2 = document.querySelectorAll("#root .f03-headline div:last-child .w");
+w2.forEach(function (el, i) {
+  tl.fromTo(el, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 1.9 + i * 0.12);
+});
+
+// seam: the incident-review card accelerates toward the viewer and dissolves into the served page
+// (gallery chrome steps aside at 4.7 inner / 15.6 global; crossfade hands over at 16.0)
+tl.to("#f03-c1", { scale: 3.2, x: 126, y: 91, duration: 0.9, ease: "power2.in" }, 4.7);
+tl.to("#f03-gallery, #f03-c2, #f03-c3, #f03-c4, #f03-c5, #f03-slot, .f03-headline", { opacity: 0, duration: 0.4, ease: "power1.out" }, 4.7);
+
+// root (paused, one per composition) starts the unpaused pick sequence +0.5s late —
+// the seam mark dives 10.5–10.88s and must dissolve fully before the picker appears
+var root = gsap.timeline({ paused: true });
+root.add(tl, 0.5);
+window.__timelines["03-pick"] = root;
+</script>
+</template>
+</body>
+</html>

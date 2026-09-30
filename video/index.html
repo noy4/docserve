@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js" integrity="sha384-sG0Hv1tP1lZCk9KQmrIbY/XNwi+OY84GQqhMscbnsoBFqAz8KNCil1kvfL3Hbbk2" crossorigin="anonymous"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-2mz0" id="root" data-composition-id="main" data-start="0" data-duration="33" data-width="1920" data-height="1080">
+      <div data-hf-id="hf-t493" id="el-01-list" class="scene" data-composition-id="01-list" data-composition-src="compositions/frames/01-list.html" data-start="0" data-duration="4.8" data-track-index="0"></div>
+      <audio data-hf-id="hf-1z28" id="el-01-list-voice" src="assets/voice/f1.wav" data-start="0" data-duration="4.8" data-track-index="10" data-volume="1"></audio>
+
+      <div data-hf-id="hf-tsuk" id="el-02-intro" class="scene" data-composition-id="02-intro" data-composition-src="compositions/frames/02-intro.html" data-start="4.8" data-duration="6.1" data-track-index="1"></div>
+      <audio data-hf-id="hf-opcz" id="el-02-intro-voice" src="assets/voice/f2.wav" data-start="4.8" data-duration="5.6" data-track-index="10" data-volume="1"></audio>
+
+      <div data-hf-id="hf-enff" id="el-03-pick" class="scene" data-composition-id="03-pick" data-composition-src="compositions/frames/03-pick.html" data-start="10.4" data-duration="6.1" data-track-index="0"></div>
+      <audio data-hf-id="hf-bfhn" id="el-03-pick-voice" src="assets/voice/f3.wav" data-start="10.4" data-duration="3.3" data-track-index="10" data-volume="1"></audio>
+
+      <div data-hf-id="hf-m9vt" id="el-04-livereload" class="scene" data-composition-id="04-livereload" data-composition-src="compositions/frames/04-livereload.html" data-start="16" data-duration="5.4" data-track-index="1"></div>
+      <audio data-hf-id="hf-hn9g" id="el-04-livereload-voice" src="assets/voice/f4.wav" data-start="16" data-duration="3.8" data-track-index="10" data-volume="1"></audio>
+
+      <div data-hf-id="hf-y8eo" id="el-05-surfaces" class="scene" data-composition-id="05-surfaces" data-composition-src="compositions/frames/05-surfaces.html" data-start="21.4" data-duration="6.7" data-track-index="0"></div>
+      <audio data-hf-id="hf-khyh" id="el-05-surfaces-voice" src="assets/voice/f5.wav" data-start="21.4" data-duration="6" data-track-index="10" data-volume="1"></audio>
+
+      <div data-hf-id="hf-zs6g" id="el-06-cta" class="scene" data-composition-id="06-cta" data-composition-src="compositions/frames/06-cta.html" data-start="28.1" data-duration="4.9" data-track-index="1"></div>
+      <audio data-hf-id="hf-yi0t" id="el-06-cta-voice" src="assets/voice/f6.wav" data-start="28.1" data-duration="3.8" data-track-index="10" data-volume="1"></audio>
+
+      <!-- 02 → 03 shared-element mark: rides above both scenes during the handoff -->
+      <div data-hf-id="hf-s23a" id="el-seam-02-03" class="scene" data-composition-id="seam-02-03" data-composition-src="compositions/frames/seam-02-03.html" data-start="10.3" data-duration="0.7" data-track-index="5"></div>
+
+      <!-- BGM -->
+      <audio data-hf-id="hf-ia4i" id="el-bgm" src="assets/bgm/track.loop.mp3" data-start="0" data-duration="33" data-track-index="11" data-volume="0.12"></audio>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      // ── frame transitions (hand-maintained — keep in sync with frame data-starts) ──
+      (function () { var tl = window.__timelines["main"];
+        // 02 → 03 icon handoff: intro crossfades away while the mark (seam-02-03 sub-composition,
+        // above both scenes) shrinks away in place as the file picker rises
+        tl.to("#el-02-intro", { opacity: 0, duration: 0.3, ease: "power2.in" }, 10.42);
+        tl.fromTo("#el-03-pick", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power1.out" }, 10.4);
+        tl.addLabel("hf:transition:02-intro:03-pick:icon-handoff", 10.4);
+        tl.to("#el-03-pick", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 16);
+        tl.fromTo("#el-04-livereload", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 16);
+        tl.addLabel("hf:transition:03-pick:04-livereload:crossfade", 16);
+        tl.to("#el-04-livereload", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 21.4);
+        tl.fromTo("#el-05-surfaces", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 21.4);
+        tl.addLabel("hf:transition:04-livereload:05-surfaces:zoom-through", 21.4);
+        tl.to("#el-05-surfaces", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 28.1);
+        tl.fromTo("#el-06-cta", { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power2.out" }, 28.1);
+        tl.addLabel("hf:transition:05-surfaces:06-cta:crossfade-settle", 28.1);
+        // end: hold the card after the VO, then dip to black as the BGM fades
+        // end: the staged exit lives in 06-cta's own timeline (badge → pill → lockup → black veil, 32.1–33.0)
+        tl.to({}, { duration: 33 }, 0); // full-span anchor — main.duration() == composition total (Studio master duration)
+      })();
+    </script>
+  </body>
+</html>

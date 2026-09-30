@@ -1,0 +1,401 @@
+{
+  "tts_provider": "heygen",
+  "voice_id": "05f19352e8f74b0392a8f411eba40de1",
+  "bgm": {
+    "path": "assets/bgm/track.mp3",
+    "volume": 0.12,
+    "query": "confident minimal tech underscore, clean, modern, driving",
+    "mode": "retrieve",
+    "duration_s": 30
+  },
+  "bgm_pending": false,
+  "bgm_provider": "heygen",
+  "bgm_pid": null,
+  "bgm_log": null,
+  "bgm_mode": "retrieve",
+  "bgm_target_duration_s": null,
+  "bgm_seed_duration_s": null,
+  "bgm_loop_count": null,
+  "voices": [
+    {
+      "id": "f1",
+      "path": "assets/voice/f1.wav",
+      "duration_s": 4.066831581117295,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Your",
+          "start": 0.23272727272727273,
+          "end": 0.3879090909090909
+        },
+        {
+          "id": "w1",
+          "text": "AI",
+          "start": 0.42636363636363633,
+          "end": 0.9309090909090909
+        },
+        {
+          "id": "w2",
+          "text": "writes",
+          "start": 1.1636363636363636,
+          "end": 1.5127272727272727
+        },
+        {
+          "id": "w3",
+          "text": "HTML.",
+          "start": 1.7454545454545454,
+          "end": 2.909090909090909
+        },
+        {
+          "id": "w4",
+          "text": "Lots",
+          "start": 3.0645454545454545,
+          "end": 3.568181818181818
+        },
+        {
+          "id": "w5",
+          "text": "of",
+          "start": 3.6845454545454546,
+          "end": 3.7624545454545455
+        },
+        {
+          "id": "w6",
+          "text": "it.",
+          "start": 3.800909090909091,
+          "end": 4.066831581117295
+        }
+      ]
+    },
+    {
+      "id": "f2",
+      "path": "assets/voice/f2.wav",
+      "duration_s": 5.329,
+      "words": [
+        {
+          "id": "w0",
+          "text": "docserve",
+          "start": 0.299,
+          "end": 0.9387
+        },
+        {
+          "id": "w1",
+          "text": "—",
+          "start": 1.052,
+          "end": 1.166
+        },
+        {
+          "id": "w2",
+          "text": "serve",
+          "start": 1.28,
+          "end": 1.7067
+        },
+        {
+          "id": "w3",
+          "text": "a",
+          "start": 1.92,
+          "end": 2.048
+        },
+        {
+          "id": "w4",
+          "text": "folder",
+          "start": 2.091,
+          "end": 2.6027
+        },
+        {
+          "id": "w5",
+          "text": "of",
+          "start": 2.731,
+          "end": 2.9867
+        },
+        {
+          "id": "w6",
+          "text": "HTML",
+          "start": 3.072,
+          "end": 3.84
+        },
+        {
+          "id": "w7",
+          "text": "as",
+          "start": 4.011,
+          "end": 4.224
+        },
+        {
+          "id": "w8",
+          "text": "a",
+          "start": 4.267,
+          "end": 4.352
+        },
+        {
+          "id": "w9",
+          "text": "card",
+          "start": 4.395,
+          "end": 4.608
+        },
+        {
+          "id": "w10",
+          "text": "gallery.",
+          "start": 4.693,
+          "end": 5.281
+        }
+      ]
+    },
+    {
+      "id": "f3",
+      "path": "assets/voice/f3.wav",
+      "duration_s": 3.291,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Pick",
+          "start": 0.256,
+          "end": 0.4267
+        },
+        {
+          "id": "w1",
+          "text": "a",
+          "start": 0.469,
+          "end": 0.5547
+        },
+        {
+          "id": "w2",
+          "text": "folder",
+          "start": 0.597,
+          "end": 0.896
+        },
+        {
+          "id": "w3",
+          "text": "—",
+          "start": 0.924,
+          "end": 0.953
+        },
+        {
+          "id": "w4",
+          "text": "and",
+          "start": 0.981,
+          "end": 1.493
+        },
+        {
+          "id": "w5",
+          "text": "there's",
+          "start": 1.536,
+          "end": 2.005
+        },
+        {
+          "id": "w6",
+          "text": "your",
+          "start": 2.219,
+          "end": 2.432
+        },
+        {
+          "id": "w7",
+          "text": "gallery.",
+          "start": 2.475,
+          "end": 3.236
+        }
+      ]
+    },
+    {
+      "id": "f4",
+      "path": "assets/voice/f4.wav",
+      "duration_s": 3.709,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Every",
+          "start": 0.256,
+          "end": 0.5547
+        },
+        {
+          "id": "w1",
+          "text": "edit",
+          "start": 0.725,
+          "end": 1.024
+        },
+        {
+          "id": "w2",
+          "text": "shows",
+          "start": 1.237,
+          "end": 1.493
+        },
+        {
+          "id": "w3",
+          "text": "up",
+          "start": 1.664,
+          "end": 1.877
+        },
+        {
+          "id": "w4",
+          "text": "on",
+          "start": 2.048,
+          "end": 2.2187
+        },
+        {
+          "id": "w5",
+          "text": "the",
+          "start": 2.261,
+          "end": 2.3467
+        },
+        {
+          "id": "w6",
+          "text": "page",
+          "start": 2.389,
+          "end": 2.6027
+        },
+        {
+          "id": "w7",
+          "text": "—",
+          "start": 2.66,
+          "end": 2.716
+        },
+        {
+          "id": "w8",
+          "text": "instantly.",
+          "start": 2.773,
+          "end": 3.657
+        }
+      ]
+    },
+    {
+      "id": "f5",
+      "path": "assets/voice/f5.wav",
+      "duration_s": 5.79,
+      "words": [
+        {
+          "id": "w0",
+          "text": "You",
+          "start": 0.23272727272727273,
+          "end": 0.3879090909090909
+        },
+        {
+          "id": "w1",
+          "text": "can",
+          "start": 0.42636363636363633,
+          "end": 0.5042727272727272
+        },
+        {
+          "id": "w2",
+          "text": "use",
+          "start": 0.5427272727272727,
+          "end": 0.6590909090909091
+        },
+        {
+          "id": "w3",
+          "text": "docserve",
+          "start": 0.7372727272727273,
+          "end": 1.1636363636363636
+        },
+        {
+          "id": "w4",
+          "text": "as",
+          "start": 1.3572727272727274,
+          "end": 1.5127272727272727
+        },
+        {
+          "id": "w5",
+          "text": "a",
+          "start": 1.5518181818181818,
+          "end": 1.6290909090909091
+        },
+        {
+          "id": "w6",
+          "text": "macOS",
+          "start": 1.668181818181818,
+          "end": 2.1718181818181814
+        },
+        {
+          "id": "w7",
+          "text": "app,",
+          "start": 2.25,
+          "end": 2.579090909090909
+        },
+        {
+          "id": "w8",
+          "text": "a",
+          "start": 2.7154545454545453,
+          "end": 3.1027272727272726
+        },
+        {
+          "id": "w9",
+          "text": "CLI,",
+          "start": 3.1418181818181816,
+          "end": 3.7818181818181817
+        },
+        {
+          "id": "w10",
+          "text": "or",
+          "start": 3.9172727272727275,
+          "end": 4.1890909090909085
+        },
+        {
+          "id": "w11",
+          "text": "a",
+          "start": 4.344545454545455,
+          "end": 4.538181818181818
+        },
+        {
+          "id": "w12",
+          "text": "VS",
+          "start": 4.577272727272727,
+          "end": 4.848181818181819
+        },
+        {
+          "id": "w13",
+          "text": "Code",
+          "start": 4.926363636363636,
+          "end": 5.119999999999999
+        },
+        {
+          "id": "w14",
+          "text": "extension.",
+          "start": 5.197272727272726,
+          "end": 5.79
+        }
+      ]
+    },
+    {
+      "id": "f6",
+      "path": "assets/voice/f6.wav",
+      "duration_s": 3.506386999244142,
+      "words": [
+        {
+          "id": "w0",
+          "text": "Try",
+          "start": 0.21333333333333335,
+          "end": 0.46225
+        },
+        {
+          "id": "w1",
+          "text": "docserve.",
+          "start": 0.7108333333333333,
+          "end": 1.5466666666666669
+        },
+        {
+          "id": "w2",
+          "text": "It's",
+          "start": 1.7775,
+          "end": 2.026666666666667
+        },
+        {
+          "id": "w3",
+          "text": "free",
+          "start": 2.0625,
+          "end": 2.24
+        },
+        {
+          "id": "w4",
+          "text": "and",
+          "start": 2.4175,
+          "end": 2.7733333333333334
+        },
+        {
+          "id": "w5",
+          "text": "open-source.",
+          "start": 2.8441666666666667,
+          "end": 3.506386999244142
+        }
+      ]
+    }
+  ],
+  "sfx": [],
+  "total_duration_s": 25.692
+}

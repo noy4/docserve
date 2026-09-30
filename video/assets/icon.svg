@@ -1,0 +1,54 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- macOS icon squircle: 824px on a 1024 grid, 100px margins (thecodewarrior template) -->
+    <path id="squircle" d="M 100 724 L 100 300 C 100 185.001 170 99.995 300.026 100 L 724 99.995 C 854 100 924 185.001 924 300 L 924 724 C 924 839.001 854 923.995 724 924 L 300.026 924 C 170 924 100 839.001 100 724 Z"/>
+    <clipPath id="iconClip"><use href="#squircle"/></clipPath>
+
+    <filter id="iconShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="30"/></filter>
+
+    <radialGradient id="bgGlow" cx="50%" cy="36%" r="80%">
+      <stop offset="0%" stop-color="#1B2434"/>
+      <stop offset="55%" stop-color="#10141E"/>
+      <stop offset="100%" stop-color="#0B0E14"/>
+    </radialGradient>
+    <linearGradient id="frontFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#223047"/>
+      <stop offset="55%" stop-color="#141C2B"/>
+      <stop offset="100%" stop-color="#0F1520"/>
+    </linearGradient>
+  </defs>
+
+  <!-- squircle + standard drop shadow -->
+  <use href="#squircle" fill="url(#bgGlow)" filter="url(#iconShadow)"/>
+
+  <g clip-path="url(#iconClip)">
+    <!-- ambient glow -->
+    <ellipse cx="512" cy="500" rx="340" ry="290" fill="#1D4ED8" opacity="0.30" filter="url(#softBlur)"/>
+
+    <!-- three back cards -->
+    <!-- back top-left -->
+    <g transform="rotate(-6 462 452)">
+      <rect x="262" y="312" width="400" height="280" rx="34" fill="#4C5FD6" stroke="#818CF8" stroke-width="8"/>
+    </g>
+    <!-- back top-right -->
+    <g transform="rotate(5 575 440)">
+      <rect x="375" y="300" width="400" height="280" rx="34" fill="#3E76C9" stroke="#5B8DEF" stroke-width="8"/>
+    </g>
+    <!-- back bottom-right -->
+    <g transform="rotate(6 562 588)">
+      <rect x="362" y="448" width="400" height="280" rx="34" fill="#2E93C4" stroke="#38BDF8" stroke-width="8"/>
+    </g>
+
+    <!-- front card: solid dark document, one size up with a subtle gradient -->
+    <g transform="rotate(-6 512 536)">
+      <rect x="280" y="375" width="464" height="322" rx="38" fill="url(#frontFill)" stroke="#38BDF8" stroke-width="8"/>
+      <g stroke="#EAF8FF" stroke-width="10" stroke-linecap="round" stroke-opacity="0.62">
+        <line x1="334" y1="578" x2="690" y2="578"/>
+        <line x1="334" y1="628" x2="548" y2="628"/>
+      </g>
+    </g>
+  </g>
+</svg>

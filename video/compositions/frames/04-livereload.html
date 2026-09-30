@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>docserve promo — 04 edit, and it's live</title></head>
+<body>
+<template>
+<style>
+@font-face{
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face{
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("assets/fonts/geist-mono.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+#root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container-type: inline-size;
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  color: #C3CDDC;
+  background:
+    linear-gradient(rgba(68, 101, 219, 0.10) 1px, transparent 1px) 0 0 / 50px 50px,
+    linear-gradient(90deg, rgba(68, 101, 219, 0.10) 1px, transparent 1px) 0 0 / 50px 50px,
+    #0B0E14;
+}
+
+.f04-editor {
+  position: absolute; left: 84px; top: 132px; width: 566px; height: 668px;
+  background: #0A0D13; border: 1px solid #383F50; border-radius: 14px; overflow: hidden;
+}
+.f04-ebits { display: flex; gap: 10px; padding: 20px 24px; }
+.f04-ebits i { width: 13px; height: 13px; border-radius: 50%; background: #383F50; }
+.f04-ecode { padding: 18px 32px 0; font-size: 27px; line-height: 2.0; color: #7E8A9E; }
+.f04-ecode .path { letter-spacing: 0.12em; text-transform: uppercase; font-size: 17px; color: #7E8A9E; margin-bottom: 18px; }
+.f04-ecode .l1 { color: #C3CDDC; }
+.f04-old { color: #7E8A9E; text-decoration: line-through; }
+.f04-new { color: #F7F9FC; white-space: pre; }
+.f04-caret { display: inline-block; width: 15px; height: 34px; background: #F08A59; vertical-align: -6px; margin-left: 4px; }
+.f04-chip {
+  display: inline-block; margin: 34px 32px 0; border: 1px solid #2C313F; border-radius: 9px;
+  padding: 9px 20px; font-size: 19px; color: #F7F9FC; background: #151A23; will-change: transform;
+}
+
+.f04-page {
+  position: absolute; left: 700px; top: 132px; width: 1136px; height: 668px;
+  background: #0B0E14; border: 1px solid #383F50; border-radius: 14px; padding: 62px 72px;
+}
+.f04-plabel { font-size: 22px; letter-spacing: 0.32em; color: #7E8A9E; }
+.f04-pheadline { font-size: 118px; font-weight: 700; letter-spacing: -0.03em; margin-top: 42px; color: #F08A59; will-change: transform; position: relative; display: inline-block; }
+.f04-psub { font-size: 26px; color: #7E8A9E; margin-top: 46px; }
+.f04-flash { position: absolute; inset: 0; border-radius: 14px; background: rgba(74, 222, 128, 0.16); opacity: 0; pointer-events: none; }
+.f04-pcap { position: absolute; right: 84px; top: 830px; font-size: 17px; letter-spacing: 0.14em; color: #7E8A9E; }
+
+.f04-pulse { position: absolute; overflow: visible; }
+.f04-pulse path { fill: none; stroke: #F08A59; stroke-width: 7; stroke-linecap: round; filter: drop-shadow(0 0 14px rgba(240, 138, 89, 0.75)); }
+.f04-arrival { position: absolute; left: 640px; top: 420px; width: 130px; height: 130px; margin: -65px 0 0 -65px; border-radius: 50%; background: radial-gradient(circle, rgba(240,138,89,0.55) 0%, rgba(240,138,89,0) 70%); opacity: 0; }
+
+.f04-line { position: absolute; left: 84px; bottom: 96px; font-size: 42px; font-weight: 600; letter-spacing: -0.02em; color: #F7F9FC; }
+.f04-line .w { display: inline-block; margin-right: 0.26em; will-change: transform; }
+.f04-line .acc { color: #F08A59; }
+</style>
+<div data-hf-id="hf-r50f" id="root" data-composition-id="04-livereload" data-width="1920" data-height="1080" data-duration="6.4">
+
+  <div data-hf-id="hf-fenm" class="f04-editor" id="f04-editor">
+    <div data-hf-id="hf-g898" class="f04-ebits"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i></div>
+    <div data-hf-id="hf-fjaz" class="f04-ecode">
+      <div data-hf-id="hf-zo4w" class="path">~/reports · incident-review.html</div>
+      <div data-hf-id="hf-gwd6" class="l1">&lt;h1&gt;</div>
+      <div data-hf-id="hf-yeow"><span data-hf-id="hf-srmp" class="f04-old" id="f04-old">Investigating</span> <span data-hf-id="hf-ygnh" class="f04-new" id="f04-new"></span><span data-hf-id="hf-4n0j" class="f04-caret" id="f04-caret"></span></div>
+    </div>
+    <div data-hf-id="hf-e7o8" class="f04-chip" id="f04-chip">edited · just now</div>
+  </div>
+
+  <svg data-hf-id="hf-z4vd" class="f04-pulse" id="f04-pulse" width="200" height="80" viewBox="0 0 200 80">
+    <path data-hf-id="hf-ytou" id="f04-pulsepath" d="M 4 40 C 70 12, 130 12, 196 40" />
+  </svg>
+
+  <div data-hf-id="hf-p1ru" class="f04-page" id="f04-page">
+    <div data-hf-id="hf-hbwt" class="f04-plabel">INCIDENT REVIEW</div>
+    <div data-hf-id="hf-nbk0" class="f04-pheadline" id="f04-headline">Investigating<span data-hf-id="hf-58ft" class="f04-flash" id="f04-flash"></span></div>
+    <div data-hf-id="hf-heik" class="f04-psub">no deploy</div>
+  </div>
+  <div data-hf-id="hf-ej9e" class="f04-arrival" id="f04-arrival"></div>
+  <div data-hf-id="hf-oxx5" class="f04-pcap">localhost:4242 · incident-review.html</div>
+
+  <div data-hf-id="hf-wjn5" class="f04-line">
+    <span data-hf-id="hf-c0bw" class="w">Every</span><span data-hf-id="hf-9o0j" class="w">edit</span><span data-hf-id="hf-lpam" class="w">—</span><span data-hf-id="hf-ruf8" class="w acc">instantly.</span>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script>
+var tl = gsap.timeline({ paused: true });
+
+// the couple establishes in one beat
+tl.fromTo("#f04-editor", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.05);
+tl.fromTo("#f04-page", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.13);
+tl.fromTo(".f04-pcap", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 0.3);
+
+// highlight sweep selects the headline value in the editor
+var oldEl = document.getElementById("f04-old");
+oldEl.style.position = "relative";
+var hl = document.createElement("span");
+hl.style.cssText = "position:absolute;inset:-2px -8px;background:rgba(68,101,219,0.32);border-radius:6px;transform:scaleX(0);transform-origin:left center;";
+oldEl.appendChild(hl);
+tl.to(hl, { scaleX: 1, duration: 0.35, ease: "power2.out" }, 0.6);
+
+// sweep-delete then retype (discrete text sequence + deterministic caret)
+var newEl = document.getElementById("f04-new");
+var caretEl = document.getElementById("f04-caret");
+var RESOLVED = "Resolved";
+var SEQ = [{ t: 1.0, text: "" }];
+for (var i = 1; i <= RESOLVED.length; i++) SEQ.push({ t: 1.0 + i * 0.09, text: RESOLVED.substring(0, i) });
+function textAt(time) {
+  for (var j = SEQ.length - 1; j >= 0; j--) { if (time >= SEQ[j].t) return SEQ[j].text; }
+  return "";
+}
+var driver = { t: 0 };
+tl.to(driver, { t: 2.0, duration: 2.0, ease: "none", onUpdate: function () {
+  newEl.textContent = textAt(driver.t);
+}}, 0);
+// caret: solid while typing, square-wave blink otherwise (pure function of time, runs to frame end)
+var CHANGES = SEQ.slice(1).map(function (e) { return e.t; });
+var blink = { p: 0 };
+tl.to(blink, { p: Math.PI * 2 * 13.5, duration: 6.0, ease: "none", onUpdate: function () {
+  var typing = false;
+  for (var k = 0; k < CHANGES.length; k++) { if (driver.t >= CHANGES[k] && driver.t - CHANGES[k] < 0.15) { typing = true; break; } }
+  caretEl.style.opacity = typing ? "1" : (Math.sin(blink.p) > 0 ? "1" : "0");
+}}, 0);
+// strike lands on the old value as the retype begins
+tl.to(oldEl, { opacity: 0.55, duration: 0.2, ease: "power1.out" }, 1.0);
+
+// "edited" chip presses in (subtle press-release)
+tl.fromTo("#f04-chip", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "power3.out" }, 2.05);
+tl.to("#f04-chip", { scale: 0.94, duration: 0.12, ease: "power1.in" }, 2.5);
+tl.to("#f04-chip", { scale: 1, duration: 0.4, ease: "back.out(1.4)" }, 2.62);
+
+// pulse line self-draws from editor to page (measured stroke)
+var pulse = document.getElementById("f04-pulse");
+pulse.style.left = "560px"; pulse.style.top = "380px"; pulse.style.width = "180px";
+var ppath = document.getElementById("f04-pulsepath");
+var len = ppath.getTotalLength();
+ppath.style.strokeDasharray = String(len);
+ppath.style.strokeDashoffset = String(len);
+tl.to(ppath, { strokeDashoffset: 0, duration: 0.55, ease: "power2.out" }, 2.55);
+tl.fromTo("#f04-arrival", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1.15, duration: 0.35, ease: "power2.out" }, 3.05);
+tl.to("#f04-arrival", { opacity: 0, duration: 0.4, ease: "power2.in" }, 3.45);
+
+// hard-cut swap on the page headline (orange → green) + quick flash
+var headline = document.getElementById("f04-headline");
+tl.set(headline, { color: "#4ade80" }, 3.2);
+tl.set(headline.firstChild, { textContent: "Resolved" }, 3.2);
+tl.fromTo("#f04-flash", { opacity: 1 }, { opacity: 0, duration: 0.45, ease: "power2.out", immediateRender: false }, 3.2);
+tl.fromTo(headline, { scale: 1.03 }, { scale: 1, duration: 0.4, ease: "power3.out", immediateRender: false }, 3.2);
+
+// landing line lands as one beat with the retype — the green swap stays the sole focal event
+var ws = document.querySelectorAll("#root .f04-line .w");
+ws.forEach(function (el, i) {
+  tl.fromTo(el, { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 0.7 + i * 0.12);
+});
+
+window.__timelines["04-livereload"] = tl;
+</script>
+</template>
+</body>
+</html>

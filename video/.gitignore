@@ -1,0 +1,8 @@
+# generated caches & build output (regenerate on preview/render)
+.hyperframes/
+.media/
+.thumbnails/
+.waveform-cache/
+snapshots/
+renders/
+node_modules/

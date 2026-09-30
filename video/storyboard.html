@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>docserve promo — storyboard v4</title>
+<style>
+  :root{
+    --paper:#0B0E14; --paper2:#151A23; --paper3:#21252F;
+    --border:#2C313F; --border-strong:#383F50;
+    --ink:#F7F9FC; --ink-soft:#C3CDDC; --muted:#7E8A9E;
+    --accent:#4465DB; --accent2:#F08A59;
+    --grid:rgba(68,101,219,.10);
+    --mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  code{font-family:var(--mono)}
+  body{background:#05070C;color:var(--ink-soft);font-family:var(--mono);padding:40px 32px 80px}
+  header{max-width:1440px;margin:0 auto 36px}
+  h1{color:var(--ink);font-size:28px;letter-spacing:-.02em}
+  .dek{color:var(--muted);margin-top:6px;font-size:13px}
+  .tag{display:inline-block;margin-top:12px;border:1px solid var(--border-strong);color:var(--accent);border-radius:999px;padding:4px 12px;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+  .grid{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .cell{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--paper)}
+  .frame{aspect-ratio:16/9;container-type:inline-size;position:relative;overflow:hidden;background:
+    linear-gradient(var(--grid) 1px,transparent 1px) 0 0/2.6cqw 2.6cqw,
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/2.6cqw 2.6cqw,
+    var(--paper)}
+  .meta{display:flex;justify-content:space-between;padding:10px 14px;font-size:11px;color:var(--muted);border-top:1px solid var(--border)}
+  .meta b{color:var(--ink);font-weight:600;letter-spacing:.08em}
+  .note{padding:10px 14px 14px;font-size:11.5px;line-height:1.65;color:var(--muted)}
+  .note b{color:var(--ink-soft)}
+  .chip{display:inline-block;margin-top:8px;border:1px solid var(--border-strong);border-radius:4px;padding:2px 8px;font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
+  .seam{max-width:1440px;margin:28px auto 0;border:1px solid var(--border);border-radius:10px;padding:18px}
+  .seam h2,.tok h2{font-size:12px;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;margin-bottom:12px}
+  .seamrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted)}
+  .seamrow span{border:1px solid var(--border);border-radius:4px;padding:2px 8px;color:var(--ink-soft)}
+  .tok{max-width:1440px;margin:20px auto 0;border:1px solid var(--border);border-radius:10px;padding:18px;font-size:12px;line-height:1.9;color:var(--muted)}
+  .tok code{color:var(--ink-soft)}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+  /* shared sketch atoms */
+  .headline{position:absolute;font-family:var(--mono);color:var(--ink);font-weight:600;letter-spacing:-.02em;line-height:1.12}
+  .slot{position:absolute;border:1px dashed var(--border-strong);border-radius:.8cqw;display:grid;place-items:center;color:#8C99AF;font-size:1.6cqw}
+  .pulse{position:absolute;height:2px;background:var(--accent2);box-shadow:0 0 1.2cqw rgba(240,138,89,.8)}
+  .pill{position:absolute;display:flex;align-items:center;justify-content:center;gap:1cqw;background:var(--paper2);border:1px solid var(--accent);border-radius:.8cqw;color:var(--ink);font-weight:600}
+  .ghpill{position:absolute;display:inline-flex;align-items:center;gap:.7cqw;background:#0A0D13;border:1px solid var(--border-strong);border-radius:999px;padding:.5cqw 1.2cqw;color:var(--ink);font-size:1.3cqw}
+
+  /* frame 1 list atoms */
+  .filerow{position:absolute;height:2.6cqw;display:flex;align-items:center;gap:1cqw;padding:0 1.2cqw}
+  .filerow .fdot{font-size:1.05cqw;color:var(--accent2);opacity:.9;flex-shrink:0;letter-spacing:-.05em;line-height:1}
+  .filerow .fname{font-size:1.25cqw;color:var(--ink-soft)}
+  .filerow .fdate{margin-left:auto;font-size:.95cqw;color:var(--muted)}
+
+  /* frame 3 picker atoms */
+  .picker{position:absolute;background:var(--paper2);border:1px solid var(--border-strong);border-radius:.9cqw;box-shadow:0 1.4cqw 3cqw rgba(0,0,0,.55);overflow:hidden}
+  .picker .ptitle{height:2.6cqw;display:flex;align-items:center;gap:.5cqw;padding:0 1cqw;border-bottom:1px solid var(--border);color:var(--muted);font-size:1cqw}
+  .picker .ptitle i{width:.8cqw;height:.8cqw;border-radius:50%;background:var(--border-strong);font-style:normal}
+  .picker .pbody{display:flex}
+  .picker .pside{width:8cqw;border-right:1px solid var(--border);padding:.8cqw 0}
+  .picker .pside div{font-size:.95cqw;color:var(--muted);padding:.4cqw 1.2cqw}
+  .picker .pmain{flex:1;padding:.8cqw 1cqw}
+  .picker .prow{position:relative;display:flex;align-items:center;gap:.8cqw;font-size:1.15cqw;color:var(--ink-soft);padding:.55cqw 1cqw;border-radius:.5cqw}
+  .picker .prow.sel{background:rgba(68,101,219,.32);color:var(--ink)}
+  .picker .pbtn{position:absolute;right:1.2cqw;bottom:1cqw;border:1px solid var(--accent);border-radius:.5cqw;padding:.4cqw 1.4cqw;font-size:1.05cqw;color:var(--ink);background:rgba(68,101,219,.2)}
+
+  /* frame 5 free-standing columns — figure on top, icon + title below, hairline dividers */
+  .scol{position:absolute}
+  .scol .sdia{position:absolute;left:0;right:0;top:0;height:13.6cqw;background:var(--paper3);border:1px solid var(--border);border-radius:.7cqw;overflow:hidden}
+  .scol .sic{position:absolute;left:0;right:0;top:17.8cqw;display:grid;place-items:center}
+  .scol .sic svg{width:4.2cqw;height:4.2cqw}
+  .scol .sttl{position:absolute;left:0;right:0;top:24cqw;text-align:center;font-size:1.7cqw;font-weight:600;color:var(--ink);letter-spacing:.04em}
+  .vline{position:absolute;width:1px;background:var(--border)}
+</style>
+</head>
+<body>
+<header>
+  <h1>docserve — promo storyboard <span style="color:var(--muted)">v4</span></h1>
+  <div class="dek">Your AI writes HTML by the dozen — docserve turns the folder into a live gallery. List → tool → gallery: the film opens on a plain, growing list of AI-generated HTML files, a hard cut hands off to the docserve mark, then every beat lives inside the gallery it opened.</div>
+  <span class="tag">1920×1080 · 33s · 6 frames · English TTS narration + BGM</span>
+</header>
+
+<div class="grid">
+
+  <!-- FRAME 1 -->
+  <div class="cell" id="frame-01">
+    <div class="frame">
+      <div style="position:absolute;left:7cqw;top:6.5cqw;bottom:6.5cqw;width:42cqw;border:1px solid var(--border);border-radius:.9cqw;background:rgba(21,26,35,.72);overflow:hidden">
+        <div class="filerow" style="left:0;right:0;top:0"><span class="fdot">&lt;&gt;</span><span class="fname">index.html</span><span class="fdate">just now</span></div>
+        <div class="filerow" style="left:0;right:0;top:3.4cqw"><span class="fdot">&lt;&gt;</span><span class="fname">report.html</span><span class="fdate">2m ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:6.8cqw"><span class="fdot">&lt;&gt;</span><span class="fname">changelog.html</span><span class="fdate">14m ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:10.2cqw"><span class="fdot">&lt;&gt;</span><span class="fname">api-docs.html</span><span class="fdate">38m ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:13.6cqw"><span class="fdot">&lt;&gt;</span><span class="fname">prototype.html</span><span class="fdate">1h ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:16.8cqw;opacity:.75"><span class="fdot">&lt;&gt;</span><span class="fname">deploy-notes.html</span><span class="fdate">3h ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:20.2cqw;opacity:.5"><span class="fdot">&lt;&gt;</span><span class="fname">incident-review.html</span><span class="fdate">6h ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:23.6cqw;opacity:.3"><span class="fdot">&lt;&gt;</span><span class="fname">uptime.html</span><span class="fdate">1d ago</span></div>
+        <div class="filerow" style="left:0;right:0;top:27cqw;opacity:.25"><span class="fdot" style="opacity:.4">&lt;&gt;</span><span class="fname" style="color:var(--muted)">…and more</span></div>
+      </div>
+      <div class="headline" style="left:54cqw;top:15cqw;font-size:3.9cqw">Your AI writes HTML.<br><span style="color:var(--accent2)">Lots of it.</span></div>
+      <div style="position:absolute;left:54cqw;top:31cqw;font-size:1.05cqw;color:var(--muted);letter-spacing:.08em">reports · changelogs · api-docs · prototypes…</div>
+    </div>
+    <div class="meta"><b>01 · THE AI FILE LIST</b><span>frame-01 · 0–4.8s</span></div>
+    <div class="note"><b>First motion:</b> the list panel fades in with the first row (never an empty box at t=0), then file rows slide in one by one — HTML glyph + filename + relative stamp (recency gradient “just now” → “1d ago”, brighter = fresher). <b>Hook line:</b> “Your AI writes HTML. / Lots of it.” A flat, growing list; sub-line enumerates the visible file kinds. <b>VO:</b> “Your AI writes HTML. Lots of it.” (enumeration stays on screen — sub-line — it did not fit the 4.8s slot at natural TTS pace) <b>Seam:</b> cut — the mark takes over.</div>
+    <div style="padding:0 14px 14px"><span class="chip">seam → cut</span></div>
+  </div>
+
+  <!-- FRAME 2 -->
+  <div class="cell" id="frame-02">
+    <div class="frame">
+      <img src="assets/icon.svg" alt="" style="position:absolute;left:41cqw;top:14cqw;width:18cqw;height:18cqw">
+      <div class="headline" style="left:0;right:0;top:36cqw;text-align:center;font-size:6.4cqw">docserve</div>
+      <div style="position:absolute;left:0;right:0;top:47cqw;text-align:center;font-size:1.7cqw;color:var(--muted)">serve a folder of HTML as a card gallery</div>
+    </div>
+    <div class="meta"><b>02 · MEET DOCSERVE</b><span>frame-02 · 4.8–10.9s</span></div>
+    <div class="note"><b>First motion:</b> the logo <b>assembles</b> — plate settles, three back cards fly in one per beat (rotation overshoot), the front card lands with a soft overshoot and its text lines render on (~1.6s, rides “docserve — serve a folder”). Wordmark rises with a tracking settle, tagline fades up as one piece. <b>VO:</b> “docserve — serve a folder of HTML as a card gallery.” <b>Seam:</b> icon handoff — wordmark/tagline crossfade away while the mark holds, then shrinks away in place as the file-picker rises (shared element).</div>
+    <div style="padding:0 14px 14px"><span class="chip">seam → icon handoff</span></div>
+  </div>
+
+  <!-- FRAME 3 -->
+  <div class="cell" id="frame-03">
+    <div class="frame">
+      <div class="picker" style="left:7cqw;top:7cqw;width:40cqw;height:24cqw">
+        <div class="ptitle"><i></i><i></i><i></i><span style="margin-left:1cqw">Choose a folder</span></div>
+        <div class="pbody" style="height:15.4cqw">
+          <div class="pside">
+            <div style="letter-spacing:.14em;text-transform:uppercase;font-size:.75cqw;padding-top:1cqw">Favorites</div>
+            <div>Desktop</div><div>Documents</div><div style="color:var(--ink)">reports</div><div>www</div>
+          </div>
+          <div class="pmain">
+            <div class="prow"><span style="color:var(--muted)">~/</span>ai-output</div>
+            <div class="prow sel"><span style="opacity:.6">~/</span><b>reports</b></div>
+            <div class="prow"><span style="opacity:.6">~/</span>sites</div>
+            <div class="prow"><span style="opacity:.6">~/</span>www</div>
+          </div>
+        </div>
+        <div class="pbtn">Choose</div>
+      </div>
+      <div class="headline" style="left:9cqw;bottom:6.5cqw;font-size:3.2cqw">Pick a folder.<br><span style="color:var(--accent2)">It’s a gallery.</span></div>
+      <div style="position:absolute;left:52cqw;top:6.5cqw;width:40cqw;height:35cqw;background:#0f1117;border:1px solid #2a2e3d;border-radius:.9cqw;overflow:hidden">
+        <div style="padding:1.6cqw 2cqw 1.2cqw;border-bottom:1px solid #2a2e3d">
+          <div style="display:flex;align-items:center;gap:1cqw;font-size:1.7cqw;font-weight:600;color:#e6e8ee"><svg viewBox="0 0 24 24" fill="#6c8cff" style="width:1.8cqw;height:1.8cqw"><path d="M6.1 10L4 18V8h17a2 2 0 0 0-2-2h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h15c.9 0 1.7-.6 1.9-1.5l2.3-8.5zM19 18H6l1.6-6h13z"/></svg>reports</div>
+          <div style="font-size:1cqw;color:#9aa0b0;margin-top:.4cqw"><code style="font-family:'Geist Mono',ui-monospace,monospace;background:#1a1d27;border:1px solid #2a2e3d;border-radius:.4cqw;padding:.1cqw .7cqw">~/reports</code> — <span style="color:#4ade80">7</span> files</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2cqw;padding:1.4cqw 2cqw">
+          <div style="background:#1a1d27;border:1px solid #2a2e3d;border-radius:1cqw;overflow:hidden;height:16.5cqw">
+            <div style="position:relative;height:9.6cqw;background:#0f1117"><div style="position:absolute;left:1cqw;top:1.6cqw;font-size:1cqw;color:#e6e8ee;font-weight:600">Incident — API outage</div><div style="position:absolute;left:1cqw;top:3.2cqw;font-size:1.8cqw;color:#F08A59;font-weight:700">Investigating</div></div>
+            <div style="border-top:1px solid #2a2e3d;padding:.6cqw 1cqw;height:7cqw;display:flex;flex-direction:column;justify-content:space-between"><div style="line-height:1.45"><span style="display:inline-block;width:1cqw;height:1cqw;border-radius:.3cqw;background:#F08A59;vertical-align:-.15cqw;margin-right:.5cqw"></span><span style="font-size:1cqw;color:#e6e8ee;font-weight:600">incident-review.html</span></div><div style="font-size:.8cqw;color:#9aa0b0">2026/09/28</div></div>
+          </div>
+          <div style="background:#1a1d27;border:1px solid #2a2e3d;border-radius:1cqw;overflow:hidden;height:16.5cqw">
+            <div style="position:relative;height:9.6cqw;background:#0f1117"><div style="position:absolute;left:1cqw;top:1.6cqw;font-size:1cqw;color:#e6e8ee;font-weight:600">v1.3.0</div><div style="position:absolute;left:1cqw;top:3.4cqw;font-size:.9cqw;color:#9aa0b0">What changed</div></div>
+            <div style="border-top:1px solid #2a2e3d;padding:.6cqw 1cqw;height:7cqw;display:flex;flex-direction:column;justify-content:space-between"><div style="display:flex;align-items:center;gap:.6cqw"><span style="width:1cqw;height:1cqw;border-radius:.3cqw;background:#F08A59"></span><span style="font-size:1cqw;color:#e6e8ee;font-weight:600">changelog.html</span></div><div style="font-size:.8cqw;color:#9aa0b0">2026/09/27</div></div>
+          </div>
+          <div class="slot" style="position:relative;left:auto;top:auto;width:auto;height:16.5cqw;border-color:#383F50">#</div>
+          <div class="slot" style="position:relative;left:auto;top:auto;width:auto;height:16.5cqw;border-color:rgba(240,138,89,.5);color:var(--accent2)">#</div>
+        </div>
+      </div>
+    </div>
+    <div class="meta"><b>03 · PICK A FOLDER, GET A GALLERY</b><span>frame-03 · 10.4–16.5s</span></div>
+    <div class="note"><b>First motion:</b> after the handoff mark fully dissolves, the <b>file-picker dialog</b> springs in; cursor moves to <b>~/reports</b> and it selects with an accent sweep. <b>Submit:</b> Choose presses, the dialog slides away. <b>Payoff — live, not a screenshot:</b> the folder drops, bursts, and the <b>real gallery page builds</b> — header (folder icon + “reports” + “~/reports — 7 files”) first, then cards in the shipped anatomy (#1a1d27, light preview, favicon + title + date) assemble one per beat (sketch shows mid-assembly). <b>VO:</b> “Pick a folder — and there’s your gallery.” Kinetic line lands with its VO beats: “Pick a folder.” as the dialog springs in, “It’s a gallery.” on the VO’s “gallery.” — before the cards burst. <b>Seam:</b> the incident-review card grows toward the viewer and dissolves into the served page.</div>
+    <div style="padding:0 14px 14px"><span class="chip">seam → card→page zoom</span></div>
+  </div>
+
+  <!-- FRAME 4 -->
+  <div class="cell" id="frame-04">
+    <div class="frame">
+      <div style="position:absolute;left:4cqw;top:7cqw;width:26cqw;height:24cqw;background:#0A0D13;border:1px solid var(--border-strong);border-radius:.8cqw">
+        <div style="display:flex;gap:.5cqw;padding:.8cqw 1cqw"><i style="width:.7cqw;height:.7cqw;border-radius:50%;background:var(--border-strong)"></i><i style="width:.7cqw;height:.7cqw;border-radius:50%;background:var(--border-strong)"></i><i style="width:.7cqw;height:.7cqw;border-radius:50%;background:var(--border-strong)"></i></div>
+        <div style="padding:1cqw 1.6cqw;font-size:1.35cqw;line-height:1.9;color:var(--muted)">
+          <div style="letter-spacing:.12em;text-transform:uppercase;font-size:.95cqw">~/reports · incident-review.html</div>
+          <div style="color:var(--ink-soft)">&lt;h1&gt;</div>
+          <div><s style="color:var(--muted)">Investigating</s> <span style="color:var(--ink)">Resolved</span>▊</div>
+          <div style="margin-top:1.4cqw;color:var(--ink)">edited · just now</div>
+        </div>
+      </div>
+      <div class="pulse" style="left:30.5cqw;top:19cqw;width:4cqw"></div>
+      <div style="position:absolute;left:34cqw;top:7cqw;width:62cqw;height:34.9cqw;background:#0B0E14;border:1px solid var(--border-strong);border-radius:.8cqw;padding:3.2cqw 4cqw">
+        <div style="font-size:1.2cqw;letter-spacing:.3em;color:var(--muted)">INCIDENT REVIEW</div>
+        <div style="font-size:6cqw;color:var(--accent2);font-weight:700;margin-top:2.4cqw">Investigating</div>
+        <div style="font-size:1.4cqw;color:var(--muted);margin-top:2cqw">no deploy</div>
+      </div>
+      <div style="position:absolute;right:4cqw;top:42.4cqw;font-size:.95cqw;letter-spacing:.12em;color:var(--muted)">localhost:4242 · incident-review.html</div>
+      <div style="position:absolute;left:6cqw;bottom:6cqw;font-size:2.2cqw;color:var(--ink)">Every edit — <span style="color:var(--accent2)">instantly.</span></div>
+    </div>
+    <div class="meta"><b>04 · EVERY EDIT AUTO-REFLECTS</b><span>frame-04 · 16–21.4s</span></div>
+    <div class="note"><b>First motion:</b> “Investigating” retypes to “Resolved” in the editor panel (caret). <b>Proof:</b> orange pulse crosses to the <b>served page itself</b> — rebuilt in HTML chrome (no screenshots); the big headline hard-cut swaps Investigating(orange)→Resolved(green) in place with a quick flash. The gallery grid never appears. <b>VO:</b> “Every edit shows up on the page — instantly.” Kinetic line lands as one beat with the retype (“Every edit — instantly.”), leaving the green swap as the sole focal event (page sub stays “no deploy”). <b>Seam:</b> camera pulls back out of the page.</div>
+    <div style="padding:0 14px 14px"><span class="chip">seam → zoom-through (out to grid)</span></div>
+  </div>
+
+  <!-- FRAME 5 -->
+  <div class="cell" id="frame-05">
+    <div class="frame">
+      <div class="headline" style="left:0;right:0;top:8cqw;text-align:center;font-size:4.2cqw">Runs where you work.</div>
+      <div class="scol" style="left:8cqw;top:19.5cqw;width:24cqw;height:31cqw">
+        <div class="sdia" style="background:var(--paper2);top:.7cqw">
+          <div style="position:absolute;left:0;right:0;top:0;height:2.6cqw;background:var(--paper3);border-bottom:1px solid var(--border)"><img src="assets/tray-running@2x.png" alt="" style="position:absolute;right:1.4cqw;top:.55cqw;width:1.9cqw;height:1.9cqw;filter:invert(1)"></div>
+          <div style="position:absolute;right:1.2cqw;top:3.3cqw;width:17.5cqw;background:var(--paper3);border:1px solid var(--border-strong);border-radius:.6cqw;box-shadow:0 .8cqw 2cqw rgba(0,0,0,.5);padding:.4cqw 0">
+            <div style="display:flex;align-items:center;gap:.7cqw;font-size:.95cqw;color:var(--muted);padding:.3cqw 1.1cqw"><img src="assets/menu-running@2x.png" alt="" style="width:1.5cqw;height:1.5cqw">Running</div>
+            <div style="font-size:1.05cqw;color:var(--ink);padding:.3cqw 1.1cqw">▸ reports (~)</div>
+            <div style="height:1px;background:var(--border);margin:.35cqw .8cqw"></div>
+            <div style="font-size:1.05cqw;color:var(--ink-soft);padding:.3cqw 1.1cqw">Open Folder...</div>
+            <div style="font-size:1.05cqw;color:var(--ink-soft);padding:.3cqw 1.1cqw">Stop All</div>
+          </div>
+        </div>
+        <div class="sic"><svg viewBox="0 0 24 24" fill="#C3CDDC" xmlns="http://www.w3.org/2000/svg"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg></div>
+        <div class="sttl">macOS app</div>
+      </div>
+      <div class="vline" style="left:34.5cqw;top:21cqw;height:26cqw"></div>
+      <div class="scol" style="left:37cqw;top:19.5cqw;width:24cqw;height:31cqw">
+        <div class="sdia" style="background:#0A0D13;top:5.2cqw;height:auto;padding:1.5cqw 1.6cqw">
+          <div style="font-size:1.35cqw;white-space:nowrap"><span style="color:#3FB950">$</span> <span style="color:var(--accent2)">npx @noy4/docserve</span></div>
+        </div>
+        <div class="sic"><span style="color:#3FB950;font-size:3cqw;font-weight:600">&gt;_</span></div>
+        <div class="sttl">CLI</div>
+      </div>
+      <div class="vline" style="left:63.5cqw;top:21cqw;height:26cqw"></div>
+      <div class="scol" style="left:66cqw;top:19.5cqw;width:24cqw;height:31cqw">
+        <div class="sdia" style="background:var(--paper2);top:.7cqw">
+          <div style="height:2.2cqw;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1cqw;font-size:.9cqw;color:var(--muted)">incident-review.html</div>
+          <div style="padding:.7cqw 1.2cqw"><div style="height:.5cqw;width:60%;background:var(--border-strong);border-radius:.3cqw;margin-bottom:.6cqw"></div><div style="height:.5cqw;width:82%;background:var(--border);border-radius:.3cqw;margin-bottom:.6cqw"></div></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:4.6cqw;background:var(--paper2);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:.9cqw;padding:0 1.4cqw"><svg viewBox="0 0 16 16" fill="#C3CDDC" style="width:2cqw;height:2cqw"><path d="M10.5 13c1.378 0 2.5-1.121 2.5-2.5v-7C13 2.121 11.878 1 10.5 1h-7A2.503 2.503 0 0 0 1 3.5v7C1 11.879 2.122 13 3.5 13zm-7-11h7c.827 0 1.5.673 1.5 1.5V4H2v-.5C2 2.673 2.673 2 3.5 2M2 10.5V5h10v5.5c0 .827-.673 1.5-1.5 1.5h-7c-.827 0-1.5-.673-1.5-1.5m13-5v5c0 2.48-2.02 4.5-4.5 4.5h-5c-.82 0-1.54-.39-2-1h7c1.93 0 3.5-1.57 3.5-3.5v-7c.61.46 1 1.18 1 2"/></svg><span style="font-size:1.6cqw;color:var(--accent)">:4242</span></div>
+        </div>
+        <div class="sic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 254"><defs><linearGradient id="sb-svg6q5wmbnq" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></linearGradient><path id="sb-svgwhz12djk" d="M180.828 252.605a15.87 15.87 0 0 0 12.65-.486l52.501-25.262a15.94 15.94 0 0 0 9.025-14.364V41.197a15.94 15.94 0 0 0-9.025-14.363l-52.5-25.263a15.88 15.88 0 0 0-18.115 3.084L74.857 96.35l-43.78-33.232a10.614 10.614 0 0 0-13.56.603L3.476 76.494c-4.63 4.211-4.635 11.495-.012 15.713l37.967 34.638l-37.967 34.637c-4.623 4.219-4.618 11.502.012 15.714l14.041 12.772a10.614 10.614 0 0 0 13.56.604l43.78-33.233l100.507 91.695a15.85 15.85 0 0 0 5.464 3.571m10.464-183.649l-76.262 57.889l76.262 57.888z"/></defs><mask id="sb-svgwsaq58h2f" fill="#fff"><use href="#sb-svgwhz12djk"/></mask><path fill="#0065a9" d="M246.135 26.873L193.593 1.575a15.885 15.885 0 0 0-18.123 3.08L3.466 161.482c-4.626 4.219-4.62 11.502.012 15.714l14.05 12.772a10.625 10.625 0 0 0 13.569.604L238.229 33.436c6.949-5.271 16.93-.315 16.93 8.407v-.61a15.94 15.94 0 0 0-9.024-14.36" mask="url(#sb-svgwsaq58h2f)"/><path fill="#007acc" d="m246.135 226.816l-52.542 25.298a15.89 15.89 0 0 1-18.123-3.08L3.466 92.207c-4.626-4.218-4.62-11.502.012-15.713l14.05-12.773a10.625 10.625 0 0 1 13.569-.603l207.132 157.135c6.949 5.271 16.93.315 16.93-8.408v.611a15.94 15.94 0 0 1-9.024 14.36" mask="url(#sb-svgwsaq58h2f)"/><path fill="#1f9cf0" d="M193.428 252.134a15.89 15.89 0 0 1-18.125-3.083c5.881 5.88 15.938 1.715 15.938-6.603V11.273c0-8.318-10.057-12.483-15.938-6.602a15.89 15.89 0 0 1 18.125-3.084l52.533 25.263a15.94 15.94 0 0 1 9.03 14.363V212.51c0 6.125-3.51 11.709-9.03 14.363z" mask="url(#sb-svgwsaq58h2f)"/><path fill="url(#sb-svg6q5wmbnq)" fill-opacity=".25" d="M180.828 252.605a15.87 15.87 0 0 0 12.65-.486l52.5-25.263a15.94 15.94 0 0 0 9.026-14.363V41.197a15.94 15.94 0 0 0-9.025-14.363L193.477 1.57a15.88 15.88 0 0 0-18.114 3.084L74.857 96.35l-43.78-33.232a10.614 10.614 0 0 0-13.56.603L3.476 76.494c-4.63 4.211-4.635 11.495-.012 15.713l37.967 34.638l-37.967 34.637c-4.623 4.219-4.618 11.502.012 15.714l14.041 12.772a10.614 10.614 0 0 0 13.56.604l43.78-33.233l100.506 91.695a15.9 15.9 0 0 0 5.465 3.571m10.464-183.65l-76.262 57.89l76.262 57.888z" mask="url(#sb-svgwsaq58h2f)"/></svg></div>
+        <div class="sttl">VS Code extension</div>
+      </div>
+    </div>
+    <div class="meta"><b>05 · MACOS, CLI, VSCODE</b><span>frame-05 · 21.4–28.1s</span></div>
+    <div class="note"><b>First motion:</b> pull-back out of the page lands on a clean wide stage; three <b>free-standing columns</b> cascade in on their VO words — <b>surface figure on TOP, icon + title below</b>, separated by <b>vertical hairlines</b> fading in as each next column lands (no card boxes, no ghost slots). <b>macOS:</b> the real tray menu (`● Running (2)` / `▸ reports (~)` / `Open Folder...` / `Stop All`); <b>CLI:</b> one-line terminal; <b>VS Code:</b> mini editor window with the real status-bar item (codicon + `:4242`). No screenshots. <b>VO:</b> “You can use docserve as a macOS app, a CLI, or a VS Code extension.” — the enumeration rides the columns (macOS → CLI land with their words; VS Code extension follows the same cascade tempo, landing as “VS Code” is spoken; frame extended 5.4s → 6.7s to fit). Headline lands with “docserve”. <b>Seam:</b> dive into the grid for the finale.</div>
+    <div style="padding:0 14px 14px"><span class="chip">seam → crossfade (settle)</span></div>
+  </div>
+
+  <!-- FRAME 6 -->
+  <div class="cell" id="frame-06">
+    <div class="frame">
+      <div style="position:absolute;left:0;right:0;top:10cqw;display:flex;flex-direction:column;align-items:center;gap:1.2cqw"><img src="assets/icon.svg" alt="" style="width:11cqw;height:11cqw"><span style="font-size:4.2cqw;font-weight:600;color:var(--ink);letter-spacing:-.02em">docserve</span></div>
+      <div class="pill" style="left:35cqw;top:31cqw;width:30cqw;height:6cqw;font-size:1.9cqw;gap:1cqw"><svg viewBox="0 0 24 24" fill="#F7F9FC" xmlns="http://www.w3.org/2000/svg" style="width:2.4cqw;height:2.4cqw"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>Download for macOS</div>
+      <div class="ghpill" style="left:40cqw;top:40cqw">      <svg viewBox="0 0 16 16" fill="#F7F9FC" xmlns="http://www.w3.org/2000/svg" style="width:1.5cqw;height:1.5cqw"><path d="M8 .8a7.2 7.2 0 0 0-2.28 14.03c.36.07.5-.16.5-.35v-1.22c-2 .43-2.42-.97-2.42-.97-.33-.83-.8-1.05-.8-1.05-.66-.45.05-.44.05-.44.72.05 1.1.75 1.1.75.65 1.1 1.7.79 2.12.6.06-.47.25-.79.46-.97-1.6-.18-3.28-.8-3.28-3.55 0-.79.28-1.43.74-1.94-.07-.18-.32-.91.07-1.9 0 0 .6-.2 1.98.74a6.9 6.9 0 0 1 3.6 0c1.37-.93 1.97-.74 1.97-.74.4.99.15 1.72.07 1.9.46.5.74 1.15.74 1.94 0 2.76-1.69 3.37-3.3 3.55.26.22.49.66.49 1.33v1.97c0 .19.13.42.5.35A7.2 7.2 0 0 0 8 .8Z"/></svg>noy4/docserve</div>
+    </div>
+    <div class="meta"><b>06 · END CARD — LOGO, DOWNLOAD, GITHUB</b><span>frame-06 · 28.1–33s</span></div>
+    <div class="note"><b>Arrival:</b> the f5 portal dive lands directly on a clean stage. <b>Stack, centered:</b> docserve lockup (icon + wordmark) → “Download for macOS” pill → GitHub badge (★ noy4/docserve, visual proof only — the VO never mentions it). Each on its own beat; a <b>one-shot card fan</b> (32.1–32.3) as the VO ends; then the GitHub badge and pill step aside and the <b>docserve lockup holds last, dissolving as the stage dips black</b> (32.3–33s). <b>VO:</b> “Try docserve. It’s free and open-source.”</div>
+    <div style="padding:0 14px 14px"><span class="chip">end hold</span></div>
+  </div>
+</div>
+
+<div class="seam">
+  <h2>Seam map</h2>
+  <div class="seamrow">
+    <span>01 list</span>→<span>cut</span>→<span>02 intro</span>→<span>icon handoff</span>→<span>03 picker &amp; assemble</span>→<span>card→page zoom</span>→<span>04 live reload</span>→<span>zoom-through (out)</span>→<span>05 surfaces</span>→<span>crossfade (settle)</span>→<span>06 cta</span>
+  </div>
+</div>
+
+<div class="tok">
+  <h2>Tokens &amp; bans</h2>
+  <div><span class="sw" style="background:#0B0E14"></span><code>paper #0B0E14</code> · <span class="sw" style="background:#151A23"></span><code>surface #151A23</code> · <span class="sw" style="background:#F7F9FC"></span><code>ink #F7F9FC</code> · <span class="sw" style="background:#4465DB"></span><code>accent #4465DB</code> · <span class="sw" style="background:#F08A59"></span><code>accent2 #F08A59</code> · graph grid rgba(68,101,219,.10)</div>
+  <div>Type: Geist Mono only — display 600 negative-tracked · mono chrome 13–16px tracked caps · body #C3CDDC. Corners sharp; hairline top/bottom rules every frame.</div>
+  <div>Truth: the file picker dialog, the gallery grid and the served page are faithful reconstructions — the page is a plain AI-generated report in docserve's served-page style (dark bg, big status headline); no screenshots anywhere in the film.</div>
+  <div>Bans: no glow (except the live-reload pulse), no stock photos, no bullet feature slides, no slideshow (every beat after 02 shares the gallery world), no motion without meaning, no CLI command typed on screen, no “0 dependencies” beat, no AI-vendor logos in the list (generic HTML files only), no scattered/rotated pile — frame 1 is an orderly list.</div>
+</div>
+</body>
+</html>

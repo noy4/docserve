@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>docserve promo — seam 02→03 icon handoff</title></head>
+<body>
+<template>
+<style>
+/* transparent overlay — no background, rides above both scenes */
+#root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+</style>
+<div data-hf-id="hf-s23r" id="root" data-composition-id="seam-02-03" data-width="1920" data-height="1080" data-duration="0.7">
+
+  <!-- pixel-identical copy of the f2 mark (f2: left 50% − 172px, top 250px, 344px) -->
+  <img data-hf-id="hf-s23b" id="seam-0203-icon" src="assets/icon.svg" alt="" style="position:absolute;left:788px;top:250px;width:344px;height:344px;opacity:0;will-change:transform">
+</div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script>
+var tl = gsap.timeline({ paused: true });
+
+// swap in over the identical f2 mark before f2 fades (global 10.3–10.42)
+tl.fromTo("#seam-0203-icon", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 0);
+
+// shrink away in place — the picker rises beneath as the mark vanishes
+tl.to("#seam-0203-icon", { scale: 0.14, duration: 0.38, ease: "power3.in" }, 0.2);
+tl.to("#seam-0203-icon", { opacity: 0, duration: 0.12, ease: "power1.in" }, 0.46);
+
+window.__timelines["seam-02-03"] = tl;
+</script>
+</template>
+</body>
+</html>
