@@ -78,6 +78,27 @@ export async function apiFiles(docsDir) {
 // files that changed.
 const metaCache = new Map() // "path:mtimeMs" -> { title, date, favicon }
 
+// <title> text is HTML: decode entities so cards read "A & B", not "A &amp; B".
+const ENTITIES = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: "\u00a0",
+}
+
+function decodeEntities(s) {
+  return s.replace(/&(#[xX]?[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]*);/g, (m, ref) => {
+    if (ref[0] === "#") {
+      const hex = /[xX]/.test(ref[1])
+      const cp = parseInt(hex ? ref.slice(2) : ref.slice(1), hex ? 16 : 10)
+      return cp > 0 && cp <= 0x10ffff ? String.fromCodePoint(cp) : m
+    }
+    return ENTITIES[ref.toLowerCase()] ?? m
+  })
+}
+
 async function metaOf(full, mtimeMs, docsDir) {
   const key = `${full}:${mtimeMs}`
   const cached = metaCache.get(key)
@@ -88,7 +109,10 @@ async function metaOf(full, mtimeMs, docsDir) {
 }
 
 async function extractMeta(full, docsDir) {
-  const findTitle = (text) => text.match(/<title>([^<]*)<\/title>/)?.[1]?.trim() ?? null
+  const findTitle = (text) => {
+    const raw = text.match(/<title>([^<]*)<\/title>/)?.[1]?.trim()
+    return raw == null ? null : decodeEntities(raw)
+  }
   const findDate = (text) => {
     for (const tag of text.match(/<meta\b[^>]*>/gi) ?? []) {
       if (!/\bname\s*=\s*["']created_at["']/i.test(tag)) continue
@@ -131,7 +155,11 @@ async function extractMeta(full, docsDir) {
       }
       // Titles and meta tags live in <head>; read only the first 4 KB.
       const head = await read(4096, 0)
-      let meta = { title: findTitle(head), date: findDate(head), favicon: findFavicon(head) }
+      let meta = {
+        title: findTitle(head),
+        date: findDate(head),
+        favicon: findFavicon(head),
+      }
       if (meta.title === null || meta.date === null || meta.favicon === null) {
         // Fallback for documents with a long preamble (inline favicon etc.)
         const text = await read(1 << 20, 0)

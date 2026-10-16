@@ -134,6 +134,7 @@ describe("docserve server", () => {
   it("lists html files with resolved metadata on /api/files", async () => {
     writeFileSync(join(content, "favicon.svg"), "<svg xmlns='http://www.w3.org/2000/svg'/>")
     writeFileSync(join(content, "fav.html"), '<html><head><link rel="icon" href="favicon.svg"><title>Fav</title></head></html>')
+    writeFileSync(join(content, "entities.html"), "<html><head><title>Q&amp;A &lt;draft&gt; &#39;26</title></head></html>")
     writeFileSync(join(content, "escaping.html"), '<html><head><link rel="icon" href="../outside.png"></head></html>')
 
     const files = await (await fetch(`http://localhost:${port}/api/files`)).json()
@@ -149,6 +150,9 @@ describe("docserve server", () => {
     const fav = files.find((f) => f.filePath.endsWith("fav.html"))
     assert.equal(fav.favicon, "/favicon.svg", "relative href resolves against the page URL")
     assert.equal(files.find((f) => f.filePath.endsWith("escaping.html")).favicon, undefined, "hrefs escaping docsDir are dropped")
+
+    const entities = files.find((f) => f.filePath.endsWith("entities.html"))
+    assert.equal(entities.title, "Q&A <draft> '26", "title entities are decoded for the gallery")
   })
 
   it("answers 403, 400 and 404 for bad paths", async () => {
