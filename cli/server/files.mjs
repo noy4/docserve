@@ -78,7 +78,7 @@ export async function apiFiles(docsDir) {
 // files that changed.
 const metaCache = new Map() // "path:mtimeMs" -> { title, date, favicon }
 
-// <title> text is HTML: decode entities so cards read "A & B", not "A &amp; B".
+// Decode <title> entities so cards read "A & B", not "A &amp; B".
 const ENTITIES = {
   amp: "&",
   lt: "<",

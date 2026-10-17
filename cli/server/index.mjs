@@ -6,11 +6,12 @@
 // │ │   ├─ /api/files ──▶ apiFiles()                       │
 // │ │   ├─ /, /index.html ──▶ gallery template             │
 // │ │   └─ other paths ──▶ raw files ──▶ injectIntoHtml()  │
+// │ │       └─ /dir/ ──▶ dir/index.html                    │
 // │ ├─ WebSocketServer("/__reload") ◀─ FileWatcher         │
 // │ └─ listen ──▶ listener.start() + writeState()          │
 // └────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
-import { readFile } from "node:fs/promises"
+import { readFile, stat } from "node:fs/promises"
 import os from "node:os"
 import { basename, extname, resolve } from "node:path"
 import { exec } from "node:child_process"
@@ -135,7 +136,9 @@ function createHandler({ docsDir }) {
       return new Response("Bad Request", { status: 400 })
     }
 
-    const path = resolve(docsDir, pathname.slice(1))
+    // /sub/ → /sub/index.html
+    const target = pathname.endsWith("/") ? `${pathname}index.html` : pathname
+    const path = resolve(docsDir, target.slice(1))
     if (!isWithin(docsDir, path)) {
       return new Response("Forbidden", { status: 403 })
     }
@@ -151,6 +154,12 @@ function createHandler({ docsDir }) {
       }
       return new Response(body, { headers: { "content-type": type } })
     } catch {
+      // Redirect /sub → /sub/
+      try {
+        if ((await stat(path)).isDirectory()) {
+          return Response.redirect(new URL(`${url.pathname}/`, url), 301)
+        }
+      } catch { }
       return new Response("Not Found", { status: 404 })
     }
   }

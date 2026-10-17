@@ -161,6 +161,24 @@ describe("docserve server", () => {
     assert.equal((await fetch(`http://localhost:${port}/missing.html`)).status, 404)
   })
 
+  it("serves a directory's index.html for slash URLs", async () => {
+    mkdirSync(join(content, "sub"), { recursive: true })
+    writeFileSync(join(content, "sub", "index.html"), "<html><head><title>Sub</title></head><body>sub index</body></html>")
+
+    const slash = await fetch(`http://localhost:${port}/sub/`)
+    assert.equal(slash.status, 200)
+    const body = await slash.text()
+    assert.ok(body.includes("sub index"), "/sub/ serves sub/index.html")
+    assert.ok(body.includes('const pageId = "sub/index.html"'), "directory index gets the reload client")
+
+    const explicit = await fetch(`http://localhost:${port}/sub/index.html`)
+    assert.ok((await explicit.text()).includes("sub index"), "/sub/index.html serves the same file")
+
+    const bare = await fetch(`http://localhost:${port}/sub`, { redirect: "manual" })
+    assert.equal(bare.status, 301, "/sub redirects to the slash form")
+    assert.equal(bare.headers.get("location"), `http://localhost:${port}/sub/`)
+  })
+
   it("targets only the page whose file changed", async () => {
     mkdirSync(join(content, "nested"), { recursive: true })
     const changed = join(content, "nested/changed.html")

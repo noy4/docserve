@@ -629,6 +629,7 @@
           <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched from <code>/api/files</code>; <code>docsDir/index.html</code> is excluded</td></tr>
           <tr><td><code>/api/files</code></td><td>JSON list per <code>*.html</code> — fields below</td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
+          <tr><td><code>/sub/</code></td><td>That directory's <code>index.html</code>; <code>/sub</code> redirects here (<code>301</code>) so relative links resolve</td></tr>
           <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
         </tbody>
       </table>
