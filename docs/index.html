@@ -403,31 +403,21 @@
   /* Footer */
   footer {
     margin-top: 56px;
-    padding-top: 20px;
+    padding-top: 24px;
     border-top: 1px solid var(--border-strong);
     color: var(--muted);
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
-  footer ul { list-style: none; }
-  footer li { padding: 2px 0; }
-  footer li iconify-icon { color: var(--muted); font-size: 14px; vertical-align: -2px; margin-right: 6px; }
+  .foot-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .foot-links { display: flex; gap: 20px; flex-wrap: wrap; }
   footer a { color: var(--primary); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
-  .f-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text);
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .f-title iconify-icon { color: var(--primary); }
-  .colophon {
-    margin-top: 16px;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--muted);
-  }
 </style>
 </head>
 <body>
@@ -564,15 +554,14 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
   </section>
 
   <footer>
-    <div class="f-title">
-      <iconify-icon icon="mdi:link-variant" noobserver></iconify-icon>
-      Links
+    <div class="foot-row">
+      <div>docserve © 2026 noy4 · <a href="https://github.com/noy4/docserve/blob/main/LICENSE" target="_blank" rel="noopener">MIT licensed</a></div>
+      <div class="foot-links">
+        <a href="./demo/">Demo</a>
+        <a href="https://github.com/noy4/docserve" target="_blank" rel="noopener">Repository</a>
+        <a href="https://github.com/noy4/docserve/issues" target="_blank" rel="noopener">Issues</a>
+      </div>
     </div>
-    <ul>
-      <li><iconify-icon icon="mdi:github" noobserver></iconify-icon><a href="https://github.com/noy4/docserve" target="_blank" rel="noopener">noy4/docserve</a> — source</li>
-      <li><iconify-icon icon="mdi:scale-balance" noobserver></iconify-icon><a href="https://github.com/noy4/docserve/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
-    </ul>
-    <div class="colophon">docserve · 2026</div>
   </footer>
 
 </div>
