@@ -217,6 +217,6 @@ if ((RC == 0)); then
     echo "    https://www.npmjs.com/package/@noy4/docserve"
   fi
 else
-  echo "==> release finished with failures. Do NOT recreate tags before checking what was published (see RELEASE.md)." >&2
+  echo "==> release finished with failures. Do NOT recreate tags before checking what was published (see docs/docs/RELEASE.md)." >&2
 fi
 exit $RC
