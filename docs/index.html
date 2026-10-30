@@ -116,6 +116,31 @@
     height: auto;
     border: 0;
   }
+  /* Hero demo — browser chrome around the live gallery */
+  .mock {
+    max-width: 720px;
+    margin: 40px auto 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--shot-shadow);
+  }
+  .mock-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .mock-bar .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mock-bar .dot.r { background: #ff5f57; }
+  .mock-bar .dot.y { background: #febc2e; }
+  .mock-bar .dot.g { background: #28c840; }
+  .mock-body { position: relative; height: 560px; overflow: hidden; background: var(--bg); }
+  .mock-frame { position: absolute; top: 0; left: 0; width: 840px; height: 620px; border: 0; transform-origin: 0 0; background: var(--bg); }
+  @media (max-width: 620px) { .mock-body { height: 420px; } }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -418,9 +443,14 @@
         GitHub
       </a>
     </div>
-    <figure class="hero-shot">
-      <img src="./assets/gallery.webp" alt="docserve gallery — report cards with live previews in the browser" width="1470" height="923" loading="lazy">
-    </figure>
+    <div class="mock">
+      <div class="mock-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      </div>
+      <div class="mock-body">
+        <iframe class="mock-frame" src="./demo/" title="docserve gallery — live demo" loading="lazy"></iframe>
+      </div>
+    </div>
     <figure class="hero-shot hero-video">
       <iframe src="https://www.youtube-nocookie.com/embed/DClpq3JmIIE" title="docserve — Your AI writes HTML. Lots of it. Turn the folder into a live gallery." loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </figure>
@@ -615,6 +645,22 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
   const previewObserver = new ResizeObserver(fitPreviews)
   document.querySelectorAll('.feature-preview').forEach(el => previewObserver.observe(el))
   addEventListener('resize', fitPreviews)
+
+  // Hero demo: render the gallery at a fixed 840px viewport and scale it to the
+  // mock's width, so the embedded content stays dense whatever the box size.
+  const MOCK_VW = 840
+  const mockBody = document.querySelector('.mock-body')
+  function fitMock() {
+    const frame = mockBody?.querySelector('.mock-frame')
+    if (!frame || !mockBody.clientWidth) return
+    const scale = mockBody.clientWidth / MOCK_VW
+    frame.style.width = `${MOCK_VW}px`
+    frame.style.height = `${mockBody.clientHeight / scale}px`
+    frame.style.transform = `scale(${scale})`
+  }
+  fitMock()
+  if (mockBody) new ResizeObserver(fitMock).observe(mockBody)
+  addEventListener('resize', fitMock)
 </script>
 </body>
 </html>
