@@ -64,13 +64,18 @@ export class TrayController {
     }
 
     const recents = this.server.readRecents()
+    // Running rows follow Open Recent order (most recently started first).
+    const order = new Map(recents.map((entry, index) => [entry.dir, index]))
+    const running = [...states].sort(
+      (a, b) => (order.get(a.docsDir) ?? Infinity) - (order.get(b.docsDir) ?? Infinity),
+    )
     const recentItem = recents.length && {
       label: "Open Recent",
       submenu: recents.map(({ dir }) => ({
         label: `${path.basename(dir) || dir} (${tildePath(path.dirname(dir))})`,
         click: () => {
-          const running = states.find((state) => state.docsDir === dir)
-          if (running) shell.openExternal(running.url)
+          const live = states.find((state) => state.docsDir === dir)
+          if (live) shell.openExternal(live.url)
           else this.server.start(dir, { open: true })
         },
       })),
@@ -84,7 +89,7 @@ export class TrayController {
         enabled: false,
       },
       // running servers
-      states.map((state) => ({
+      running.map((state) => ({
         label: `${path.basename(state.docsDir) || state.docsDir} (${tildePath(path.dirname(state.docsDir))})`,
         submenu: [
           {
