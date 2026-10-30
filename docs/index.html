@@ -99,6 +99,21 @@
     flex-wrap: wrap;
     gap: 10px;
   }
+  .cta-band {
+    text-align: center;
+    background: linear-gradient(180deg, var(--primary-soft), transparent 70%), var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 44px 28px;
+  }
+  .cta-band h2 {
+    display: block;
+    justify-content: center;
+    font-size: 1.45rem;
+    margin: 0 0 8px;
+  }
+  .cta-band p { color: var(--muted); margin: 0 auto; max-width: 560px; }
+  .cta-band .cta-row { margin-top: 22px; }
   .hero-shot {
     max-width: 600px;
     margin: 40px auto 0;
@@ -283,17 +298,6 @@
     background: linear-gradient(180deg, var(--surface-2), var(--surface));
     border-bottom: 1px solid var(--border);
     overflow: hidden;
-  }
-  .feature-iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 960px;
-    height: 900px;
-    border: 0;
-    transform-origin: 0 0;
-    pointer-events: none;
-    background: var(--surface);
   }
   .feature-preview iconify-icon {
     font-size: 56px;
@@ -541,48 +545,21 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
     </div>
   </section>
 
-  <!-- FOR DEVELOPERS -->
+  <!-- CTA -->
   <section>
-    <h2><iconify-icon icon="mdi:code-tags" width="24" noobserver></iconify-icon>For developers</h2>
-    <p class="section-desc">How docserve works under the hood.</p>
-
-    <div class="grid-3">
-      <a class="card feature-card" href="./docs/SPEC.html" style="text-decoration:none">
-        <div class="feature-preview">
-          <iframe class="feature-iframe" src="./docs/SPEC.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="SPEC.html preview"></iframe>
-        </div>
-        <div class="feature-body">
-          <h4><iconify-icon icon="mdi:file-document-edit-outline" noobserver></iconify-icon>SPEC.html</h4>
-          <p>Design &amp; implementation spec.</p>
-        </div>
-      </a>
-      <a class="card feature-card" href="./docs/PLAN.html" style="text-decoration:none">
-        <div class="feature-preview">
-          <iframe class="feature-iframe" src="./docs/PLAN.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="PLAN.html preview"></iframe>
-        </div>
-        <div class="feature-body">
-          <h4><iconify-icon icon="mdi:flag-checkered" noobserver></iconify-icon>PLAN.html</h4>
-          <p>Implementation roadmap.</p>
-        </div>
-      </a>
-      <a class="card feature-card" href="./docs/VSCODE_PLAN.html" style="text-decoration:none">
-        <div class="feature-preview">
-          <iframe class="feature-iframe" src="./docs/VSCODE_PLAN.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="VSCODE_PLAN.html preview"></iframe>
-        </div>
-        <div class="feature-body">
-          <h4><iconify-icon icon="mdi:microsoft-visual-studio-code" noobserver></iconify-icon>VSCODE_PLAN.html</h4>
-          <p>VS Code extension roadmap.</p>
-        </div>
-      </a>
-      <a class="card feature-card" href="./docs/DEV.html" style="text-decoration:none">
-        <div class="feature-preview">
-          <iframe class="feature-iframe" src="./docs/DEV.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="DEV.html preview"></iframe>
-        </div>
-        <div class="feature-body">
-          <h4><iconify-icon icon="mdi:hammer-wrench" noobserver></iconify-icon>DEV.html</h4>
-          <p>Repo recipes &amp; conventions.</p>
-        </div>
-      </a>
+    <div class="cta-band">
+      <h2>Turn a folder into a live gallery</h2>
+      <p>Zero dependencies. Free and open source.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary js-dmg" href="https://github.com/noy4/docserve/releases/latest" rel="noopener">
+          <iconify-icon icon="mdi:tray-arrow-down" noobserver></iconify-icon>
+          Download for macOS
+        </a>
+        <a class="btn" href="https://github.com/noy4/docserve" target="_blank" rel="noopener">
+          <iconify-icon icon="mdi:github" noobserver></iconify-icon>
+          GitHub
+        </a>
+      </div>
     </div>
   </section>
 
@@ -632,19 +609,6 @@ npx @noy4/docserve stop               <span style="color:var(--muted)"># stop al
   }
 
   document.querySelectorAll('.js-dmg').forEach(el => el.addEventListener('click', downloadDmg));
-
-  // Gallery-style previews: render each page at a fixed 960px viewport and
-  // scale it down to the card width, like cli/index.html's gallery.
-  function fitPreviews() {
-    for (const preview of document.querySelectorAll('.feature-preview')) {
-      const iframe = preview.querySelector('.feature-iframe')
-      if (iframe) iframe.style.transform = `scale(${preview.clientWidth / 960})`
-    }
-  }
-  fitPreviews()
-  const previewObserver = new ResizeObserver(fitPreviews)
-  document.querySelectorAll('.feature-preview').forEach(el => previewObserver.observe(el))
-  addEventListener('resize', fitPreviews)
 
   // Hero demo: render the gallery at a fixed 840px viewport and scale it to the
   // mock's width, so the embedded content stays dense whatever the box size.
