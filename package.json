@@ -1,0 +1,7 @@
+{
+  "name": "docserve",
+  "private": true,
+  "scripts": {
+    "dev": "npm -C desktop start"
+  }
+}
