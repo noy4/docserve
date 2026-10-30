@@ -1,6 +1,7 @@
 {
   "name": "docserve",
   "private": true,
+  "packageManager": "npm@10.9.8",
   "scripts": {
     "dev": "npm -C desktop start"
   }
