@@ -63,10 +63,10 @@ export class TrayController {
       updateItems.push(___)
     }
 
-    const recentDirs = this.server.readRecentDirs()
-    const recentItem = recentDirs.length && {
+    const recents = this.server.readRecents()
+    const recentItem = recents.length && {
       label: "Open Recent",
-      submenu: recentDirs.map((dir) => ({
+      submenu: recents.map(({ dir }) => ({
         label: `${path.basename(dir) || dir} (${tildePath(path.dirname(dir))})`,
         click: () => {
           const running = states.find((state) => state.docsDir === dir)
@@ -115,7 +115,7 @@ export class TrayController {
     }
     const result = await dialog.showOpenDialog({
       title: "docserve — Choose a folder to serve",
-      defaultPath: this.server.readRecentDirs()[0] || os.homedir(),
+      defaultPath: this.server.readRecents()[0]?.dir || os.homedir(),
       properties: ["openDirectory"],
     })
     const dir = result.filePaths[0]

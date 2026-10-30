@@ -63,7 +63,7 @@ class App {
         this.server.start(dir, { silent: true })
       return
     }
-    const dir = this.server.readRecentDirs()[0]
+    const dir = this.server.readRecents()[0]?.dir
     if (dir) {
       this.server.start(dir, { silent: true })
     } else {

@@ -19,7 +19,7 @@ function desktopFile() {
   return path.join(homeDir(), "desktop.json")
 }
 
-const MAX_RECENT_DIRS = 10
+const MAX_RECENTS = 10
 
 // CLI candidates: dev layout, packaged asarUnpack / extraResources, PATH.
 function resolveCliEntry() {
@@ -54,15 +54,19 @@ export class ServerManager {
     return this.startingDirs.size > 0
   }
 
-  start(dir, { open = false, silent = false } = {}) {
+  start(dir, { open = false, silent = false, port = null } = {}) {
     if (!dir || this.startingDirs.has(dir)) return
+    const preferredPort = port ?? this.readRecents().find((entry) => entry.dir === dir)?.port ?? null
     this.startingDirs.add(dir)
     this.startTimers.set(dir, setTimeout(() => this.#clearStart(dir), START_TIMEOUT_MS))
-    this.pushRecentDir(dir)
+    this.pushRecent(dir, preferredPort)
     this.#changed()
     console.log(`[docserve-desktop] start: ${dir}${open ? " (open)" : ""}${silent ? " (silent)" : ""}`)
 
-    const { command, args, env } = this.#cliCommand([dir, "--background", ...(open ? ["--open"] : [])])
+    const spawnArgs = [dir, "--background"]
+    if (open) spawnArgs.push("--open")
+    if (preferredPort) spawnArgs.push("--port", preferredPort)
+    const { command, args, env } = this.#cliCommand(spawnArgs)
     const child = spawn(command, args, { env, stdio: ["ignore", "ignore", "pipe"] })
     let stderr = ""
     child.stderr?.on("data", (chunk) => {
@@ -100,13 +104,17 @@ export class ServerManager {
     }
   }
 
-  // Called on before-quit; the next launch resumes exactly this set.
+  // called on before-quit. the next launch resumes exactly this set
   snapshotRunningDirs() {
-    const dirs = this.getStates().map((state) => state.docsDir)
-    try {
-      fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
-      writeJsonAtomic(desktopFile(), { recentDirs: this.readRecentDirs(), resumeDirs: dirs })
-    } catch { }
+    const states = this.getStates()
+    const recents = this.readRecents().map((entry) => {
+      const live = states.find((state) => state.docsDir === entry.dir)
+      return live ? { dir: entry.dir, port: live.port } : entry
+    })
+    this.#writeDesktopJson({
+      recents,
+      resumeDirs: states.map((state) => state.docsDir),
+    })
   }
 
   ensureCliSymlink() {
@@ -137,10 +145,15 @@ export class ServerManager {
     }
   }
 
-  readRecentDirs() {
+  readRecents() {
     const data = readJson(desktopFile())
-    if (Array.isArray(data?.recentDirs)) return data.recentDirs.filter((d) => typeof d === "string")
-    return typeof data?.lastDir === "string" ? [data.lastDir] : []
+    if (!Array.isArray(data?.recents)) return []
+    return data.recents
+      .filter((entry) => entry && typeof entry.dir === "string")
+      .map((entry) => ({
+        dir: entry.dir,
+        port: typeof entry.port === "number" ? entry.port : null,
+      }))
   }
 
   readResumeDirs() {
@@ -148,12 +161,18 @@ export class ServerManager {
     return Array.isArray(data?.resumeDirs) ? data.resumeDirs.filter((d) => typeof d === "string") : null
   }
 
-  pushRecentDir(dir) {
-    const dirs = [dir, ...this.readRecentDirs().filter((d) => d !== dir)].slice(0, MAX_RECENT_DIRS)
-    try {
-      fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
-      writeJsonAtomic(desktopFile(), { recentDirs: dirs })
-    } catch { }
+  pushRecent(dir, port = null) {
+    const existing = this.readRecents()
+    const prevPort = existing.find((entry) => entry.dir === dir)?.port ?? null
+    const recents = [
+      { dir, port: port ?? prevPort },
+      ...existing.filter((entry) => entry.dir !== dir),
+    ]
+      .slice(0, MAX_RECENTS)
+    this.#writeDesktopJson({
+      recents,
+      resumeDirs: this.readResumeDirs() ?? [],
+    })
   }
 
   watchPaths() {
@@ -162,6 +181,14 @@ export class ServerManager {
 
   #changed() {
     this.onChange?.()
+  }
+
+  // Atomic write: a group-wide Ctrl+C can kill the app mid-write.
+  #writeDesktopJson(data) {
+    try {
+      fs.mkdirSync(path.dirname(desktopFile()), { recursive: true })
+      writeJsonAtomic(desktopFile(), data)
+    } catch { }
   }
 
   #clearStart(dir) {
