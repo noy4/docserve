@@ -41,7 +41,7 @@
       },
       {
         "command": "docserve.stop",
-        "title": "Stop Server",
+        "title": "Stop Workspace Server",
         "category": "Docserve"
       },
       {

@@ -58,17 +58,17 @@ export async function list(): Promise<void> {
 
   if (mine) {
     items.push({
-      label: "$(link-external) Open Gallery",
+      label: "$(link-external) Open Workspace Gallery",
       description: mine.url,
       run: () => openGallery(mine),
     })
     items.push({
-      label: "$(stop-circle) Stop Gallery",
+      label: "$(stop-circle) Stop Workspace Server",
       run: () => void stopWithProgress(mine),
     })
   } else if (folders.length > 0) {
     items.push({
-      label: "$(play) Start & Open Gallery",
+      label: "$(play) Start & Open Workspace Gallery",
       description: folders.length === 1 ? tildify(folders[0]) : "choose folder…",
       run: () => void pickFolder(startServerIn),
     })
