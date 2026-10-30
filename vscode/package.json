@@ -35,6 +35,11 @@
         "category": "Docserve"
       },
       {
+        "command": "docserve.openFolder",
+        "title": "Open Folder…",
+        "category": "Docserve"
+      },
+      {
         "command": "docserve.stop",
         "title": "Stop Server",
         "category": "Docserve"

@@ -93,7 +93,7 @@ export async function list(): Promise<void> {
   }
 
   const actions: (vscode.QuickPickItem & { run?: () => void })[] = [
-    { label: "$(folder-opened) Open Folder…", run: () => void startWithDialog() },
+    { label: "$(folder-opened) Open Folder…", run: () => void openFolder() },
   ]
   if (states.length > 0) actions.push({ label: "$(circle-slash) Stop All", run: stopAll })
   if (items.length > 0) items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
@@ -105,7 +105,8 @@ export async function list(): Promise<void> {
 
 // --- Actions ---
 
-async function startWithDialog(): Promise<void> {
+/** Open a folder picker, then start and open the gallery in that folder. */
+export async function openFolder(): Promise<void> {
   const folder = await pickAnyFolder()
   if (folder) await startServerIn(folder)
 }
