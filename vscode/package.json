@@ -31,7 +31,7 @@
     "commands": [
       {
         "command": "docserve.open",
-        "title": "Open Gallery",
+        "title": "Open Workspace Gallery",
         "category": "Docserve"
       },
       {
