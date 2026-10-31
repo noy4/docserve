@@ -27,7 +27,7 @@ Desktop and CLI versions are independent. If the publish fails with auth errors,
 
 1. Bump `version` in `vscode/package.json`
 2. Commit and push `main`
-3. Publish: `npx vsce package` in `vscode/`, then upload the `.vsix` via the manage portal (More Actions → Update): https://marketplace.visualstudio.com/manage/publishers/noy4/extensions/docserve/hub
+3. Publish: `npx vsce package` in `vscode/`, then upload the `.vsix` via the manage portal (More Actions → Update): https://marketplace.visualstudio.com/manage/publishers/noy4
 
 Notes:
 
