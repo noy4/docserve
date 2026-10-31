@@ -27,8 +27,9 @@ Desktop and CLI versions are independent. If the publish fails with auth errors,
 
 1. Bump `version` in `vscode/package.json`
 2. Commit and push `main`
-3. Publish: `npx vsce package` in `vscode/`, then upload the `.vsix` via the manage portal (More Actions → Update)
+3. Publish: `npx vsce package` in `vscode/`, then upload the `.vsix` via the manage portal (More Actions → Update): https://marketplace.visualstudio.com/manage/publishers/noy4/extensions/docserve/hub
 
 Notes:
 
-- The `publish-vscode` workflow (tag `vscode-v*`) is not usable yet — it needs a trusted publishing policy on the publisher page, which isn't available there yet
+- The `publish-vscode` workflow (tag `vscode-v*`) fails with `401 Unauthorized: The token could not be exchanged for the specified publisher` until a trusted publishing policy exists on the publisher page: https://marketplace.visualstudio.com/manage/publishers/noy4
+- Requires `@vscode/vsce` >= 4 for the `--oidc` flag
