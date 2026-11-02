@@ -1,0 +1,71 @@
+.toc {
+  --content-width: 720px;
+  --gutter: 96px;
+  display: none;
+  position: fixed;
+  top: 96px;
+  left: calc(50% + var(--content-width) / 2 + var(--gutter));
+  width: 200px;
+  max-height: calc(100vh - 128px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+@media (min-width: 1240px) {
+  .toc {
+    display: block;
+  }
+}
+.toc-title {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.toc-content {
+  position: relative;
+  border-left: 1px solid var(--border);
+}
+.toc-marker {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 2px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--primary);
+  opacity: 0;
+  transition:
+    top 0.25s cubic-bezier(0, 1, 0.5, 1),
+    opacity 0.25s;
+}
+.toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.toc ul ul {
+  padding-left: 13px;
+}
+.toc a {
+  display: block;
+  padding: 3px 8px 3px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+}
+.toc a:hover {
+  color: var(--text-strong);
+}
+.toc a.active {
+  color: var(--primary);
+}
+.toc iconify-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  vertical-align: -2px;
+  margin-right: 5px;
+}
+.toc a.active iconify-icon {
+  color: inherit;
+}
