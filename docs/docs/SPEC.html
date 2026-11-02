@@ -453,7 +453,7 @@
 │       ├── index.mjs             <span class="c"># HTTP server + lifecycle</span>
 │       ├── state.mjs             <span class="c"># per-instance state files · pid liveness</span>
 │       ├── files.mjs             <span class="c"># *.html listing · meta + git dates · path utils</span>
-│       ├── inject.mjs            <span class="c"># reload client + copy button</span>
+│       ├── inject.mjs            <span class="c"># reload client · stylesheet refresh · copy button</span>
 │       ├── websocket.mjs         <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
 │       └── watch.mjs             <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
 └── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
@@ -760,7 +760,7 @@
           <iconify-icon icon="mdi:file-eye-outline" noobserver></iconify-icon>
           <h4>Detection</h4>
         </div>
-        <p>A single <code>fs.watch(docsDir, { recursive: true })</code>, filtered to <code>*.html</code>.</p>
+        <p>A single <code>fs.watch(docsDir, { recursive: true })</code>, filtered to <code>*.html</code> and <code>*.css</code>.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -776,6 +776,13 @@
         </div>
         <p>On socket close, page tabs reload after 1 s and recover once the server is back.</p>
       </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:palette-swatch-outline" noobserver></iconify-icon>
+          <h4>Stylesheet refresh</h4>
+        </div>
+        <p>A <code>css</code> message re-fetches same-origin <code>&lt;link rel="stylesheet"&gt;</code> in place — no reload, state preserved.</p>
+      </div>
     </div>
 
     <h3><iconify-icon icon="mdi:code-json" noobserver></iconify-icon>Message format</h3>
@@ -787,6 +794,11 @@
   "templateChanged": false                 <span class="c">// true when the gallery template itself was edited</span>
 }</pre>
 
+    <pre>{
+  "type": "css",
+  "files": ["styles/main.css", "theme/dark.css"]   <span class="c">// docsDir-relative stylesheets touched in the batch</span>
+}</pre>
+
     <h3><iconify-icon icon="mdi:tab" noobserver></iconify-icon>Who reloads when</h3>
 
     <div class="table-wrap">
@@ -795,7 +807,7 @@
           <tr><th>Client</th><th>Reloads when</th></tr>
         </thead>
         <tbody>
-          <tr><td>Page tab</td><td>Its own path appears in <code>pages</code></td></tr>
+          <tr><td>Page tab</td><td>Its own path appears in <code>pages</code>, or a <code>css</code> message refreshes its stylesheets</td></tr>
           <tr><td>Gallery tab</td><td><code>contentSetChanged</code> or <code>templateChanged</code> is <code>true</code></td></tr>
           <tr><td>iframe preview</td><td>Never connects — the <code>window.self !== window.top</code> guard keeps edits from reloading previews</td></tr>
         </tbody>
@@ -816,7 +828,7 @@
           <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
           <h4>Reload client</h4>
         </div>
-        <p>Connects to <code>/__reload</code> and follows the Reload protocol.</p>
+        <p>Connects to <code>/__reload</code>, follows the Reload protocol, and re-fetches linked stylesheets on a <code>css</code> message.</p>
       </div>
       <div class="card">
         <div class="card-head">

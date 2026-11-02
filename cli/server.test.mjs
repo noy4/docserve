@@ -86,6 +86,26 @@ function waitForChange(ws, match, timeoutMs = 3000) {
   })
 }
 
+// Resolve with the next css message matching the predicate; others are skipped.
+function waitForCss(ws, match, timeoutMs = 3000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("timeout waiting for css")), timeoutMs)
+    ws.addEventListener("message", function onMessage(e) {
+      let msg
+      try { msg = JSON.parse(e.data) } catch { return }
+      if (msg?.type === "css" && match(msg)) {
+        clearTimeout(timer)
+        ws.removeEventListener("message", onMessage)
+        resolve(msg)
+      }
+    })
+    ws.addEventListener("error", (err) => {
+      clearTimeout(timer)
+      reject(err)
+    })
+  })
+}
+
 describe("docserve server", () => {
   let child
   let port
@@ -225,6 +245,41 @@ describe("docserve server", () => {
     } finally {
       rmSync(file, { force: true })
       ws.close()
+    }
+  })
+
+  it("broadcasts one css message for a burst of stylesheet edits", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "docserve-css-"))
+    const testPort = 36000 + Math.floor(Math.random() * 8000)
+    const { close } = await runServer({ docsDir: dir, port: testPort })
+    const ws = new WebSocket(`ws://localhost:${testPort}${WS_PATH}`)
+    await once(ws, "open")
+    try {
+      writeFileSync(join(dir, "a.css"), "body{}")
+      writeFileSync(join(dir, "b.css"), "body{}")
+      const msg = await waitForCss(ws, (c) => c.files.includes("a.css") && c.files.includes("b.css"))
+      assert.deepEqual([...msg.files].sort(), ["a.css", "b.css"])
+    } finally {
+      ws.close()
+      close()
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it("ignores stylesheet changes under hidden directories", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "docserve-css-ignore-"))
+    const testPort = 36000 + Math.floor(Math.random() * 8000)
+    const { close } = await runServer({ docsDir: dir, port: testPort })
+    const ws = new WebSocket(`ws://localhost:${testPort}${WS_PATH}`)
+    await once(ws, "open")
+    try {
+      mkdirSync(join(dir, ".git"), { recursive: true })
+      writeFileSync(join(dir, ".git", "hidden.css"), "body{}")
+      await assert.rejects(waitForCss(ws, () => true, 700), /timeout/)
+    } finally {
+      ws.close()
+      close()
+      rmSync(dir, { recursive: true, force: true })
     }
   })
 

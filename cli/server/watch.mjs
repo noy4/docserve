@@ -1,16 +1,11 @@
-// FileWatcher: watch docsDir recursively for *.html changes and broadcast
-// debounced batches over the reload socket. The gallery template is watched
-// too; its edits set templateChanged so gallery tabs pick them up even though
-// nothing in docsDir changed.
-//
-// The gallery list is every *.html except any index.html; files outside that
-// set never flip contentSetChanged.
+// Watches docsDir for *.html / *.css and the gallery template, broadcasting
+// debounced reload batches. The gallery set is every *.html except index.html;
+// only additions/removals flip contentSetChanged.
 import { existsSync, watch } from "node:fs"
 import { basename, dirname, resolve } from "node:path"
 import { isWithin, listHtmlFiles, normalizedRelative, shouldIgnore } from "./files.mjs"
 
-const DEBOUNCE_MS = 50 // like livePreview.previewDebounceDelay
-const TEMPLATE_TOUCH = "\u0000template" // sentinel: never a real docsDir-relative path
+const DEBOUNCE_MS = 50
 
 export class FileWatcher {
   constructor(options = {}) {
@@ -19,14 +14,25 @@ export class FileWatcher {
     this.templatePath = options.templatePath
     this.debounceMs = options.debounceMs ?? DEBOUNCE_MS
     this.knownFiles = new Set()
-    this.broadcastQueue = Promise.resolve()
+    this.queue = Promise.resolve()
     this.watchers = []
+    this.pending = { pages: new Set(), css: new Set(), template: false }
 
-    this.queueBroadcast = debounceBatch((touched) => {
-      this.broadcastQueue = this.broadcastQueue
-        .then(() => this.broadcastChanges(touched))
-        .catch((error) => console.error(error))
+    // html/css/template edits in one burst flush together
+    this.queueFlush = debounce(() => {
+      const { pages, css, template } = this.pending
+      this.pending = { pages: new Set(), css: new Set(), template: false }
+      if (pages.size || template) {
+        this.enqueue(() => this.broadcastChanges({ pages: [...pages], template }))
+      }
+      if (css.size)
+        this.enqueue(() => this.broadcastCss([...css]))
     }, this.debounceMs)
+  }
+
+  enqueue(task) {
+    this.queue = this.queue.then(task)
+      .catch((error) => console.error(error))
   }
 
   async start() {
@@ -40,47 +46,47 @@ export class FileWatcher {
 
     this.watchers.push(
       watch(this.docsDir, { recursive: true }, (event, filename) => {
-        if (!filename?.endsWith(".html")) return
-        if (shouldIgnore(filename)) return
+        if (!filename || shouldIgnore(filename)) return
         const full = resolve(this.docsDir, filename)
         if (!isWithin(this.docsDir, full)) return
-        this.queueBroadcast(normalizedRelative(this.docsDir, full))
-      }).on("error", () => {}),
+        const rel = normalizedRelative(this.docsDir, full)
+
+        if (filename.endsWith(".html")) {
+          this.pending.pages.add(rel)
+          this.queueFlush()
+        } else if (filename.endsWith(".css")) {
+          this.pending.css.add(rel)
+          this.queueFlush()
+        }
+      }).on("error", () => { }),
     )
 
     if (this.templatePath) {
-      // Watch the template's directory: atomic saves replace the file, so the
-      // file itself would miss events.
+      // Watch the directory
       const templateName = basename(this.templatePath)
       this.watchers.push(
         watch(dirname(this.templatePath), (event, filename) => {
-          if (filename === templateName) this.queueBroadcast(TEMPLATE_TOUCH)
-        }).on("error", () => {}),
+          if (filename === templateName) {
+            this.pending.template = true
+            this.queueFlush()
+          }
+        }).on("error", () => { }),
       )
     }
   }
 
-  async broadcastChanges(touched) {
-    let contentSetChanged = false
-    const templateChanged = touched.includes(TEMPLATE_TOUCH)
-    const pages = touched.filter((rel) => rel !== TEMPLATE_TOUCH)
+  async broadcastChanges({ pages, template }) {
+    this.wss.broadcast({
+      type: "change",
+      pages,
+      contentSetChanged: syncKnownFiles(this.knownFiles, this.docsDir, pages),
+      templateChanged: template,
+    })
+  }
 
-    for (const rel of pages) {
-      if (basename(rel) === "index.html") continue // never a gallery card
-      const full = resolve(this.docsDir, rel)
-      const exists = existsSync(full)
-      const wasKnown = this.knownFiles.has(rel)
-
-      if (exists && !wasKnown) {
-        this.knownFiles.add(rel)
-        contentSetChanged = true
-      } else if (!exists && wasKnown) {
-        this.knownFiles.delete(rel)
-        contentSetChanged = true
-      }
-    }
-
-    this.wss.broadcast({ type: "change", pages, contentSetChanged, templateChanged })
+  // Refresh linked stylesheets in place.
+  broadcastCss(files) {
+    this.wss.broadcast({ type: "css", files })
   }
 
   close() {
@@ -88,17 +94,26 @@ export class FileWatcher {
   }
 }
 
-// Accumulate items during the debounce window and deliver them as one batch.
-function debounceBatch(fn, ms) {
+// True when pages were added to or removed from the gallery.
+function syncKnownFiles(knownFiles, docsDir, pages) {
+  let changed = false
+  for (const rel of pages) {
+    if (basename(rel) === "index.html") continue // not a gallery card
+    const exists = existsSync(resolve(docsDir, rel))
+    const wasKnown = knownFiles.has(rel)
+    if (exists === wasKnown) continue
+    if (exists) knownFiles.add(rel)
+    else knownFiles.delete(rel)
+    changed = true
+  }
+  return changed
+}
+
+// Trailing-edge debounce.
+function debounce(fn, ms) {
   let timer = null
-  const pending = new Set()
-  return (item) => {
-    pending.add(item)
+  return () => {
     clearTimeout(timer)
-    timer = setTimeout(() => {
-      const items = [...pending]
-      pending.clear()
-      fn(items)
-    }, ms)
+    timer = setTimeout(fn, ms)
   }
 }
