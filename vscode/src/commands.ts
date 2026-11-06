@@ -28,7 +28,7 @@ export async function open(): Promise<void> {
 export async function stop(): Promise<void> {
   const states = listLiveStates()
   if (states.length === 0) {
-    void vscode.window.showInformationMessage("docserve: no servers running")
+    vscode.window.showInformationMessage("docserve: no servers running")
     return
   }
   const folders = vscode.workspace.workspaceFolders?.map((f) => path.resolve(f.uri.fsPath)) ?? []
@@ -64,13 +64,13 @@ export async function list(): Promise<void> {
     })
     items.push({
       label: "$(stop-circle) Stop Workspace Server",
-      run: () => void stopWithProgress(mine),
+      run: () => stopWithProgress(mine),
     })
   } else if (folders.length > 0) {
     items.push({
       label: "$(play) Start & Open Workspace Gallery",
       description: folders.length === 1 ? tildify(folders[0]) : "choose folder…",
-      run: () => void pickFolder(startServerIn),
+      run: () => pickFolder(startServerIn),
     })
   }
 
@@ -87,13 +87,13 @@ export async function list(): Promise<void> {
     for (const s of states) {
       items.push({
         label: `$(stop-circle) Stop ${serverLabel(s)}`,
-        run: () => void stopWithProgress(s),
+        run: () => stopWithProgress(s),
       })
     }
   }
 
   const actions: (vscode.QuickPickItem & { run?: () => void })[] = [
-    { label: "$(folder-opened) Open Folder…", run: () => void openFolder() },
+    { label: "$(folder-opened) Open Folder…", run: () => openFolder() },
   ]
   if (states.length > 0) actions.push({ label: "$(circle-slash) Stop All", run: stopAll })
   if (items.length > 0) items.push({ kind: vscode.QuickPickItemKind.Separator, label: "actions" })
@@ -119,14 +119,14 @@ export async function openFolder(): Promise<void> {
 export async function openFile(uri?: vscode.Uri): Promise<void> {
   const file = targetFile(uri)
   if (!file || !/\.html?$/i.test(file)) {
-    void vscode.window.showInformationMessage("docserve: right-click an HTML file to open it with docserve")
+    vscode.window.showInformationMessage("docserve: right-click an HTML file to open it with docserve")
     return
   }
   const root = serveRoot(file)
   const state = await ensureServer(root)
   if (!state) return
   const url = new URL(toUrlPath(path.relative(root, file)), state.url).toString()
-  void vscode.env.openExternal(vscode.Uri.parse(url))
+  vscode.env.openExternal(vscode.Uri.parse(url))
 }
 
 async function startServerIn(folder: string): Promise<void> {
@@ -145,7 +145,7 @@ async function ensureServer(folder: string): Promise<DocserveState | undefined> 
   })
   if (result.ok) return result.state
   if (result.reason === "enoent") showCliMissing()
-  else void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
+  else vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
   return undefined
 }
 
@@ -161,7 +161,7 @@ async function stopWithProgress(state: DocserveState): Promise<void> {
 async function pickRunningServer(): Promise<DocserveState | undefined> {
   const states = listLiveStates()
   if (states.length === 0) {
-    void vscode.window.showInformationMessage("docserve: no servers running")
+    vscode.window.showInformationMessage("docserve: no servers running")
     return undefined
   }
   if (states.length === 1) return states[0]
@@ -196,7 +196,7 @@ async function pickAnyFolder(): Promise<string | undefined> {
 // --- Helpers ---
 
 function openGallery(state: DocserveState): void {
-  void vscode.env.openExternal(vscode.Uri.parse(state.url))
+  vscode.env.openExternal(vscode.Uri.parse(state.url))
 }
 
 // The file the command targets: an explorer/editor URI, else the active editor.
@@ -236,13 +236,13 @@ function tildify(p: string): string {
 }
 
 function showCliMissing(): void {
-  void vscode.window
+  vscode.window
     .showErrorMessage(
       "docserve: CLI not found (requires Node.js / npx). Set docserve.cliCommand if it lives elsewhere.",
       "Open Settings",
     )
     .then((pick) => {
-      if (pick) void vscode.commands.executeCommand("workbench.action.openSettings", "docserve.cliCommand")
+      if (pick) vscode.commands.executeCommand("workbench.action.openSettings", "docserve.cliCommand")
     })
 }
 

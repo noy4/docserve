@@ -57,7 +57,7 @@ function runCli(args: string[]): Promise<void> {
     const child = spawn(runner.command, [...runner.args, ...args], { stdio: "ignore" })
     child.on("error", (err) => {
       channel().appendLine(`[error] ${err.message}`)
-      void vscode.window.showErrorMessage(`docserve: failed to run CLI — ${err.message}`)
+      vscode.window.showErrorMessage(`docserve: failed to run CLI — ${err.message}`)
       resolve()
     })
     child.on("close", () => resolve())
