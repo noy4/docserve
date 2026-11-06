@@ -35,6 +35,11 @@
         "category": "Docserve"
       },
       {
+        "command": "docserve.openFile",
+        "title": "Open with Docserve",
+        "category": "Docserve"
+      },
+      {
         "command": "docserve.openFolder",
         "title": "Open Folder…",
         "category": "Docserve"
@@ -55,6 +60,34 @@
         "category": "Docserve"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "docserve.openFile",
+          "when": "resourceExtname == .html || resourceExtname == .htm",
+          "group": "navigation@20"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "docserve.openFile",
+          "when": "resourceExtname == .html || resourceExtname == .htm",
+          "group": "navigation@20"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "docserve.openFile",
+          "when": "resourceExtname == .html || resourceExtname == .htm"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "docserve.openFile",
+          "when": "resourceExtname == .html || resourceExtname == .htm"
+        }
+      ]
+    },
     "configuration": {
       "title": "Docserve",
       "properties": {

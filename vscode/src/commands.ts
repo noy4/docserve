@@ -2,7 +2,7 @@ import * as os from "node:os"
 import * as path from "node:path"
 import * as vscode from "vscode"
 import { startServer, stopAllServers, stopServer } from "./server"
-import { DocserveState, listLiveStates } from "./state"
+import { DocserveState, findByDir, listLiveStates } from "./state"
 
 // --- Commands ---
 
@@ -111,18 +111,42 @@ export async function openFolder(): Promise<void> {
   if (folder) await startServerIn(folder)
 }
 
+/**
+ * "Open with Docserve" — the explorer/editor-file analogue of Live Server.
+ * Serves the workspace folder that holds the file (its own folder outside a
+ * workspace) and opens that file's URL, starting the server first if needed.
+ */
+export async function openFile(uri?: vscode.Uri): Promise<void> {
+  const file = targetFile(uri)
+  if (!file || !/\.html?$/i.test(file)) {
+    void vscode.window.showInformationMessage("docserve: right-click an HTML file to open it with docserve")
+    return
+  }
+  const root = serveRoot(file)
+  const state = await ensureServer(root)
+  if (!state) return
+  const url = new URL(toUrlPath(path.relative(root, file)), state.url).toString()
+  void vscode.env.openExternal(vscode.Uri.parse(url))
+}
+
 async function startServerIn(folder: string): Promise<void> {
+  const state = await ensureServer(folder)
+  if (state) openGallery(state)
+}
+
+/** Reuse the running server for this folder, or start one and wait for its state. */
+async function ensureServer(folder: string): Promise<DocserveState | undefined> {
+  const existing = findByDir(listLiveStates(), folder)
+  if (existing) return existing
+
   const result = await progress({
     title: `docserve: starting ${path.basename(folder)}…`,
     task: () => startServer(folder),
   })
-  if (result.ok) {
-    openGallery(result.state)
-  } else if (result.reason === "enoent") {
-    showCliMissing()
-  } else {
-    void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
-  }
+  if (result.ok) return result.state
+  if (result.reason === "enoent") showCliMissing()
+  else void vscode.window.showErrorMessage("docserve: server did not report startup (timeout)")
+  return undefined
 }
 
 async function stopWithProgress(state: DocserveState): Promise<void> {
@@ -173,6 +197,32 @@ async function pickAnyFolder(): Promise<string | undefined> {
 
 function openGallery(state: DocserveState): void {
   void vscode.env.openExternal(vscode.Uri.parse(state.url))
+}
+
+// The file the command targets: an explorer/editor URI, else the active editor.
+function targetFile(uri?: vscode.Uri): string | undefined {
+  if (uri?.scheme === "file") return uri.fsPath
+  const active = vscode.window.activeTextEditor?.document.uri
+  return active?.scheme === "file" ? active.fsPath : undefined
+}
+
+// Serve the innermost workspace folder that contains the file, else its folder.
+function serveRoot(file: string): string {
+  const owner = (vscode.workspace.workspaceFolders ?? [])
+    .map((f) => path.resolve(f.uri.fsPath))
+    .filter((dir) => isInside(dir, file))
+    .sort((a, b) => b.length - a.length)[0]
+  return owner ?? path.dirname(file)
+}
+
+function isInside(dir: string, file: string): boolean {
+  const rel = path.relative(dir, file)
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel)
+}
+
+// docsDir-relative path → URL path: forward slashes, percent-encoded segments.
+function toUrlPath(relative: string): string {
+  return relative.split(path.sep).map(encodeURIComponent).join("/")
 }
 
 // "reports (~/repos/research)" — same shape as the desktop tray menu

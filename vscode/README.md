@@ -16,6 +16,7 @@ Serve a folder of HTML as a card gallery with live reload — control [docserve]
 | Command | Title |
 | --- | --- |
 | `docserve.open` | Docserve: Open Workspace Gallery |
+| `docserve.openFile` | Docserve: Open with Docserve |
 | `docserve.openFolder` | Docserve: Open Folder… |
 | `docserve.stop` | Docserve: Stop Workspace Server |
 | `docserve.stopAll` | Docserve: Stop All Servers |
