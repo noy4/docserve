@@ -4,19 +4,20 @@ import { el } from "./lib/dom.js"
 import { createEmitter } from "./lib/emitter.js"
 import { connectLive } from "./live.js"
 import { createPages } from "./pages.js"
+import { createPlacement } from "./placement.js"
 import { createPlugins } from "./plugins.js"
 import { createRpc } from "./rpc.js"
 import { createUi } from "./ui.js"
 
-// Inline in the shadow root so the dock has its shape before widget.css loads.
+// Inline `<style>` in the shadow root: keeps the host out of the layout and
+// hidden until `reveal()` sets `data-ready`. The rules after it are only a
+// fallback for a stylesheet that never loads.
 const CRITICAL_CSS = [
-  ":host{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:2147483647;margin:0;padding:0;line-height:0;visibility:hidden}",
-  ":host([data-ready]){visibility:visible}",
+  ":host{display:none;position:fixed;right:16px;bottom:16px;z-index:2147483647;margin:0;padding:0;line-height:0}",
+  ":host([data-ready]){display:block}",
   ".docserve-dock{display:flex;align-items:center}",
-  ".docserve-dock__button{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;background:none;color:inherit}",
-  ".docserve-dock__button svg{width:18px;height:18px}",
+  ".docserve-dock__button{display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;background:none;color:inherit}",
   ".docserve-dock__status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}",
-  ".docserve-panel:not([data-open]){display:none}",
 ].join("")
 
 /**
@@ -39,6 +40,7 @@ export function createHost() {
   const rpc = createRpc()
   const pages = createPages({ rpc })
   const dock = createDock({ host: shadow, getContext: () => ctx })
+  const placement = createPlacement({ element, handle: dock.element })
   const { on, emit } = createEmitter()
   const ui = createUi({ host: shadow, status })
   ui.style("/__docserve/widget/widget.css")
@@ -87,6 +89,7 @@ export function createHost() {
     live?.close()
     live = null
     if (mounted) {
+      placement.destroy()
       document.documentElement.toggleAttribute("data-docserve-widget", false)
       element.toggleAttribute("data-ready", false)
       element.remove()
