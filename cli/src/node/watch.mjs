@@ -3,7 +3,7 @@
 // only additions/removals flip contentSetChanged.
 import { existsSync, watch } from "node:fs"
 import { basename, dirname, resolve } from "node:path"
-import { isWithin, listHtmlFiles, normalizedRelative, shouldIgnore } from "./files.mjs"
+import { isWithin, listHtmlFiles, normalizedRelative, shouldIgnore } from "./scan.mjs"
 
 const DEBOUNCE_MS = 50
 

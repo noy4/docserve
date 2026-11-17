@@ -12,8 +12,8 @@ import { existsSync, readFileSync, readdirSync, mkdirSync, mkdtempSync, rmSync, 
 import { tmpdir } from "node:os"
 import { basename, join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
-import { runServer } from "../src/node/index.mjs"
-import { listHtmlFiles, shouldIgnore } from "../src/node/files.mjs"
+import { runServer } from "../src/node/server.mjs"
+import { listHtmlFiles, shouldIgnore } from "../src/node/scan.mjs"
 
 const CLI = join(dirname(dirname(fileURLToPath(import.meta.url))), "bin.mjs")
 const PORT = 20000 + Math.floor(Math.random() * 20000)

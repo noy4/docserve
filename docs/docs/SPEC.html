@@ -418,9 +418,15 @@
 │   ├── index.html                <span class="c"># gallery template, served at /</span>
 │   └── src/
 │       ├── node/
-│       │   ├── index.mjs         <span class="c"># HTTP server · asset routes · lifecycle</span>
+│       │   ├── server.mjs        <span class="c"># listen · port fallback · lifecycle</span>
+│       │   ├── routes.mjs        <span class="c"># HTTP routes</span>
+│       │   ├── assets.mjs        <span class="c"># MIME + widget/plugin files</span>
+│       │   ├── gallery.mjs       <span class="c"># gallery template response</span>
 │       │   ├── state.mjs         <span class="c"># per-instance state files · pid liveness</span>
-│       │   ├── files.mjs         <span class="c"># *.html listing · meta + git dates · path utils</span>
+│       │   ├── scan.mjs          <span class="c"># *.html listing · path guards</span>
+│       │   ├── meta.mjs          <span class="c"># title · created_at · favicon</span>
+│       │   ├── dates.mjs         <span class="c"># git created/modified dates</span>
+│       │   ├── files.mjs         <span class="c"># /api/files composition</span>
 │       │   ├── inject.mjs        <span class="c"># widget tags · idempotent insertion</span>
 │       │   ├── websocket.mjs     <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
 │       │   └── watch.mjs         <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
