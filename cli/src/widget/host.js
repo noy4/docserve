@@ -49,11 +49,12 @@ export function createHost() {
     subscribe: commands.onChange,
   })
 
+  // plugins
+  const { use, dispose } = createPlugins(getContext)
+
   // context
   /** @type {DocserveContext} */
-  let ctx
-  const { use, dispose } = createPlugins(getContext)
-  ctx = {
+  const ctx = {
     page,
     rpc,
     dock,
@@ -65,6 +66,8 @@ export function createHost() {
   }
 
   return { ctx, start, stop }
+
+  // ---
 
   function start() {
     if (mounted) return ctx
