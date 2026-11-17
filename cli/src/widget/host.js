@@ -21,6 +21,11 @@ export function createHost() {
   // element
   const { host, root, status, reveal } = mount()
 
+  // lifecycle state
+  /** @type {ReturnType<typeof connectLive> | null} */
+  let live = null
+  let mounted = false
+
   // transport
   const rpc = createRpc()
   const pages = createPages({ rpc })
@@ -57,11 +62,6 @@ export function createHost() {
     use,
     start,
   }
-
-  // lifecycle state
-  /** @type {ReturnType<typeof connectLive> | null} */
-  let live = null
-  let mounted = false
 
   return { ctx, start, stop }
 
@@ -103,34 +103,27 @@ export function createHost() {
    * @param {LiveMessage} message
    */
   function onLiveMessage(message) {
-    if (message.type === "css") {
-      refreshStyles()
-      return
+    switch (message.type) {
+      case "css":
+        reloadStyles([document, root])
+        return
+      case "change":
+        onContentChange(message)
+        return
     }
-
-    if (message.contentSetChanged || message.pages.length) pages.invalidate()
-    emit("change", message)
-
-    // only reload when this page changed
-    if (message.pages.includes(page)) {
-      location.reload()
-      return
-    }
-    if (message.templateChanged) location.reload()
   }
 
-  // re-fetch same-origin stylesheets, including the widget's own
-  function refreshStyles() {
-    const stamp = String(Date.now())
-    for (const link of document.querySelectorAll('link[rel~="stylesheet"]')) {
-      if (!(link instanceof HTMLLinkElement)) continue
-      const url = new URL(link.href, location.href)
-      if (url.origin !== location.origin) continue
-      url.searchParams.set("__docserve_rev", stamp)
-      link.href = url.href
-    }
-    const own = /** @type {HTMLLinkElement | null} */ (root.querySelector('link[rel="stylesheet"]'))
-    if (own) own.href = `/__docserve/widget/widget.css?__docserve_rev=${stamp}`
+  /**
+   * @param {ChangeMessage} message
+   */
+  function onContentChange(message) {
+    if (message.contentSetChanged || message.pages.length)
+      pages.invalidate()
+    emit("change", message)
+
+    // only reload when this page or the gallery template changed
+    if (message.pages.includes(page) || message.templateChanged)
+      location.reload()
   }
 }
 
@@ -155,6 +148,24 @@ function settled(link) {
     link.addEventListener("load", () => resolve(), { once: true })
     link.addEventListener("error", () => resolve(), { once: true })
   })
+}
+
+/**
+ * Re-fetch every same-origin stylesheet, page and shadow root alike, so edits
+ * apply without a reload.
+ * @param {ParentNode[]} scopes
+ */
+function reloadStyles(scopes) {
+  const stamp = String(Date.now())
+  for (const scope of scopes) {
+    for (const link of scope.querySelectorAll('link[rel~="stylesheet"]')) {
+      if (!(link instanceof HTMLLinkElement)) continue
+      const url = new URL(link.href, location.href)
+      if (url.origin !== location.origin) continue
+      url.searchParams.set("__docserve_rev", stamp)
+      link.href = url.href
+    }
+  }
 }
 
 /** Shadow host, its root, the live region and the reveal hook. */
