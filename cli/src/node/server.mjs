@@ -3,12 +3,13 @@
 //
 // ┌──────────────────────────────────────────────────────────┐
 // │ runServer()                                              │
-// │ ├─ createServer ──▶ routes.createHandler()               │
+// │ ├─ createServer ──▶ adapter(createHandler())             │
 // │ ├─ WebSocketServer("/__reload") ◀─ FileWatcher           │
 // │ └─ listen ──▶ watcher.start() + writeState()             │
 // └──────────────────────────────────────────────────────────┘
 import { exec } from "node:child_process"
 import { createServer } from "node:http"
+import { createNodeServerAdapter } from "./adapter.mjs"
 import { INDEX_TEMPLATE } from "./gallery.mjs"
 import { createHandler } from "./routes.mjs"
 import { clearState, writeState } from "./state.mjs"
@@ -25,19 +26,28 @@ export async function runServer({ docsDir, port: initialPort, open = false }) {
   const wss = new WebSocketServer({ path: WS_PATH })
   const fileWatcher = new FileWatcher({ wss, docsDir, templatePath: INDEX_TEMPLATE })
   let port = initialPort
+  let closed = false
 
   const server = createServer(createNodeServerAdapter(createHandler({ docsDir })))
   wss.attach(server)
 
-  const cleanup = () => {
+  const close = () => {
+    if (closed) return
+    closed = true
+    process.off("SIGINT", onSignal)
+    process.off("SIGTERM", onSignal)
     fileWatcher.close()
     wss.close()
     clearState()
     server.closeAllConnections()
     if (server.listening) server.close()
   }
-  process.on("SIGINT", () => { cleanup(); process.exit(0) })
-  process.on("SIGTERM", () => { cleanup(); process.exit(0) })
+  const onSignal = () => {
+    close()
+    process.exit(0)
+  }
+  process.on("SIGINT", onSignal)
+  process.on("SIGTERM", onSignal)
 
   server.on("error", (/** @type {NodeJS.ErrnoException} */ err) => {
     if (err.code === "EADDRINUSE" && port < initialPort + MAX_PORT_TRIES) {
@@ -55,26 +65,5 @@ export async function runServer({ docsDir, port: initialPort, open = false }) {
     console.log(state.url)
     if (open && process.platform === "darwin") exec(`open ${state.url}`)
   })
-  return { server, wss, fileWatcher, close: cleanup }
-}
-
-// --- Node server adapter ---
-
-function createNodeServerAdapter(handler) {
-  return async (/** @type {import("node:http").IncomingMessage} */ req, /** @type {import("node:http").ServerResponse} */ res) => {
-    try {
-      const response = await handler(toWebRequest(req))
-      res.writeHead(response.status, Object.fromEntries(response.headers))
-      res.end(Buffer.from(await response.arrayBuffer()))
-    } catch (err) {
-      console.error(err)
-      res.writeHead(500, { "content-type": "text/plain" })
-      res.end("Internal Server Error")
-    }
-  }
-}
-
-function toWebRequest(req) {
-  const host = req.headers.host || "localhost"
-  return new Request(`http://${host}${req.url}`, { method: req.method, headers: req.headers })
+  return { server, wss, fileWatcher, close }
 }

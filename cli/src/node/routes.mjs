@@ -1,80 +1,82 @@
-// HTTP routing: the gallery, the docs folder, the widget assets and the page
-// list. Nothing here knows about listening or signals.
-import { readFile, stat } from "node:fs/promises"
-import { extname, resolve } from "node:path"
-import { MIME, serveAsset } from "./assets.mjs"
+// HTTP routing: an ordered table of handlers over one docs static handler.
+// Nothing here knows about listening, signals or sockets.
+import { resolve } from "node:path"
+import { serveAsset } from "./assets.mjs"
 import { apiFiles } from "./files.mjs"
 import { galleryResponse } from "./gallery.mjs"
 import { injectIntoHtml } from "./inject.mjs"
-import { isWithin, normalizedRelative } from "./scan.mjs"
+import { createStaticHandler } from "./serve-static.mjs"
 
 const WIDGET_DIR = resolve(import.meta.dirname, "..", "widget")
 const PLUGINS_DIR = resolve(import.meta.dirname, "..", "plugins")
+const INTERNAL_PREFIX = "/__docserve/"
+const WIDGET_PREFIX = `${INTERNAL_PREFIX}widget/`
+const PLUGINS_PREFIX = `${INTERNAL_PREFIX}plugins/`
 
 /**
  * @param {{ docsDir: string }} options
  * @returns {(request: Request) => Promise<Response>}
  */
 export function createHandler({ docsDir }) {
+  // Every other HTML response is injected; the gallery template is not.
+  const docs = createStaticHandler({
+    root: docsDir,
+    headers: { "cache-control": "no-store" },
+    transform: (html, relative) => injectIntoHtml(html, relative),
+  })
+
+  /** @type {Array<{ match: (pathname: string) => boolean, handle: (request: Request, url: URL) => Promise<Response> }>} */
+  const routes = [
+    { match: (pathname) => pathname === "/api/files", handle: serveFiles },
+    { match: (pathname) => pathname.startsWith(INTERNAL_PREFIX), handle: serveInternal },
+    { match: (pathname) => pathname === "/" || pathname === "/index.html", handle: serveGallery },
+    { match: () => true, handle: serveDocs },
+  ]
+
   return async function handler(request) {
     const url = new URL(request.url)
+    const route = routes.find((candidate) => candidate.match(url.pathname))
+    return route.handle(request, url)
+  }
 
-    if (url.pathname === "/api/files") {
-      try {
-        return Response.json(await apiFiles(docsDir))
-      } catch (err) {
-        console.error(err)
-        return Response.json([])
-      }
-    }
-
-    // widget and plugin sources, re-read per request so edits show up live
-    if (url.pathname.startsWith("/__docserve/widget/"))
-      return serveAsset(WIDGET_DIR, url.pathname.slice("/__docserve/widget/".length))
-    if (url.pathname.startsWith("/__docserve/plugins/"))
-      return serveAsset(PLUGINS_DIR, url.pathname.slice("/__docserve/plugins/".length))
-    if (url.pathname.startsWith("/__docserve/"))
-      return new Response("Not Found", { status: 404 })
-
-    let pathname
+  /**
+   * @returns {Promise<Response>}
+   */
+  async function serveFiles() {
     try {
-      pathname = decodeURIComponent(url.pathname)
-    } catch {
-      return new Response("Bad Request", { status: 400 })
+      return Response.json(await apiFiles(docsDir), { headers: { "cache-control": "no-store" } })
+    } catch (err) {
+      console.error(err)
+      return Response.json([], { headers: { "cache-control": "no-store" } })
     }
+  }
 
-    if (pathname === "/" || pathname === "/index.html") {
-      return galleryResponse(docsDir)
-    }
+  /**
+   * Widget and plugin sources, re-read per request so edits show up live.
+   * @param {Request} request
+   * @param {URL} url
+   * @returns {Promise<Response>}
+   */
+  async function serveInternal(request, url) {
+    if (url.pathname.startsWith(WIDGET_PREFIX))
+      return serveAsset(WIDGET_DIR, url.pathname.slice(WIDGET_PREFIX.length))
+    if (url.pathname.startsWith(PLUGINS_PREFIX))
+      return serveAsset(PLUGINS_DIR, url.pathname.slice(PLUGINS_PREFIX.length))
+    return new Response("Not Found", { status: 404 })
+  }
 
-    if (pathname.includes("\0")) {
-      return new Response("Bad Request", { status: 400 })
-    }
+  /**
+   * @returns {Promise<Response>}
+   */
+  async function serveGallery() {
+    return galleryResponse(docsDir)
+  }
 
-    // /sub/ → /sub/index.html
-    const target = pathname.endsWith("/") ? `${pathname}index.html` : pathname
-    const path = resolve(docsDir, target.slice(1))
-    if (!isWithin(docsDir, path)) {
-      return new Response("Forbidden", { status: 403 })
-    }
-
-    try {
-      const body = await readFile(path)
-      const type = MIME[extname(path).toLowerCase()] || "application/octet-stream"
-      // inject the widget into docsDir pages only; the gallery template ships its own client
-      if (type === "text/html") {
-        const html = injectIntoHtml(body.toString(), normalizedRelative(docsDir, path))
-        return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
-      }
-      return new Response(body, { headers: { "content-type": type } })
-    } catch {
-      // Redirect /sub → /sub/
-      try {
-        if ((await stat(path)).isDirectory()) {
-          return Response.redirect(new URL(`${url.pathname}/`, url), 301)
-        }
-      } catch { }
-      return new Response("Not Found", { status: 404 })
-    }
+  /**
+   * @param {Request} request
+   * @returns {Promise<Response>}
+   */
+  async function serveDocs(request) {
+    return (await docs(request)) ?? new Response("Not Found", { status: 404 })
   }
 }
