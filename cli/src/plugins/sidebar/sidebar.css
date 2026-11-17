@@ -205,15 +205,12 @@
 }
 /* Gallery view: preview cards */
 .docserve-sidebar[data-view="gallery"] .docserve-sidebar__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
-  align-content: start;
-  gap: 8px;
+  gap: 10px;
 }
 
 .docserve-sidebar__card {
-  display: flex;
-  flex-direction: column;
+  display: block;
+  flex: none;
   overflow: hidden;
   border: 1px solid var(--docserve-panel-border);
   border-radius: 9px;
@@ -233,7 +230,7 @@
 
 .docserve-sidebar__thumb {
   position: relative;
-  aspect-ratio: 4 / 3;
+  height: 150px;
   overflow: hidden;
   background: #fff;
 }
@@ -261,7 +258,7 @@
   align-items: center;
   gap: 5px;
   min-width: 0;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 600;
   line-height: 1.35;
 }
@@ -282,7 +279,7 @@
 
 .docserve-sidebar__card-date {
   color: var(--docserve-panel-muted);
-  font-size: 10px;
+  font-size: 10.5px;
   font-variant-numeric: tabular-nums;
 }
 
