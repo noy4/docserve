@@ -21,10 +21,15 @@ function desktopFile() {
 
 const MAX_RECENTS = 10
 
-// CLI candidates: dev layout, packaged asarUnpack / extraResources, PATH.
+// CLI candidates: in dev always the workspace CLI (never a stale global one);
+// packaged builds use asarUnpack / extraResources, then PATH.
 function resolveCliEntry() {
+  if (dev) {
+    const local = path.join(ROOT, "cli", "bin.mjs")
+    if (!fs.existsSync(local)) console.error(`[docserve-desktop] dev: workspace CLI missing at ${local}`)
+    return fs.existsSync(local) ? local : null
+  }
   const candidates = [
-    path.join(ROOT, "cli", "bin.mjs"),
     process.resourcesPath && path.join(process.resourcesPath, "app.asar.unpacked", "cli", "bin.mjs"),
     process.resourcesPath && path.join(process.resourcesPath, "cli", "bin.mjs"),
   ].filter(Boolean)
@@ -66,7 +71,17 @@ export class ServerManager {
     const spawnArgs = [dir, "--background"]
     if (open) spawnArgs.push("--open")
     if (preferredPort) spawnArgs.push("--port", preferredPort)
-    const { command, args, env } = this.#cliCommand(spawnArgs)
+    let cli
+    try {
+      cli = this.#cliCommand(spawnArgs)
+    } catch (err) {
+      this.#clearStart(dir)
+      this.#changed()
+      if (silent) console.warn(`[docserve-desktop] start failed: ${dir}: ${err.message}`)
+      else this.onStartError?.(`Failed to start the server for:\n${dir}\n\n${err.message}`)
+      return
+    }
+    const { command, args, env } = cli
     const child = spawn(command, args, { env, stdio: ["ignore", "ignore", "pipe"] })
     let stderr = ""
     child.stderr?.on("data", (chunk) => {
@@ -99,7 +114,14 @@ export class ServerManager {
   stopSync() {
     this.#clearStartingAll()
     if (this.getStates().length) {
-      const { command, args, env } = this.#cliCommand(["stop"])
+      let cli
+      try {
+        cli = this.#cliCommand(["stop"])
+      } catch (err) {
+        console.warn(`[docserve-desktop] stop failed: ${err.message}`)
+        return
+      }
+      const { command, args, env } = cli
       spawnSync(command, args, { env, stdio: "ignore" })
     }
   }
@@ -206,7 +228,15 @@ export class ServerManager {
 
   #runCli(args) {
     return new Promise((resolve) => {
-      const { command, args: cliArgs, env } = this.#cliCommand(args)
+      let cli
+      try {
+        cli = this.#cliCommand(args)
+      } catch (err) {
+        console.warn(`[docserve-desktop] ${args.join(" ")} failed: ${err.message}`)
+        resolve()
+        return
+      }
+      const { command, args: cliArgs, env } = cli
       const child = spawn(command, cliArgs, { env, stdio: "ignore" })
       child.on("exit", () => {
         this.#changed()
@@ -216,6 +246,9 @@ export class ServerManager {
   }
 
   #cliCommand(args) {
+    if (!CLI_ENTRY && dev) {
+      throw new Error(`dev: workspace CLI not found at ${path.join(ROOT, "cli", "bin.mjs")}`)
+    }
     if (CLI_ENTRY) {
       return {
         command: process.execPath,
