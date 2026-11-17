@@ -22,7 +22,7 @@ import { WebSocketServer } from "./websocket.mjs"
 import { FileWatcher } from "./watch.mjs"
 
 const MAX_PORT_TRIES = 20 // on conflict, try the next port up to 20 times
-const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "index.html")
+const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "..", "index.html")
 
 const MIME = {
   ".html": "text/html",

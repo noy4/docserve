@@ -7,13 +7,20 @@
     "docserve": "./bin.mjs"
   },
   "scripts": {
-    "test": "node --test"
+    "dev": "node bin.mjs ../docs/docs --port 4300 --open",
+    "test": "node --test --test-timeout=60000",
+    "typecheck": "tsc --noEmit",
+    "pack:check": "npm pack --dry-run"
   },
   "files": [
     "bin.mjs",
     "index.html",
-    "server/"
+    "src/"
   ],
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
   "engines": {
     "node": ">=22.12.0"
   },

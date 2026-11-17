@@ -14,8 +14,8 @@ import path from "node:path"
 import { exec, spawn } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { parseArgs } from "node:util"
-import { runServer } from "./server/index.mjs"
-import { findByDir, listLiveStates, removeState } from "./server/state.mjs"
+import { runServer } from "./src/node/index.mjs"
+import { findByDir, listLiveStates, removeState } from "./src/node/state.mjs"
 
 const pkg = JSON.parse(fs.readFileSync(new URL("./package.json", import.meta.url), "utf8"))
 const VERSION = pkg.version
