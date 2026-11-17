@@ -21,15 +21,21 @@ export function createHost() {
   // element
   const { host, root, status, reveal } = mount()
 
-  // services
+  // transport
   const rpc = createRpc()
   const pages = createPages({ rpc })
-  const dock = createDock({ root, getContext: () => ctx })
-  const commands = createCommands({ getContext: () => ctx })
-  const placement = createPlacement({ host, handle: dock.element })
   const { on, emit } = createEmitter()
-  const ui = createUi({ root, status })
 
+  // context is filled below, services resolve it when called
+  const getContext = () => ctx
+
+  // commands
+  const commands = createCommands({ getContext })
+
+  // interface
+  const ui = createUi({ root, status })
+  const dock = createDock({ root, getContext })
+  const placement = createPlacement({ host, handle: dock.element })
   const palette = createPalette({
     root,
     ui,
@@ -40,7 +46,7 @@ export function createHost() {
   // context
   /** @type {DocserveContext} */
   let ctx
-  const { use, dispose } = createPlugins(() => ctx)
+  const { use, dispose } = createPlugins(getContext)
   ctx = {
     page,
     rpc,
