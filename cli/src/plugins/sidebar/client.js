@@ -30,6 +30,14 @@ export function sidebarPlugin() {
         title: ctx.docs?.path || "",
       })
       const files = el("span", { class: "docserve-sidebar__files" })
+      const closeButton = el("button", {
+        type: "button",
+        class: "docserve-sidebar__close",
+        "aria-label": "Close sidebar",
+        title: "Close sidebar",
+        html: ICON_SIDEBAR,
+        onclick: () => setOpen(false),
+      })
       const sub = el("div", { class: "docserve-sidebar__sub" }, [docsPath, files])
       sub.hidden = !ctx.docs
       const list = el("nav", { class: "docserve-sidebar__list", "aria-label": "Pages" })
@@ -39,6 +47,7 @@ export function sidebarPlugin() {
             el("span", { class: "docserve-sidebar__icon", html: ICON_FOLDER }),
             name,
             count,
+            closeButton,
           ]),
           sub,
         ]),
