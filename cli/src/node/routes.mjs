@@ -22,7 +22,7 @@ export function createHandler({ docsDir }) {
   const docs = createStaticHandler({
     root: docsDir,
     headers: { "cache-control": "no-store" },
-    transform: (html, relative) => injectIntoHtml(html, relative),
+    transform: (html, relative) => injectIntoHtml(html, relative, docsDir),
   })
 
   /** @type {Array<{ match: (pathname: string) => boolean, handle: (request: Request, url: URL) => Promise<Response> }>} */

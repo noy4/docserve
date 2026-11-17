@@ -17,7 +17,9 @@ import { createUi } from "./ui.js"
  * @returns {{ ctx: DocserveContext, start: () => DocserveContext, stop: () => void }}
  */
 export function createHost() {
-  const page = resolvePage()
+  const script = injectedScript()
+  const page = resolvePage(script)
+  const docs = resolveDocs(script)
 
   // element
   const { host, root, status, reveal } = mount()
@@ -56,6 +58,7 @@ export function createHost() {
   /** @type {DocserveContext} */
   const ctx = {
     page,
+    docs,
     rpc,
     dock,
     commands: commands.api,
@@ -162,10 +165,25 @@ function mount() {
   }
 }
 
+/** The injected module script, when the page was served by docserve. */
+function injectedScript() {
+  return /** @type {HTMLScriptElement | null} */ (
+    document.querySelector('script[src="/__docserve/widget/index.js"]')
+  )
+}
+
 /** docs-relative path of the page being viewed */
-function resolvePage() {
-  const script = document.querySelector('script[src="/__docserve/widget/index.js"][data-page]')
+function resolvePage(script) {
   const page = script?.getAttribute("data-page")
   if (page) return page
   return location.pathname.replace(/^\//, "")
+}
+
+/** Served folder identity from `data-docs-*`; undefined outside docserve. */
+function resolveDocs(script) {
+  const name = script?.getAttribute("data-docs-name") || ""
+  const path = script?.getAttribute("data-docs-path") || ""
+  if (!name && !path) return undefined
+  const hue = Number(script?.getAttribute("data-docs-hue"))
+  return { name: name || path, path: path || name, hue: Number.isFinite(hue) ? hue : 0 }
 }

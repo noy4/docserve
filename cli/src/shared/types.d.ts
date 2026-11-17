@@ -16,6 +16,16 @@ interface DocPage {
   favicon?: string
 }
 
+/** Identity of the served folder, from the injected script's data attributes. */
+interface DocsInfo {
+  /** Folder name, e.g. `reports`. */
+  name: string
+  /** Display path with the home directory collapsed to `~`. */
+  path: string
+  /** Deterministic hue (0-359) shared with the gallery favicon. */
+  hue: number
+}
+
 /** Websocket message from `/__reload` describing file changes. */
 interface ChangeMessage {
   type: 'change'
@@ -169,6 +179,8 @@ interface UiApi {
 interface DocserveContext {
   /** Current page path from `data-page`. */
   page: string
+  /** Served folder identity from `data-docs-*`; undefined when unset. */
+  docs?: DocsInfo
   rpc: RpcBus
   /** The one dock every plugin contributes items to. */
   dock: DockHandle

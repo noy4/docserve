@@ -3,6 +3,8 @@ import { decoded, displayDate, el, icon, pageUrl } from "../../widget/lib/dom.js
 import { persistedFlag } from "../../widget/lib/storage.js"
 
 const ICON_SIDEBAR = icon('<rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" />')
+const ICON_FOLDER =
+  '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.1 10L4 18V8h17a2 2 0 0 0-2-2h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h15c.9 0 1.7-.6 1.9-1.5l2.3-8.5zM19 18H6l1.6-6h13z"/></svg>'
 
 /**
  * @returns {DocservePlugin}
@@ -17,14 +19,32 @@ export function sidebarPlugin() {
       let request = 0
 
       const count = el("span", { class: "docserve-sidebar__count" })
+      const name = el("span", {
+        class: "docserve-sidebar__name",
+        text: ctx.docs?.name || "Pages",
+        title: ctx.docs?.name || "Pages",
+      })
+      const docsPath = el("code", {
+        class: "docserve-sidebar__path",
+        text: ctx.docs?.path || "",
+        title: ctx.docs?.path || "",
+      })
+      const files = el("span", { class: "docserve-sidebar__files" })
+      const sub = el("div", { class: "docserve-sidebar__sub" }, [docsPath, files])
+      sub.hidden = !ctx.docs
       const list = el("nav", { class: "docserve-sidebar__list", "aria-label": "Pages" })
-      const element = el("aside", { class: "docserve-sidebar", "aria-label": "Pages" }, [
-        el("div", { class: "docserve-sidebar__head" }, [
-          el("span", { text: "Pages" }),
-          count,
+      const element = el("aside", { class: "docserve-sidebar", "aria-label": ctx.docs?.name || "Pages" }, [
+        el("header", { class: "docserve-sidebar__head" }, [
+          el("div", { class: "docserve-sidebar__title" }, [
+            el("span", { class: "docserve-sidebar__icon", html: ICON_FOLDER }),
+            name,
+            count,
+          ]),
+          sub,
         ]),
         list,
       ])
+      if (ctx.docs) element.style.setProperty("--docserve-sidebar-hue", String(ctx.docs.hue))
       list.append(el("p", { class: "docserve-sidebar__empty", text: "Loading…" }))
 
       ctx.ui.style("/__docserve/plugins/sidebar/sidebar.css")
@@ -112,6 +132,7 @@ export function sidebarPlugin() {
        */
       function render(pages) {
         count.textContent = String(pages.length)
+        files.textContent = `${pages.length} ${pages.length === 1 ? "file" : "files"}`
         const scrollTop = list.scrollTop
         list.replaceChildren()
         activeItem = null
@@ -143,6 +164,7 @@ export function sidebarPlugin() {
 
       function renderError() {
         count.textContent = ""
+        files.textContent = ""
         activeItem = null
         list.replaceChildren(el("div", { class: "docserve-sidebar__empty" }, [
           el("p", { text: "Could not load pages" }),
