@@ -19,10 +19,7 @@ export function sidebarPlugin() {
     id: "sidebar",
     setup(ctx) {
       const openState = persistedFlag("docserve:sidebar:open")
-      const viewState = persisted("docserve:sidebar:view", {
-        fallback: /** @type {"list" | "gallery"} */ ("list"),
-        parse: (raw) => raw === "gallery" ? "gallery" : "list",
-      })
+      const viewState = persisted("docserve:sidebar:view", /** @type {"list" | "gallery"} */ ("list"))
       /** @type {"list" | "gallery"} */
       let view = viewState.value
       /** @type {DocPage[]} */

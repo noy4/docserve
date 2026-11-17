@@ -2,8 +2,6 @@
 // choice is remembered across loads.
 import { persisted } from "./lib/storage.js"
 
-/** `bottom-right` etc. — vertical letter + horizontal letter. */
-const CORNERS = ["br", "bl", "tr", "tl"]
 const STORAGE_KEY = "docserve:dock-corner"
 /** Travel before a press counts as a drag, so clicks still click. */
 const DRAG_THRESHOLD = 4
@@ -29,10 +27,7 @@ const DRAG_MARGIN = 8
  * @returns {{ corner: () => string, destroy: () => void }}
  */
 export function createPlacement({ host, handle }) {
-  const saved = persisted(STORAGE_KEY, {
-    fallback: "br",
-    parse: (raw) => (CORNERS.includes(raw) ? raw : "br"),
-  })
+  const saved = persisted(STORAGE_KEY, "br")
   host.dataset.corner = saved.value
 
   /** @type {DragState | null} */

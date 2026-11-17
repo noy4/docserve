@@ -10,28 +10,31 @@
 /**
  * @template T
  * @param {string} key
+ * @param {T} [initial]  Returned when the key is absent or cannot be parsed.
  * @param {object} [options]
- * @param {T} [options.fallback]     Returned when the key is absent or storage fails.
  * @param {(raw: string) => T} [options.parse]
  * @param {(value: T) => string} [options.serialize]
  * @returns {Persisted<T>}
  */
-export function persisted(key, options = {}) {
-  const { fallback = /** @type {any} */ (null), parse = (raw) => /** @type {any} */ (raw), serialize = (value) => String(value) } = options
+export function persisted(key, initial = /** @type {any} */ (null), options = {}) {
+  const {
+    parse = (raw) => /** @type {any} */(raw),
+    serialize = (value) => String(value),
+  } = options
 
   function read() {
     try {
       const raw = localStorage.getItem(key)
-      return raw == null ? fallback : parse(raw)
+      return raw == null ? initial : parse(raw)
     } catch {
-      return fallback
+      return initial
     }
   }
 
   function write(value) {
     try {
       localStorage.setItem(key, serialize(value))
-    } catch {}
+    } catch { }
   }
 
   return {
@@ -44,7 +47,7 @@ export function persisted(key, options = {}) {
     clear() {
       try {
         localStorage.removeItem(key)
-      } catch {}
+      } catch { }
     },
   }
 }
@@ -52,12 +55,11 @@ export function persisted(key, options = {}) {
 /**
  * Boolean variant: stores `"true"` / `"false"`.
  * @param {string} key
- * @param {boolean} [fallback]
+ * @param {boolean} [initial]
  * @returns {Persisted<boolean>}
  */
-export function persistedFlag(key, fallback = false) {
-  return persisted(key, {
-    fallback,
+export function persistedFlag(key, initial = false) {
+  return persisted(key, initial, {
     parse: (raw) => raw === "true",
     serialize: (value) => String(value),
   })
