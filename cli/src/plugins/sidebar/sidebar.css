@@ -53,7 +53,8 @@
   text-align: center;
 }
 
-.docserve-sidebar__close {
+.docserve-sidebar__close,
+.docserve-sidebar__view {
   display: grid;
   flex-shrink: 0;
   place-items: center;
@@ -71,24 +72,27 @@
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.docserve-sidebar__close svg {
+.docserve-sidebar__close svg,
+.docserve-sidebar__view svg {
   width: 16px;
   height: 16px;
 }
 
-.docserve-sidebar__close:hover {
+.docserve-sidebar__close:hover,
+.docserve-sidebar__view:hover {
   background: color-mix(in srgb, var(--docserve-panel-text) 8%, transparent);
   color: var(--docserve-panel-text);
 }
 
-.docserve-sidebar__close:focus-visible {
+.docserve-sidebar__close:focus-visible,
+.docserve-sidebar__view:focus-visible {
   outline: 2px solid var(--docserve-dock-accent);
   outline-offset: 2px;
 }
 
 .docserve-sidebar__sub {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
   min-width: 0;
@@ -101,6 +105,7 @@
 }
 
 .docserve-sidebar__path {
+  flex: 1 1 auto;
   min-width: 0;
   max-width: 100%;
   overflow: hidden;
@@ -197,4 +202,113 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--docserve-panel-muted) 40%, transparent);
   background-clip: content-box;
+}
+/* Gallery view: preview cards */
+.docserve-sidebar[data-view="gallery"] .docserve-sidebar__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  align-content: start;
+  gap: 8px;
+}
+
+.docserve-sidebar__card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--docserve-panel-border);
+  border-radius: 9px;
+  color: var(--docserve-panel-text);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.docserve-sidebar__card:hover {
+  border-color: var(--docserve-dock-accent);
+}
+
+.docserve-sidebar__card[aria-current="page"] {
+  border-color: var(--docserve-dock-accent);
+  background: color-mix(in srgb, var(--docserve-dock-accent) 10%, transparent);
+}
+
+.docserve-sidebar__thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #fff;
+}
+
+.docserve-sidebar__thumb iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  background: #fff;
+  pointer-events: none;
+  transform-origin: top left;
+}
+
+.docserve-sidebar__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px 8px;
+  border-top: 1px solid var(--docserve-panel-border);
+}
+
+.docserve-sidebar__card-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.docserve-sidebar__card-title > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docserve-sidebar__favicon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+.docserve-sidebar__card-date {
+  color: var(--docserve-panel-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.docserve-sidebar__views {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1px;
+  margin-left: auto;
+  padding: 2px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--docserve-panel-text) 6%, transparent);
+}
+
+.docserve-sidebar__views .docserve-sidebar__view {
+  width: 22px;
+  height: 20px;
+  border-radius: 5px;
+}
+
+.docserve-sidebar__views .docserve-sidebar__view svg {
+  width: 14px;
+  height: 14px;
+}
+
+.docserve-sidebar__view[aria-pressed="true"] {
+  background: var(--docserve-panel-bg);
+  color: var(--docserve-panel-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 }
