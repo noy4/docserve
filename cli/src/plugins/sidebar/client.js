@@ -1,5 +1,6 @@
 // Dock toggle plus a left panel that lists every page, as rows or preview cards.
 import { el } from "../../widget/lib/dom.js"
+import { createDisposables } from "../../widget/lib/disposables.js"
 import { persisted, persistedFlag } from "../../widget/lib/storage.js"
 import { createHeader } from "./header.js"
 import { ICON_GRID, ICON_SIDEBAR } from "./icons.js"
@@ -40,36 +41,41 @@ export function sidebarPlugin() {
 
       ctx.ui.style("/__docserve/plugins/sidebar/sidebar.css")
 
+      const disposables = createDisposables()
+
       const panel = ctx.ui.panel({
         side: "left",
         width: "min(280px, 86vw)",
         open: openState.value,
         element,
       })
+      disposables.add(() => panel.remove())
 
       const previews = createPreviews(list)
       const resize = new ResizeObserver(() => previews.fit())
       resize.observe(list)
+      disposables.add(() => resize.disconnect())
+      disposables.add(() => previews.reset())
 
-      const offToggle = ctx.commands.register({
+      disposables.add(ctx.commands.register({
         id: "plugin:sidebar:toggle",
         title: "Toggle sidebar",
         group: "View",
         icon: ICON_SIDEBAR,
         keys: ["[", "Alt+B"],
         run: () => setOpen(!panel.isOpen()),
-      })
+      }))
 
-      const offClose = ctx.commands.register({
+      disposables.add(ctx.commands.register({
         id: "plugin:sidebar:close",
         title: "Close sidebar",
         keys: ["Escape"],
         showInPalette: false,
         when: () => panel.isOpen(),
         run: () => setOpen(false),
-      })
+      }))
 
-      const offView = ctx.commands.register({
+      disposables.add(ctx.commands.register({
         id: "plugin:sidebar:view",
         title: "Toggle sidebar view",
         group: "View",
@@ -77,7 +83,7 @@ export function sidebarPlugin() {
         keys: ["v"],
         when: () => panel.isOpen(),
         run: () => setView(view === "list" ? "gallery" : "list"),
-      })
+      }))
 
       const item = ctx.dock.add({
         id: "sidebar",
@@ -87,30 +93,20 @@ export function sidebarPlugin() {
         command: "plugin:sidebar:toggle",
         isActive: () => panel.isOpen(),
       })
+      disposables.add(() => item.remove())
 
-      const offChange = ctx.on("change", (change) => {
+      disposables.add(ctx.on("change", (change) => {
         if (change.pages.length || change.contentSetChanged) load(true)
-      })
-      const offOpen = ctx.on("open", () => load(true))
-      const offStart = ctx.on("start", () => {
+      }))
+      disposables.add(ctx.on("open", () => load(true)))
+      disposables.add(ctx.on("start", () => {
         if (panel.isOpen()) scrollActive()
-      })
+      }))
 
       load()
       scrollActive()
 
-      return () => {
-        offToggle()
-        offClose()
-        offView()
-        offChange()
-        offOpen()
-        offStart()
-        item.remove()
-        panel.remove()
-        resize.disconnect()
-        previews.reset()
-      }
+      return disposables.dispose
 
       /**
        * @param {boolean} next
@@ -134,7 +130,6 @@ export function sidebarPlugin() {
         header.setView(view)
         render()
       }
-
 
       /**
        * @param {boolean} [force]
