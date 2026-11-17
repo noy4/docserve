@@ -31,7 +31,6 @@ export function sidebarPlugin() {
       let activeItem = null
       let request = 0
 
-      const count = el("span", { class: "docserve-sidebar__count" })
       const name = el("span", {
         class: "docserve-sidebar__name",
         text: ctx.docs?.name || "Pages",
@@ -79,7 +78,6 @@ export function sidebarPlugin() {
           el("div", { class: "docserve-sidebar__title" }, [
             el("span", { class: "docserve-sidebar__icon", html: ICON_FOLDER }),
             name,
-            count,
             closeButton,
           ]),
           sub,
@@ -207,7 +205,6 @@ export function sidebarPlugin() {
       }
 
       function render() {
-        count.textContent = String(pages.length)
         files.textContent = `${pages.length} ${pages.length === 1 ? "file" : "files"}`
         viewTabs.style.display = pages.length ? "" : "none"
         const scrollTop = list.scrollTop
@@ -242,7 +239,18 @@ export function sidebarPlugin() {
           title: page.title,
           "aria-current": isActive(page, target) ? "page" : null,
         }, [
-          el("span", { class: "docserve-sidebar__title", text: pageLabel(page) }),
+          el("span", { class: "docserve-sidebar__title" }, [
+            page.favicon
+              ? el("img", {
+                class: "docserve-sidebar__favicon",
+                src: page.favicon,
+                alt: "",
+                loading: "lazy",
+                onerror: (e) => e.currentTarget.remove(),
+              })
+              : null,
+            el("span", { text: pageLabel(page) }),
+          ]),
           el("span", { class: "docserve-sidebar__date", text: displayDate(page.created) }),
         ])
         if (isActive(page, target)) activeItem = link
@@ -288,7 +296,6 @@ export function sidebarPlugin() {
       }
 
       function renderError() {
-        count.textContent = ""
         files.textContent = ""
         viewTabs.style.display = "none"
         activeItem = null

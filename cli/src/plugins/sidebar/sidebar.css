@@ -41,18 +41,6 @@
   white-space: nowrap;
 }
 
-.docserve-sidebar__count {
-  flex-shrink: 0;
-  min-width: 20px;
-  padding: 1px 6px;
-  border: 1px solid var(--docserve-panel-border);
-  border-radius: 999px;
-  color: var(--docserve-panel-muted);
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
 .docserve-sidebar__close,
 .docserve-sidebar__view {
   display: grid;
@@ -137,7 +125,7 @@
 
 .docserve-sidebar__item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 8px 10px;
@@ -157,10 +145,22 @@
 }
 
 .docserve-sidebar__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
+  overflow: hidden;
+}
+
+.docserve-sidebar__item .docserve-sidebar__title > span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.docserve-sidebar__item .docserve-sidebar__favicon {
+  width: 14px;
+  height: 14px;
 }
 
 .docserve-sidebar__date {
