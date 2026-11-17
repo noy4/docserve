@@ -2,7 +2,7 @@
 import { icon, writeClipboard } from "../../widget/dom.js"
 
 const ICON_COPY = icon('<rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />', { class: "docserve-icon-copy" })
-const ICON_CHECK = icon('<path d="m20 6-11 11-5-5" />', { class: "docserve-icon-check", width: 2.5 })
+const ICON_CHECK = icon('<path d="m20 6-11 11-5-5" />', { class: "docserve-icon-check", stroke: 2.5 })
 
 /**
  * @returns {DocservePlugin}
@@ -22,7 +22,6 @@ export function copyPlugin() {
         id: "copy",
         label: "Copy file path",
         icon: ICON_COPY + ICON_CHECK,
-        order: 10,
         group: "actions",
         async onClick() {
           const file = /** @type {DocPage | null} */ (await ctx.rpc.call("docserve:pages:resolve", ctx.page))

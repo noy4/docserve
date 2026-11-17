@@ -40,7 +40,6 @@ export function sidebarPlugin() {
         id: "sidebar",
         label: "Toggle sidebar",
         icon: ICON_SIDEBAR,
-        order: 0,
         group: "main",
         isActive: () => panel.isOpen(),
         onClick: () => setOpen(!panel.isOpen()),

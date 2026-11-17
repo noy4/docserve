@@ -15,7 +15,6 @@ export function homePlugin() {
         label: "Back to gallery",
         icon: ICON_HOME,
         href: "/",
-        order: 20,
         group: "actions",
       })
       return () => item.remove()

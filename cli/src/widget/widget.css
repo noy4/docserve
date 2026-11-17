@@ -114,7 +114,6 @@ html[data-docserve-panel-left] body {
 }
 
 .docserve-panel {
-  display: none;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -125,6 +124,10 @@ html[data-docserve-panel-left] body {
   color: var(--docserve-panel-text);
   font-size: 14px;
   line-height: 1.5;
+}
+
+.docserve-panel:not([data-open]) {
+  display: none;
 }
 
 .docserve-panel[data-open] {

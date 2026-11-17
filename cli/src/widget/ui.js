@@ -2,28 +2,61 @@
 import { el } from "./dom.js"
 
 /**
+ * What core gets back: the plugin-facing API plus the style-readiness hook,
+ * which plugins have no use for.
+ * @typedef {UiApi & { whenStylesReady: () => Promise<void> }} UiHandle
+ */
+
+/**
  * @param {object} options
  * @param {ShadowRoot} options.host
  * @param {HTMLElement} options.status   Live region for `announce`.
- * @returns {UiApi}
+ * @returns {UiHandle}
  */
 export function createUi({ host, status }) {
   const panels = createPanels(host)
   /** @type {Set<string>} */
   const styles = new Set()
+  /** @type {Set<Promise<void>>} */
+  const loads = new Set()
 
   return {
     panel: panels.add,
+    style,
+    announce,
+    whenStylesReady,
+  }
 
-    style(href) {
-      if (styles.has(href)) return
-      styles.add(href)
-      host.append(el("link", { rel: "stylesheet", href }))
-    },
+  /**
+   * Add a stylesheet inside the shadow root once.
+   * @param {string} href
+   */
+  function style(href) {
+    if (styles.has(href)) return
+    styles.add(href)
 
-    announce(message) {
-      status.textContent = message
-    },
+    const link = el("link", { rel: "stylesheet", href })
+    const load = new Promise((resolve) => {
+      link.addEventListener("load", () => resolve(), { once: true })
+      link.addEventListener("error", () => resolve(), { once: true })
+    })
+    loads.add(load)
+    host.append(link)
+  }
+
+  /**
+   * Resolves once every stylesheet added so far has loaded or failed.
+   * @returns {Promise<void>}
+   */
+  function whenStylesReady() {
+    return Promise.all([...loads]).then(() => {})
+  }
+
+  /**
+   * @param {string} message
+   */
+  function announce(message) {
+    status.textContent = message
   }
 }
 

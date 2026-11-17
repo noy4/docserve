@@ -8,7 +8,16 @@ import { createPlugins } from "./plugins.js"
 import { createRpc } from "./rpc.js"
 import { createUi } from "./ui.js"
 
-const CRITICAL_CSS = ":host{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:2147483647;margin:0;padding:0;line-height:0}"
+// Inline in the shadow root so the dock has its shape before widget.css loads.
+const CRITICAL_CSS = [
+  ":host{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:2147483647;margin:0;padding:0;line-height:0;visibility:hidden}",
+  ":host([data-ready]){visibility:visible}",
+  ".docserve-dock{display:flex;align-items:center}",
+  ".docserve-dock__button{display:grid;place-items:center;width:36px;height:36px;padding:0;border:0;background:none;color:inherit}",
+  ".docserve-dock__button svg{width:18px;height:18px}",
+  ".docserve-dock__status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}",
+  ".docserve-panel:not([data-open]){display:none}",
+].join("")
 
 /**
  * Create the widget without mounting it.
@@ -20,10 +29,7 @@ export function createHost() {
   // shadow host keeps page css out
   const element = el("div", { id: "docserve-dock-host", "data-docserve-widget": "" })
   const shadow = element.attachShadow({ mode: "open" })
-  shadow.append(
-    el("style", { text: CRITICAL_CSS }),
-    el("link", { rel: "stylesheet", href: "/__docserve/widget/widget.css" }),
-  )
+  shadow.append(el("style", { text: CRITICAL_CSS }))
 
   // live region for announcements
   const status = el("span", { class: "docserve-dock__status", role: "status", "aria-live": "polite" })
@@ -35,6 +41,7 @@ export function createHost() {
   const dock = createDock({ host: shadow, getContext: () => ctx })
   const { on, emit } = createEmitter()
   const ui = createUi({ host: shadow, status })
+  ui.style("/__docserve/widget/widget.css")
 
   // public surface, built before plugins run
   /** @type {DocserveContext} */
@@ -55,6 +62,7 @@ export function createHost() {
 
     document.documentElement.toggleAttribute("data-docserve-widget", true)
     document.body.append(element)
+    reveal()
     emit("start")
 
     live = connectLive({
@@ -67,11 +75,20 @@ export function createHost() {
     return ctx
   }
 
+  // Show the widget only once its stylesheets are applied, so nothing appears
+  // unstyled. The timeout covers a stylesheet that never settles.
+  function reveal() {
+    const done = () => element.toggleAttribute("data-ready", true)
+    ui.whenStylesReady().then(done)
+    setTimeout(done, 500)
+  }
+
   function stop() {
     live?.close()
     live = null
     if (mounted) {
       document.documentElement.toggleAttribute("data-docserve-widget", false)
+      element.toggleAttribute("data-ready", false)
       element.remove()
       mounted = false
     }
