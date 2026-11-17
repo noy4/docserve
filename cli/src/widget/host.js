@@ -9,6 +9,7 @@ import { createPalette } from "./palette.js"
 import { createPlacement } from "./placement.js"
 import { createPlugins } from "./plugins.js"
 import { createRpc } from "./rpc.js"
+import { reloadStyles, settled } from "./styles.js"
 import { createUi } from "./ui.js"
 
 /**
@@ -88,6 +89,7 @@ export function createHost() {
     live?.close()
     live = null
     if (mounted) {
+      // reverse order
       placement.destroy()
       palette.destroy()
       commands.destroy()
@@ -137,36 +139,6 @@ const CRITICAL_CSS = [
   ".docserve-dock__button{display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;background:none;color:inherit}",
   ".docserve-dock__status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}",
 ].join("")
-
-/**
- * @param {HTMLLinkElement} link
- * @returns {Promise<void>}
- */
-function settled(link) {
-  if (link.sheet) return Promise.resolve()
-  return new Promise((resolve) => {
-    link.addEventListener("load", () => resolve(), { once: true })
-    link.addEventListener("error", () => resolve(), { once: true })
-  })
-}
-
-/**
- * Re-fetch every same-origin stylesheet, page and shadow root alike, so edits
- * apply without a reload.
- * @param {ParentNode[]} scopes
- */
-function reloadStyles(scopes) {
-  const stamp = String(Date.now())
-  for (const scope of scopes) {
-    for (const link of scope.querySelectorAll('link[rel~="stylesheet"]')) {
-      if (!(link instanceof HTMLLinkElement)) continue
-      const url = new URL(link.href, location.href)
-      if (url.origin !== location.origin) continue
-      url.searchParams.set("__docserve_rev", stamp)
-      link.href = url.href
-    }
-  }
-}
 
 /** Shadow host, its root, the live region and the reveal hook. */
 function mount() {
