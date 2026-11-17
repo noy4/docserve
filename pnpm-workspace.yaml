@@ -4,8 +4,9 @@ packages:
   - vscode
   - video
 
-onlyBuiltDependencies:
-  - electron
-  - electron-builder
-  - esbuild
-  - "@vscode/vsce-sign"
+allowBuilds:
+  electron: true
+  electron-builder: true
+  esbuild: true
+  "@vscode/vsce-sign": true
+  electron-winstaller: false

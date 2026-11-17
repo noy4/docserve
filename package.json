@@ -1,11 +1,13 @@
 {
   "name": "docserve",
   "private": true,
+  "packageManager": "pnpm@12.21.0",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
     "dev": "pnpm -C desktop start",
+    "cli": "pnpm -C cli dev",
     "test": "pnpm -C cli test",
     "typecheck": "pnpm -r --if-present typecheck",
     "build": "pnpm -C vscode build",
