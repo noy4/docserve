@@ -1,5 +1,5 @@
 // Dock link back to the gallery.
-import { icon } from "../../widget/dom.js"
+import { icon } from "../../widget/lib/dom.js"
 
 const ICON_HOME = icon('<path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" />')
 

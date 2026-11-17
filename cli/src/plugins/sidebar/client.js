@@ -1,6 +1,6 @@
 // Dock toggle plus a left panel that lists every page.
-import { decoded, displayDate, el, icon, isTyping, pageUrl } from "../../widget/dom.js"
-import { persistedFlag } from "../../widget/storage.js"
+import { decoded, displayDate, el, icon, isTyping, pageUrl } from "../../widget/lib/dom.js"
+import { persistedFlag } from "../../widget/lib/storage.js"
 
 const ICON_SIDEBAR = icon('<rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" />')
 

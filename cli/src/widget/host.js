@@ -1,7 +1,7 @@
 // Widget host: shadow root, lifecycle, context assembly and the live connection.
 import { createDock } from "./dock.js"
-import { el } from "./dom.js"
-import { createEmitter } from "./emitter.js"
+import { el } from "./lib/dom.js"
+import { createEmitter } from "./lib/emitter.js"
 import { connectLive } from "./live.js"
 import { createPages } from "./pages.js"
 import { createPlugins } from "./plugins.js"

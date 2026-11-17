@@ -1,5 +1,5 @@
 // UI helpers handed to plugins: panels, stylesheets, announcements.
-import { el } from "./dom.js"
+import { el } from "./lib/dom.js"
 
 /**
  * What core gets back: the plugin-facing API plus the style-readiness hook,

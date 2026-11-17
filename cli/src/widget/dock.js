@@ -1,5 +1,5 @@
 // The dock: one pill that every plugin contributes items to.
-import { el } from "./dom.js"
+import { el } from "./lib/dom.js"
 
 /**
  * Build the dock and mount it into the shadow root.

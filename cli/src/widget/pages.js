@@ -1,5 +1,5 @@
 // Page listing for the widget: /api/files, cached until a change arrives.
-import { decoded, pageUrl } from "./dom.js"
+import { decoded, pageUrl } from "./lib/dom.js"
 
 /**
  * @param {{ rpc: RpcBus }} options
