@@ -29,36 +29,30 @@ const CRITICAL_CSS = [
 export function createHost() {
   const page = resolvePage()
 
-  // shadow host keeps page css out
-  const element = el("div", { id: "docserve-dock-host", "data-docserve-widget": "" })
-  const shadow = element.attachShadow({ mode: "open" })
-  shadow.append(el("style", { text: CRITICAL_CSS }))
-
-  // live region for announcements
+  // element
+  const host = el("div", { id: "docserve-dock-host", "data-docserve-widget": "" })
+  const root = host.attachShadow({ mode: "open" })
+  root.append(el("style", { text: CRITICAL_CSS }))
   const status = el("span", { class: "docserve-dock__status", role: "status", "aria-live": "polite" })
-  shadow.append(status)
+  root.append(status)
 
-  // core services
+  // services
   const rpc = createRpc()
   const pages = createPages({ rpc })
-  const dock = createDock({ host: shadow, getContext: () => ctx })
+  const dock = createDock({ root, getContext: () => ctx })
   const commands = createCommands({ getContext: () => ctx })
-  const placement = createPlacement({ element, handle: dock.element })
+  const placement = createPlacement({ host, handle: dock.element })
   const { on, emit } = createEmitter()
-  const ui = createUi({
-    host: shadow,
-    status,
-    styles: ["/__docserve/widget/widget.css"],
-  })
+  const ui = createUi({ root, status })
 
   const palette = createPalette({
-    host: shadow,
+    root,
     ui,
     commands: commands.api,
     subscribe: commands.onChange,
   })
 
-  // public surface, built before plugins run
+  // context
   /** @type {DocserveContext} */
   let ctx
   const { use, dispose } = createPlugins(() => ctx)
@@ -85,7 +79,7 @@ export function createHost() {
     mounted = true
 
     document.documentElement.toggleAttribute("data-docserve-widget", true)
-    document.body.append(element)
+    document.body.append(host)
     reveal()
     emit("start")
 
@@ -102,7 +96,7 @@ export function createHost() {
   // Show the widget only once its stylesheets are applied, so nothing appears
   // unstyled. The timeout covers a stylesheet that never settles.
   function reveal() {
-    const done = () => element.toggleAttribute("data-ready", true)
+    const done = () => host.toggleAttribute("data-ready", true)
     ui.whenStylesReady().then(done)
     setTimeout(done, 500)
   }
@@ -115,8 +109,8 @@ export function createHost() {
       palette.destroy()
       commands.destroy()
       document.documentElement.toggleAttribute("data-docserve-widget", false)
-      element.toggleAttribute("data-ready", false)
-      element.remove()
+      host.toggleAttribute("data-ready", false)
+      host.remove()
       mounted = false
     }
     dispose()
@@ -152,7 +146,7 @@ export function createHost() {
       url.searchParams.set("__docserve_rev", stamp)
       link.href = url.href
     }
-    const own = /** @type {HTMLLinkElement | null} */ (shadow.querySelector('link[rel="stylesheet"]'))
+    const own = /** @type {HTMLLinkElement | null} */ (root.querySelector('link[rel="stylesheet"]'))
     if (own) own.href = `/__docserve/widget/widget.css?__docserve_rev=${stamp}`
   }
 }

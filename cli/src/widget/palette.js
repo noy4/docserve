@@ -5,13 +5,13 @@ import { el } from "./lib/dom.js"
 
 /**
  * @param {object} options
- * @param {ShadowRoot} options.host   Where the overlay is mounted.
+ * @param {ShadowRoot} options.root   Where the overlay is mounted.
  * @param {UiApi} options.ui
  * @param {CommandsApi} options.commands
  * @param {(listener: () => void) => () => void} options.subscribe
  * @returns {{ open: () => void, close: () => void, destroy: () => void }}
  */
-export function createPalette({ host, ui, commands, subscribe }) {
+export function createPalette({ root, ui, commands, subscribe }) {
   const input = /** @type {HTMLInputElement} */ (el("input", {
     class: "docserve-palette__input",
     type: "text",
@@ -36,9 +36,9 @@ export function createPalette({ host, ui, commands, subscribe }) {
     ]),
   ])
   const backdrop = el("div", { class: "docserve-palette__backdrop" })
-  const root = el("div", { class: "docserve-palette" }, [backdrop, dialog])
+  const overlay = el("div", { class: "docserve-palette" }, [backdrop, dialog])
 
-  host.append(root)
+  root.append(overlay)
   ui.style("/__docserve/widget/palette.css")
 
   /** @type {DocserveCommand[]} */
@@ -76,7 +76,7 @@ export function createPalette({ host, ui, commands, subscribe }) {
       return
     }
     shown = open
-    root.toggleAttribute("data-open", open)
+    overlay.toggleAttribute("data-open", open)
     document.documentElement.toggleAttribute("data-docserve-palette", open)
 
     if (open) {
@@ -201,7 +201,7 @@ export function createPalette({ host, ui, commands, subscribe }) {
 
   function destroy() {
     off()
-    root.remove()
+    overlay.remove()
     document.documentElement.removeAttribute("data-docserve-palette")
   }
 }

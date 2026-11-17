@@ -6,18 +6,18 @@ import { el } from "./lib/dom.js"
 /**
  * Build the dock and mount it into the shadow root.
  * @param {object} options
- * @param {ShadowRoot} options.host
+ * @param {ShadowRoot} options.root
  * @param {() => DocserveContext} options.getContext  Resolved when an item is clicked.
  * @returns {DockHandle}
  */
-export function createDock({ host, getContext }) {
+export function createDock({ root, getContext }) {
   /** @type {DockItem[]} */
   const items = []
   const element = el("div", { class: "docserve-dock", role: "toolbar", "aria-label": "docserve" })
   /** @type {Map<string, DockItemHandle>} */
   const handles = new Map()
 
-  host.append(element)
+  root.append(element)
   render()
 
   return {

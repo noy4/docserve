@@ -24,16 +24,16 @@ const DRAG_MARGIN = 8
 
 /**
  * @param {object} options
- * @param {HTMLElement} options.element  Shadow host; carries `data-corner`.
+ * @param {HTMLElement} options.host  Shadow host; carries `data-corner`.
  * @param {HTMLElement} options.handle   The dock pill, used as the drag surface.
  * @returns {{ corner: () => string, destroy: () => void }}
  */
-export function createPlacement({ element, handle }) {
+export function createPlacement({ host, handle }) {
   const saved = persisted(STORAGE_KEY, {
     fallback: "br",
     parse: (raw) => (CORNERS.includes(raw) ? raw : "br"),
   })
-  element.dataset.corner = saved.value
+  host.dataset.corner = saved.value
 
   /** @type {DragState | null} */
   let drag = null
@@ -43,12 +43,12 @@ export function createPlacement({ element, handle }) {
   let settleTimer = null
 
   handle.addEventListener("pointerdown", onDown)
-  element.addEventListener("click", onClick, true)
+  host.addEventListener("click", onClick, true)
   window.addEventListener("blur", cancel)
 
   return {
     corner() {
-      return element.dataset.corner ?? "br"
+      return host.dataset.corner ?? "br"
     },
     destroy,
   }
@@ -61,7 +61,7 @@ export function createPlacement({ element, handle }) {
     swallowClick = false
     if (settleTimer) settle()
 
-    const rect = element.getBoundingClientRect()
+    const rect = host.getBoundingClientRect()
     drag = {
       id: event.pointerId,
       x: event.clientX,
@@ -92,16 +92,16 @@ export function createPlacement({ element, handle }) {
     if (!drag.moved) {
       if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return
       drag.moved = true
-      element.toggleAttribute("data-dragging", true)
+      host.toggleAttribute("data-dragging", true)
     }
 
     // Follow the pointer in px; corners are re-applied on release.
     const maxLeft = Math.max(DRAG_MARGIN, window.innerWidth - drag.width - DRAG_MARGIN)
     const maxTop = Math.max(DRAG_MARGIN, window.innerHeight - drag.height - DRAG_MARGIN)
-    element.style.left = `${clamp(drag.left + dx, DRAG_MARGIN, maxLeft)}px`
-    element.style.top = `${clamp(drag.top + dy, DRAG_MARGIN, maxTop)}px`
-    element.style.right = "auto"
-    element.style.bottom = "auto"
+    host.style.left = `${clamp(drag.left + dx, DRAG_MARGIN, maxLeft)}px`
+    host.style.top = `${clamp(drag.top + dy, DRAG_MARGIN, maxTop)}px`
+    host.style.right = "auto"
+    host.style.bottom = "auto"
     event.preventDefault()
   }
 
@@ -111,7 +111,7 @@ export function createPlacement({ element, handle }) {
   function onUp(event) {
     if (!drag || event.pointerId !== drag.id) return
     const moved = drag.moved
-    const from = element.getBoundingClientRect()
+    const from = host.getBoundingClientRect()
     finish()
     if (!moved) return
     swallowClick = true
@@ -130,22 +130,22 @@ export function createPlacement({ element, handle }) {
    * @param {DOMRect} from
    */
   function snap(corner, from) {
-    element.style.transition = "none"
-    element.dataset.corner = corner
+    host.style.transition = "none"
+    host.dataset.corner = corner
     saved.value = corner
     clearInline()
-    const to = element.getBoundingClientRect()
+    const to = host.getBoundingClientRect()
 
-    element.style.right = "auto"
-    element.style.bottom = "auto"
-    element.style.left = `${from.left}px`
-    element.style.top = `${from.top}px`
-    void element.offsetWidth // commit the start, so the change below animates
+    host.style.right = "auto"
+    host.style.bottom = "auto"
+    host.style.left = `${from.left}px`
+    host.style.top = `${from.top}px`
+    void host.offsetWidth // commit the start, so the change below animates
 
-    element.style.transition = ""
-    element.style.left = `${to.left}px`
-    element.style.top = `${to.top}px`
-    element.addEventListener("transitionend", settle, { once: true })
+    host.style.transition = ""
+    host.style.left = `${to.left}px`
+    host.style.top = `${to.top}px`
+    host.addEventListener("transitionend", settle, { once: true })
     settleTimer = setTimeout(settle, 250)
   }
 
@@ -153,9 +153,9 @@ export function createPlacement({ element, handle }) {
   function settle() {
     if (settleTimer) clearTimeout(settleTimer)
     settleTimer = null
-    element.removeEventListener("transitionend", settle)
+    host.removeEventListener("transitionend", settle)
     if (drag) return
-    element.style.removeProperty("transition")
+    host.style.removeProperty("transition")
     clearInline()
   }
 
@@ -172,11 +172,11 @@ export function createPlacement({ element, handle }) {
     window.removeEventListener("pointerup", onUp)
     window.removeEventListener("pointercancel", cancel)
     drag = null
-    element.toggleAttribute("data-dragging", false)
+    host.toggleAttribute("data-dragging", false)
   }
 
   function clearInline() {
-    for (const property of ["left", "top", "right", "bottom"]) element.style.removeProperty(property)
+    for (const property of ["left", "top", "right", "bottom"]) host.style.removeProperty(property)
   }
 
   /**
@@ -193,7 +193,7 @@ export function createPlacement({ element, handle }) {
     cancel()
     settle()
     handle.removeEventListener("pointerdown", onDown)
-    element.removeEventListener("click", onClick, true)
+    host.removeEventListener("click", onClick, true)
     window.removeEventListener("blur", cancel)
   }
 }

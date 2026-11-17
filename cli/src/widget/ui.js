@@ -9,19 +9,18 @@ import { el } from "./lib/dom.js"
 
 /**
  * @param {object} options
- * @param {ShadowRoot} options.host
+ * @param {ShadowRoot} options.root
  * @param {HTMLElement} options.status   Live region for `announce`.
- * @param {string[]} [options.styles]    Core stylesheets, added before plugins.
  * @returns {UiHandle}
  */
-export function createUi({ host, status, styles = [] }) {
-  const panels = createPanels(host)
+export function createUi({ root, status }) {
+  const panels = createPanels(root)
   /** @type {Set<string>} */
   const added = new Set()
   /** @type {Set<Promise<void>>} */
   const loads = new Set()
 
-  for (const href of styles) style(href)
+  style("/__docserve/widget/widget.css")
 
   return {
     panel: panels.add,
@@ -44,7 +43,7 @@ export function createUi({ host, status, styles = [] }) {
       link.addEventListener("error", () => resolve(), { once: true })
     })
     loads.add(load)
-    host.append(link)
+    root.append(link)
   }
 
   /**
@@ -65,10 +64,10 @@ export function createUi({ host, status, styles = [] }) {
 
 /**
  * Side panels. An open left panel shifts the page with a CSS variable.
- * @param {ShadowRoot} host
+ * @param {ShadowRoot} root
  * @returns {{ add: (options: PanelOptions) => PanelHandle }}
  */
-function createPanels(host) {
+function createPanels(root) {
   /** @type {PanelHandle[]} */
   const panels = []
 
@@ -86,7 +85,7 @@ function createPanels(host) {
     element.dataset.side = side
     element.style.width = width
     element.toggleAttribute("data-open", Boolean(options.open))
-    host.append(element)
+    root.append(element)
 
     const handle = {
       element,
@@ -114,13 +113,13 @@ function createPanels(host) {
   // The last open left panel wins; right panels never shift the page.
   function syncOffset() {
     const open = panels.filter((panel) => panel.side === "left" && panel.isOpen()).at(-1)
-    const root = document.documentElement
+    const html = document.documentElement
     if (open) {
-      root.style.setProperty("--docserve-panel-left", open.width)
-      root.toggleAttribute("data-docserve-panel-left", true)
+      html.style.setProperty("--docserve-panel-left", open.width)
+      html.toggleAttribute("data-docserve-panel-left", true)
     } else {
-      root.style.removeProperty("--docserve-panel-left")
-      root.toggleAttribute("data-docserve-panel-left", false)
+      html.style.removeProperty("--docserve-panel-left")
+      html.toggleAttribute("data-docserve-panel-left", false)
     }
   }
 }
