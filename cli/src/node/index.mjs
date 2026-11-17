@@ -1,15 +1,17 @@
 // docserve server core: HTTP layer + server lifecycle.
 //
-// ┌────────────────────────────────────────────────────────┐
-// │ runServer()                                            │
-// │ ├─ createServer ──▶ handler()                          │ # HTTP
-// │ │   ├─ /api/files ──▶ apiFiles()                       │
-// │ │   ├─ /, /index.html ──▶ gallery template             │
-// │ │   └─ other paths ──▶ raw files ──▶ injectIntoHtml()  │
-// │ │       └─ /dir/ ──▶ dir/index.html                    │
-// │ ├─ WebSocketServer("/__reload") ◀─ FileWatcher         │
-// │ └─ listen ──▶ listener.start() + writeState()          │
-// └────────────────────────────────────────────────────────┘
+// ┌──────────────────────────────────────────────────────────┐
+// │ runServer()                                              │
+// │ ├─ createServer ──▶ handler()                            │ # HTTP
+// │ │   ├─ /api/files ──▶ apiFiles()                         │
+// │ │   ├─ /, /index.html ──▶ gallery template               │
+// │ │   ├─ /__docserve/widget/* ──▶ src/widget (no-store)    │
+// │ │   ├─ /__docserve/plugins/* ──▶ src/plugins (no-store)  │
+// │ │   └─ other paths ──▶ raw files ──▶ injectIntoHtml()    │
+// │ │       └─ /dir/ ──▶ dir/index.html                      │
+// │ ├─ WebSocketServer("/__reload") ◀─ FileWatcher           │
+// │ └─ listen ──▶ listener.start() + writeState()            │
+// └──────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
 import { readFile, realpath, stat } from "node:fs/promises"
 import os from "node:os"

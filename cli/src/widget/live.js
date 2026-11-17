@@ -22,7 +22,6 @@ export function connectLive({ path = "/__reload", onMessage, onOpen }) {
   /** @type {WebSocket | null} */
   let socket = null
   let delay = MIN_DELAY
-  let attempts = 0
   /** @type {ReturnType<typeof setTimeout> | null} */
   let timer = null
   let closed = false
@@ -51,7 +50,6 @@ export function connectLive({ path = "/__reload", onMessage, onOpen }) {
     ws.addEventListener("open", () => {
       if (closed) return
       delay = MIN_DELAY
-      attempts = 0
       onOpen?.()
     })
 
@@ -79,7 +77,6 @@ export function connectLive({ path = "/__reload", onMessage, onOpen }) {
 
   function schedule() {
     if (closed || timer) return
-    attempts += 1
     timer = setTimeout(() => {
       timer = null
       open()
