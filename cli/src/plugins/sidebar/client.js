@@ -58,6 +58,10 @@ export function sidebarPlugin() {
         html: ICON_GRID,
         onclick: () => setView("gallery"),
       })
+      const homeLink = el("a", { class: "docserve-sidebar__home", href: "/", title: "Open gallery" }, [
+        el("span", { class: "docserve-sidebar__icon", html: ICON_FOLDER }),
+        name,
+      ])
       const viewTabs = el("div", { class: "docserve-sidebar__views", role: "group", "aria-label": "View" }, [
         listButton,
         galleryButton,
@@ -76,8 +80,7 @@ export function sidebarPlugin() {
       const element = el("aside", { class: "docserve-sidebar", "aria-label": ctx.docs?.name || "Pages" }, [
         el("header", { class: "docserve-sidebar__head" }, [
           el("div", { class: "docserve-sidebar__title" }, [
-            el("span", { class: "docserve-sidebar__icon", html: ICON_FOLDER }),
-            name,
+            homeLink,
             closeButton,
           ]),
           sub,
