@@ -2,23 +2,15 @@
 import { el } from "./lib/dom.js"
 
 /**
- * What core gets back: the plugin-facing API plus the style-readiness hook,
- * which plugins have no use for.
- * @typedef {UiApi & { whenStylesReady: () => Promise<void> }} UiHandle
- */
-
-/**
  * @param {object} options
  * @param {ShadowRoot} options.root
  * @param {HTMLElement} options.status   Live region for `announce`.
- * @returns {UiHandle}
+ * @returns {UiApi}
  */
 export function createUi({ root, status }) {
   const panels = createPanels(root)
   /** @type {Set<string>} */
   const added = new Set()
-  /** @type {Set<Promise<void>>} */
-  const loads = new Set()
 
   style("/__docserve/widget/widget.css")
 
@@ -26,7 +18,6 @@ export function createUi({ root, status }) {
     panel: panels.add,
     style,
     announce,
-    whenStylesReady,
   }
 
   /**
@@ -37,21 +28,7 @@ export function createUi({ root, status }) {
     if (added.has(href)) return
     added.add(href)
 
-    const link = el("link", { rel: "stylesheet", href })
-    const load = new Promise((resolve) => {
-      link.addEventListener("load", () => resolve(), { once: true })
-      link.addEventListener("error", () => resolve(), { once: true })
-    })
-    loads.add(load)
-    root.append(link)
-  }
-
-  /**
-   * Resolves once every stylesheet added so far has loaded or failed.
-   * @returns {Promise<void>}
-   */
-  function whenStylesReady() {
-    return Promise.all([...loads]).then(() => {})
+    root.append(el("link", { rel: "stylesheet", href }))
   }
 
   /**
