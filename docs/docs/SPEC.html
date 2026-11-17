@@ -416,13 +416,27 @@
 │   ├── package.json              <span class="c"># "bin": { "docserve": "./bin.mjs" }</span>
 │   ├── bin.mjs                   <span class="c"># CLI entry: args · start/stop/spawn</span>
 │   ├── index.html                <span class="c"># gallery template, served at /</span>
-│   └── server/
-│       ├── index.mjs             <span class="c"># HTTP server + lifecycle</span>
-│       ├── state.mjs             <span class="c"># per-instance state files · pid liveness</span>
-│       ├── files.mjs             <span class="c"># *.html listing · meta + git dates · path utils</span>
-│       ├── inject.mjs            <span class="c"># reload client · stylesheet refresh · copy button</span>
-│       ├── websocket.mjs         <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
-│       └── watch.mjs             <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
+│   └── src/
+│       ├── node/
+│       │   ├── index.mjs         <span class="c"># HTTP server · asset routes · lifecycle</span>
+│       │   ├── state.mjs         <span class="c"># per-instance state files · pid liveness</span>
+│       │   ├── files.mjs         <span class="c"># *.html listing · meta + git dates · path utils</span>
+│       │   ├── inject.mjs        <span class="c"># widget tags · idempotent insertion</span>
+│       │   ├── websocket.mjs     <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
+│       │   └── watch.mjs         <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
+│       ├── widget/               <span class="c"># injected client (shadow DOM, no build)</span>
+│       │   ├── index.js          <span class="c"># entry: register built-ins · start</span>
+│       │   ├── host.js           <span class="c"># shadow root · lifecycle · reload wiring</span>
+│       │   ├── dock.js  ui.js    <span class="c"># dock items · panels · styles · announce</span>
+│       │   ├── rpc.js  pages.js  <span class="c"># method bus · /api/files cache</span>
+│       │   ├── live.js  plugins.js  emitter.js
+│       │   ├── dom.js  storage.js
+│       │   └── widget.css
+│       ├── plugins/              <span class="c"># built-ins, same shape as external ones</span>
+│       │   ├── sidebar/{client.js, sidebar.css}
+│       │   ├── copy/{client.js, copy.css}
+│       │   └── home/client.js
+│       └── shared/types.d.ts     <span class="c"># global types for ctx, dock, rpc</span>
 └── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
     ├── package.json
     └── src/
@@ -741,7 +755,7 @@
           <iconify-icon icon="mdi:restart" noobserver></iconify-icon>
           <h4>Auto recovery</h4>
         </div>
-        <p>On socket close, page tabs reload after 1 s and recover once the server is back.</p>
+        <p>On socket close the dock reconnects with exponential backoff (0.5 s → 10 s) and refetches pages; it never reloads the page by itself.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -775,6 +789,7 @@
         </thead>
         <tbody>
           <tr><td>Page tab</td><td>Its own path appears in <code>pages</code>, or a <code>css</code> message refreshes its stylesheets</td></tr>
+          <tr><td>Dock</td><td>Never reloads the page; it refetches <code>/api/files</code> on <code>change</code> and on reconnect</td></tr>
           <tr><td>Gallery tab</td><td><code>contentSetChanged</code> or <code>templateChanged</code> is <code>true</code></td></tr>
           <tr><td>iframe preview</td><td>Never connects — the <code>window.self !== window.top</code> guard keeps edits from reloading previews</td></tr>
         </tbody>
@@ -786,32 +801,101 @@
   <section>
     <h2><iconify-icon icon="mdi:needle" width="24" noobserver></iconify-icon>Injection</h2>
     <p class="section-desc">
-      Every <code>text/html</code> response gets one client script before the last <code>&lt;/body&gt;</code>. Iframes are skipped — the gallery template ships its own client.
+      Every <code>text/html</code> response gets two tags before the last <code>&lt;/body&gt;</code>: a stylesheet and one module script. Iframes are skipped — the gallery template ships its own client.
     </p>
 
     <div class="grid-2">
       <div class="card">
         <div class="card-head">
-          <iconify-icon icon="mdi:refresh" noobserver></iconify-icon>
-          <h4>Reload client</h4>
+          <iconify-icon icon="mdi:code-tags" noobserver></iconify-icon>
+          <h4>Two tags</h4>
         </div>
-        <p>Connects to <code>/__reload</code>, follows the Reload protocol, and re-fetches linked stylesheets on a <code>css</code> message.</p>
+        <p><code>widget.css</code> and <code>widget/index.js</code> under <code>/__docserve/</code>, with <code>data-page</code> carrying the docs-relative path.</p>
       </div>
       <div class="card">
         <div class="card-head">
-          <iconify-icon icon="mdi:content-copy" noobserver></iconify-icon>
-          <h4>Copy path button</h4>
+          <iconify-icon icon="mdi:content-duplicate" noobserver></iconify-icon>
+          <h4>Idempotent</h4>
         </div>
-        <p>Fixed at the top-right — copies the file's absolute path and shows "Copied" for 1.2 s.</p>
+        <p>An HTML comment marker makes a second pass a no-op; without <code>&lt;/body&gt;</code> the tags are appended at the end.</p>
       </div>
       <div class="card">
         <div class="card-head">
-          <iconify-icon icon="mdi:code-json" noobserver></iconify-icon>
-          <h4>Embedded data</h4>
+          <iconify-icon icon="mdi:folder-eye-outline" noobserver></iconify-icon>
+          <h4>Served as files</h4>
         </div>
-        <p><code>pageId</code> and the absolute path are JSON-encoded, with <code>&lt;</code> escaped to <code>\u003c</code> so page content cannot break out of the client.</p>
+        <p><code>/__docserve/widget/*</code> and <code>/__docserve/plugins/*</code> read from <code>src/</code> per request with <code>cache-control: no-store</code> — edits need no restart.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:shield-lock-outline" noobserver></iconify-icon>
+          <h4>Sandboxed</h4>
+        </div>
+        <p>Paths are checked twice (lexical + <code>realpath</code>), and the widget renders inside a shadow root so page CSS cannot reach it.</p>
       </div>
     </div>
+
+    <pre>&lt;!--docserve-widget--&gt;
+&lt;link rel="stylesheet" href="/__docserve/widget/widget.css" data-docserve-widget&gt;
+&lt;script type="module" src="/__docserve/widget/index.js" data-docserve-widget data-page="guides/intro.html"&gt;&lt;/script&gt;</pre>
+  </section>
+
+  <!-- PLUGINS -->
+  <section>
+    <h2><iconify-icon icon="mdi:puzzle-outline" width="24" noobserver></iconify-icon>Plugins</h2>
+    <p class="section-desc">
+      Plugins extend the injected widget.
+    </p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:puzzle-check-outline" noobserver></iconify-icon>
+          <h4>Plugin shape</h4>
+        </div>
+        <p>Whatever <code>setup(ctx)</code> returns runs on teardown.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:dock-bottom" noobserver></iconify-icon>
+          <h4>UI</h4>
+        </div>
+        <p><code>dock.add</code>, <code>ui.panel</code>, <code>ui.style</code> and <code>ui.announce</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:swap-horizontal" noobserver></iconify-icon>
+          <h4>RPC bus</h4>
+        </div>
+        <p>Plugins never import each other, and <code>ctx.rpc.call</code> always returns a promise.</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <iconify-icon icon="mdi:file-document-multiple-outline" noobserver></iconify-icon>
+          <h4>Page data</h4>
+        </div>
+        <p><code>docserve:pages:list</code> and <code>docserve:pages:resolve</code> wrap <code>/api/files</code>.</p>
+      </div>
+    </div>
+
+    <p class="section-desc">Sidebar, copy and home are built this way.</p>
+
+    <h3><iconify-icon icon="mdi:code-braces" noobserver></iconify-icon>Writing a plugin</h3>
+
+    <pre>export const hello = {
+  id: "hello",
+  setup(ctx) {
+    const item = ctx.dock.add({
+      id: "hello",
+      label: "Say hello",
+      icon: "&lt;svg …&gt;",
+      onClick: () =&gt; ctx.ui.announce("Hello"),
+    })
+    ctx.ui.style("/__docserve/plugins/hello/hello.css")
+    return () =&gt; item.remove()
+  },
+}</pre>
+
   </section>
 
   <!-- DESKTOP -->
