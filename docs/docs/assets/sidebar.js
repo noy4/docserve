@@ -19,6 +19,7 @@
       text: "Plans",
       items: [
         { text: "Plan", link: "PLAN.html", icon: "mdi:clipboard-list-outline" },
+        { text: "Dock plugins", link: "PLAN-DOCK.html", icon: "mdi:dock-bottom" },
         { text: "Site plan", link: "PLAN-SITE.html", icon: "mdi:web" },
         { text: "VS Code", link: "VSCODE_PLAN.html", icon: "mdi:microsoft-visual-studio-code" },
       ],

@@ -11,7 +11,7 @@
 // │ └─ listen ──▶ listener.start() + writeState()          │
 // └────────────────────────────────────────────────────────┘
 import { createServer } from "node:http"
-import { readFile, stat } from "node:fs/promises"
+import { readFile, realpath, stat } from "node:fs/promises"
 import os from "node:os"
 import { basename, extname, resolve } from "node:path"
 import { exec } from "node:child_process"
@@ -23,6 +23,8 @@ import { FileWatcher } from "./watch.mjs"
 
 const MAX_PORT_TRIES = 20 // on conflict, try the next port up to 20 times
 const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "..", "index.html")
+const WIDGET_DIR = resolve(import.meta.dirname, "..", "widget")
+const PLUGINS_DIR = resolve(import.meta.dirname, "..", "plugins")
 
 const MIME = {
   ".html": "text/html",
@@ -121,6 +123,14 @@ function createHandler({ docsDir }) {
       }
     }
 
+    // widget and plugin sources, re-read per request so edits show up live
+    if (url.pathname.startsWith("/__docserve/widget/"))
+      return serveAsset(WIDGET_DIR, url.pathname.slice("/__docserve/widget/".length))
+    if (url.pathname.startsWith("/__docserve/plugins/"))
+      return serveAsset(PLUGINS_DIR, url.pathname.slice("/__docserve/plugins/".length))
+    if (url.pathname.startsWith("/__docserve/"))
+      return new Response("Not Found", { status: 404 })
+
     let pathname
     try {
       pathname = decodeURIComponent(url.pathname)
@@ -146,10 +156,9 @@ function createHandler({ docsDir }) {
     try {
       const body = await readFile(path)
       const type = MIME[extname(path).toLowerCase()] || "application/octet-stream"
-      // Inject the reload client + copy path button into docsDir pages only;
-      // the gallery template ships its own client.
+      // inject the widget into docsDir pages only; the gallery template ships its own client
       if (type === "text/html") {
-        const html = injectIntoHtml(body.toString(), normalizedRelative(docsDir, path), path)
+        const html = injectIntoHtml(body.toString(), normalizedRelative(docsDir, path))
         return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
       }
       return new Response(body, { headers: { "content-type": type } })
@@ -162,6 +171,34 @@ function createHandler({ docsDir }) {
       } catch { }
       return new Response("Not Found", { status: 404 })
     }
+  }
+}
+
+// Serve a file from the widget or plugin tree; symlinks must stay inside root.
+async function serveAsset(root, relative) {
+  if (!relative || relative.includes("\0")) return new Response("Not Found", { status: 404 })
+
+  let requested
+  try {
+    requested = decodeURIComponent(relative)
+  } catch {
+    return new Response("Bad Request", { status: 400 })
+  }
+
+  const target = resolve(root, requested)
+  if (!isWithin(root, target)) return new Response("Forbidden", { status: 403 })
+
+  try {
+    const real = await realpath(target)
+    if (!isWithin(await realpath(root), real)) return new Response("Forbidden", { status: 403 })
+    if (!(await stat(real)).isFile()) return new Response("Not Found", { status: 404 })
+
+    const type = MIME[extname(real).toLowerCase()] || "application/octet-stream"
+    return new Response(await readFile(real), {
+      headers: { "content-type": type, "cache-control": "no-store" },
+    })
+  } catch {
+    return new Response("Not Found", { status: 404 })
   }
 }
 

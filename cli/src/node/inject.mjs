@@ -1,28 +1,40 @@
-// Injection: every text/html response served from docsDir gets one client script
-// before the last </body> (appended at the end if the tag is missing). The script
-// exits immediately inside iframes, so previews get neither part; the gallery
-// template ships its own client. The client template is loaded once at startup.
-import { readFileSync } from "node:fs"
+// Injection: every HTML response from the docs root gets the widget tags before
+// the last </body>. The gallery template is served separately and never reaches
+// this module.
 
 export const WS_PATH = "/__reload"
 
-const clientTemplate = readFileSync(new URL("./inject.html", import.meta.url), "utf8")
+const MARKER = "<!--docserve-widget-->"
+const SCRIPT_SRC = "/__docserve/widget/index.js"
 
-export function injectIntoHtml(html, pageId, absPath) {
-  const idx = html.toLowerCase().lastIndexOf("</body>")
-  if (idx === -1) return html + clientJs(pageId, absPath)
-  return html.slice(0, idx) + clientJs(pageId, absPath) + html.slice(idx)
+/**
+ * Append the widget once. Idempotent: a second pass over the same document is a
+ * no-op. Without a </body> the tags are appended at the end.
+ * @param {string} html
+ * @param {string} page   Docs-relative path, e.g. `guides/intro.html`.
+ * @returns {string}
+ */
+export function injectIntoHtml(html, page) {
+  if (html.includes(MARKER)) return html
+
+  const tags = [
+    MARKER,
+    '<link rel="stylesheet" href="/__docserve/widget/widget.css" data-docserve-widget>',
+    `<script type="module" src="${SCRIPT_SRC}" data-docserve-widget data-page="${escapeAttribute(page)}"></script>`,
+  ].join("\n")
+
+  const index = html.toLowerCase().lastIndexOf("</body>")
+  return index === -1 ? `${html}\n${tags}` : `${html.slice(0, index)}${tags}\n${html.slice(index)}`
 }
 
-function clientJs(pageId, absPath) {
-  const values = {
-    PAGE_ID: JSON.stringify(pageId).replaceAll("<", "\\u003c"),
-    ABS_PATH: JSON.stringify(absPath).replaceAll("<", "\\u003c"),
-    WS_PATH: JSON.stringify(WS_PATH),
-  }
-  let rendered = clientTemplate
-  for (const [key, value] of Object.entries(values)) {
-    rendered = rendered.replaceAll(`__DOCSERVE_${key}__`, () => value)
-  }
-  return rendered
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeAttribute(value) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
 }

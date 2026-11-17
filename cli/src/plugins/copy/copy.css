@@ -1,0 +1,21 @@
+.docserve-dock__button .docserve-icon-check {
+  display: none;
+}
+
+.docserve-dock__button[data-state="copied"] {
+  color: #16a34a;
+}
+
+.docserve-dock__button[data-state="copied"] .docserve-icon-copy {
+  display: none;
+}
+
+.docserve-dock__button[data-state="copied"] .docserve-icon-check {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  .docserve-dock__button[data-state="copied"] {
+    color: #4ade80;
+  }
+}

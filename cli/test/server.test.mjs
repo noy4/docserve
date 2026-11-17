@@ -129,14 +129,13 @@ describe("docserve server", () => {
     for (const dir of [content, home, otherDir]) rmSync(dir, { recursive: true, force: true })
   })
 
-  it("injects a reload client with a per-file page ID", async () => {
+  it("injects the widget tags once with a data-page", async () => {
     writeFileSync(join(content, "page.html"), "<html><body></body></html>")
     const page = await (await fetch(`http://localhost:${port}/page.html`)).text()
-    assert.ok(page.includes('const pageId = "page.html"'))
-    assert.ok(page.includes(`const absPath = ${JSON.stringify(join(content, "page.html"))}`))
-    assert.ok(page.includes(WS_PATH))
-    assert.ok(!page.includes("__DOCSERVE_"), "all injection template markers are substituted")
-    assert.ok(page.includes("window.self !== window.top"), "iframe previews get no client")
+    assert.ok(page.includes('src="/__docserve/widget/index.js"'))
+    assert.ok(page.includes('href="/__docserve/widget/widget.css"'))
+    assert.ok(page.includes('data-page="page.html"'))
+    assert.equal(page.split("<!--docserve-widget-->").length, 2, "injected exactly once")
   })
 
   it("serves the gallery template, not injected", async () => {
@@ -189,7 +188,7 @@ describe("docserve server", () => {
     assert.equal(slash.status, 200)
     const body = await slash.text()
     assert.ok(body.includes("sub index"), "/sub/ serves sub/index.html")
-    assert.ok(body.includes('const pageId = "sub/index.html"'), "directory index gets the reload client")
+    assert.ok(body.includes('data-page="sub/index.html"'), "directory index gets the widget")
 
     const explicit = await fetch(`http://localhost:${port}/sub/index.html`)
     assert.ok((await explicit.text()).includes("sub index"), "/sub/index.html serves the same file")
@@ -388,8 +387,9 @@ describe("docserve multi-instance", () => {
   it("keeps reload broadcasts per folder", async () => {
     const wsA = new WebSocket(`ws://localhost:${portA}${WS_PATH}`)
     const wsB = new WebSocket(`ws://localhost:${portB}${WS_PATH}`)
-    await once(wsA, "open")
-    await once(wsB, "open")
+    // Attach both listeners before awaiting: the second socket can open while
+    // the first is still connecting, and the event is not replayed.
+    await Promise.all([once(wsA, "open"), once(wsB, "open")])
     try {
       // Folder B must stay quiet: a timeout there is the expected outcome.
       const quietB = waitForChange(wsB, () => true, 700).then(

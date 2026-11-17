@@ -12,6 +12,6 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["bin.mjs", "src/**/*.mjs", "test/**/*.mjs"],
+  "include": ["bin.mjs", "src/**/*.mjs", "src/**/*.d.ts", "test/**/*.mjs"],
   "exclude": ["node_modules"]
 }
