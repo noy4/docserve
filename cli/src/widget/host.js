@@ -1,9 +1,11 @@
 // Widget host: shadow root, lifecycle, context assembly and the live connection.
+import { createCommands } from "./commands.js"
 import { createDock } from "./dock.js"
 import { el } from "./lib/dom.js"
 import { createEmitter } from "./lib/emitter.js"
 import { connectLive } from "./live.js"
 import { createPages } from "./pages.js"
+import { createPalette } from "./palette.js"
 import { createPlacement } from "./placement.js"
 import { createPlugins } from "./plugins.js"
 import { createRpc } from "./rpc.js"
@@ -40,16 +42,36 @@ export function createHost() {
   const rpc = createRpc()
   const pages = createPages({ rpc })
   const dock = createDock({ host: shadow, getContext: () => ctx })
+  const commands = createCommands({ getContext: () => ctx })
   const placement = createPlacement({ element, handle: dock.element })
   const { on, emit } = createEmitter()
-  const ui = createUi({ host: shadow, status })
-  ui.style("/__docserve/widget/widget.css")
+  const ui = createUi({
+    host: shadow,
+    status,
+    styles: ["/__docserve/widget/widget.css"],
+  })
+
+  const palette = createPalette({
+    host: shadow,
+    ui,
+    commands: commands.api,
+    subscribe: commands.onChange,
+  })
 
   // public surface, built before plugins run
   /** @type {DocserveContext} */
   let ctx
   const { use, dispose } = createPlugins(() => ctx)
-  ctx = { page, rpc, dock, ui, on, use, start }
+  ctx = {
+    page,
+    rpc,
+    dock,
+    commands: commands.api,
+    ui,
+    on,
+    use,
+    start,
+  }
 
   // lifecycle state
   /** @type {ReturnType<typeof connectLive> | null} */
@@ -90,6 +112,8 @@ export function createHost() {
     live = null
     if (mounted) {
       placement.destroy()
+      palette.destroy()
+      commands.destroy()
       document.documentElement.toggleAttribute("data-docserve-widget", false)
       element.toggleAttribute("data-ready", false)
       element.remove()

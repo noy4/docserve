@@ -1,4 +1,6 @@
-// The dock: one pill that every plugin contributes items to.
+// The dock: one pill that every plugin contributes items to. An item either
+// runs a command or is a link.
+import { formatKey } from "./commands.js"
 import { el } from "./lib/dom.js"
 
 /**
@@ -34,6 +36,7 @@ export function createDock({ host, getContext }) {
   function add(item) {
     if (typeof item?.id !== "string" || !item.id) throw new TypeError("dock.add expects an item with an id")
     if (handles.has(item.id)) throw new Error(`dock item already added: ${item.id}`)
+    if (!item.command === !item.href) throw new TypeError(`dock item ${item.id} needs exactly one of command or href`)
 
     const handle = {
       /** @type {HTMLElement | null} */
@@ -86,15 +89,16 @@ export function createDock({ host, getContext }) {
 }
 
 /**
- * Build one dock item: a button, or a link when `href` is set.
+ * Build one dock item: a command button, or a link when `href` is set.
  * @param {DockItem} item
  * @param {DocserveContext} ctx
  * @returns {HTMLElement}
  */
 function createDockItem(item, ctx) {
+  const keys = item.command ? ctx.commands.list().find((command) => command.id === item.command)?.keys ?? [] : []
   const props = {
     class: "docserve-dock__button",
-    title: item.label,
+    title: keys.length ? `${item.label} (${keys.map(formatKey).join(" / ")})` : item.label,
     "aria-label": item.label,
     "data-action": item.id,
     html: item.icon ?? "",
@@ -104,7 +108,11 @@ function createDockItem(item, ctx) {
     : el("button", { ...props, type: "button" })
 
   syncDockItem(node, item)
-  if (item.onClick) node.addEventListener("click", (event) => item.onClick?.(/** @type {MouseEvent} */ (event), ctx))
+  if (!item.href) {
+    node.addEventListener("click", () => {
+      ctx.commands.run(/** @type {string} */ (item.command)).catch((error) => console.error(`[docserve] dock command failed: ${item.command}`, error))
+    })
+  }
   return node
 }
 

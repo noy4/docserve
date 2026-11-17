@@ -1,5 +1,5 @@
 // Dock toggle plus a left panel that lists every page.
-import { decoded, displayDate, el, icon, isTyping, pageUrl } from "../../widget/lib/dom.js"
+import { decoded, displayDate, el, icon, pageUrl } from "../../widget/lib/dom.js"
 import { persistedFlag } from "../../widget/lib/storage.js"
 
 const ICON_SIDEBAR = icon('<rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" />')
@@ -36,13 +36,31 @@ export function sidebarPlugin() {
         element,
       })
 
+      const offToggle = ctx.commands.register({
+        id: "plugin:sidebar:toggle",
+        title: "Toggle sidebar",
+        group: "View",
+        icon: ICON_SIDEBAR,
+        keys: ["[", "Alt+B"],
+        run: () => setOpen(!panel.isOpen()),
+      })
+
+      const offClose = ctx.commands.register({
+        id: "plugin:sidebar:close",
+        title: "Close sidebar",
+        keys: ["Escape"],
+        showInPalette: false,
+        when: () => panel.isOpen(),
+        run: () => setOpen(false),
+      })
+
       const item = ctx.dock.add({
         id: "sidebar",
         label: "Toggle sidebar",
         icon: ICON_SIDEBAR,
         group: "main",
+        command: "plugin:sidebar:toggle",
         isActive: () => panel.isOpen(),
-        onClick: () => setOpen(!panel.isOpen()),
       })
 
       const offChange = ctx.on("change", (change) => {
@@ -53,13 +71,12 @@ export function sidebarPlugin() {
         if (panel.isOpen()) scrollActive()
       })
 
-      window.addEventListener("keydown", onKeydown)
-
       load()
       scrollActive()
 
       return () => {
-        window.removeEventListener("keydown", onKeydown)
+        offToggle()
+        offClose()
         offChange()
         offOpen()
         offStart()
@@ -75,21 +92,6 @@ export function sidebarPlugin() {
         item.update()
         openState.value = next
         if (next) scrollActive()
-      }
-
-      /**
-       * @param {KeyboardEvent} event
-       */
-      function onKeydown(event) {
-        if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return
-        if (isTyping(event.target)) return
-
-        if (event.key === "[") {
-          event.preventDefault()
-          setOpen(!panel.isOpen())
-        } else if (event.key === "Escape" && panel.isOpen()) {
-          setOpen(false)
-        }
       }
 
       /**

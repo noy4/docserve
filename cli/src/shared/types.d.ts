@@ -61,9 +61,10 @@ interface DockItem {
   order?: number
   /** Items in different groups get a divider between them. */
   group?: string
-  /** Render as `<a>` when set. */
+  /** Command id run through `ctx.commands`; exactly one of `command` / `href`. */
+  command?: string
+  /** Rendered as `<a href>` instead of a command button. */
   href?: string
-  onClick?: (event: MouseEvent, ctx: DocserveContext) => void
   /** Mirrors `aria-pressed`. */
   isActive?: () => boolean
 }
@@ -74,6 +75,44 @@ interface DockItemHandle {
   /** Re-evaluate `isActive`. */
   update: () => void
   remove: () => void
+}
+
+/** One command, reachable from a shortcut and from the palette. */
+interface DocserveCommand {
+  /** Unique; core ids start with `docserve:`, plugins use `plugin:<id>:<name>`. */
+  id: string
+  /** Palette row text and dock `title`. */
+  title: string
+  /** Optional palette subtitle. */
+  hint?: string
+  /** Optional palette section heading. */
+  group?: string
+  /** Inline SVG markup, shared with dock items. */
+  icon?: string
+  /** Normalized shortcuts: `"Mod+K"`, `"Alt+B"`, `"Shift+C"`, `"["`. */
+  keys?: string[]
+  /** Default true; `false` keeps it out of the palette. */
+  showInPalette?: boolean
+  /** False when the command cannot run right now. */
+  when?: () => boolean
+  /** Runs on shortcut or palette selection. */
+  run: (ctx: DocserveContext) => void | Promise<void>
+}
+
+/** Command registry plus the palette it feeds. */
+interface CommandsApi {
+  /** Throws on a duplicate id; the result unregisters. */
+  register: (command: DocserveCommand) => () => void
+  /** Rejects when the id is unknown or `when()` is false. */
+  run: (id: string) => Promise<void>
+  /** Available commands, in registration order. */
+  list: () => DocserveCommand[]
+  palette: {
+    open: () => void
+    close: () => void
+    toggle: () => void
+    isOpen: () => boolean
+  }
 }
 
 /** The single dock. Plugins add and remove items; only core owns the container. */
@@ -133,6 +172,8 @@ interface DocserveContext {
   rpc: RpcBus
   /** The one dock every plugin contributes items to. */
   dock: DockHandle
+  /** Shortcut and palette registry. */
+  commands: CommandsApi
   ui: UiApi
   on: Emitter<DocserveEventMap>['on']
   use: (plugin: DocservePlugin) => DocserveContext

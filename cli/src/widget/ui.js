@@ -11,14 +11,17 @@ import { el } from "./lib/dom.js"
  * @param {object} options
  * @param {ShadowRoot} options.host
  * @param {HTMLElement} options.status   Live region for `announce`.
+ * @param {string[]} [options.styles]    Core stylesheets, added before plugins.
  * @returns {UiHandle}
  */
-export function createUi({ host, status }) {
+export function createUi({ host, status, styles = [] }) {
   const panels = createPanels(host)
   /** @type {Set<string>} */
-  const styles = new Set()
+  const added = new Set()
   /** @type {Set<Promise<void>>} */
   const loads = new Set()
+
+  for (const href of styles) style(href)
 
   return {
     panel: panels.add,
@@ -32,8 +35,8 @@ export function createUi({ host, status }) {
    * @param {string} href
    */
   function style(href) {
-    if (styles.has(href)) return
-    styles.add(href)
+    if (added.has(href)) return
+    added.add(href)
 
     const link = el("link", { rel: "stylesheet", href })
     const load = new Promise((resolve) => {

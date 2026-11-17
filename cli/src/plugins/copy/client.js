@@ -18,27 +18,40 @@ export function copyPlugin() {
 
       ctx.ui.style("/__docserve/plugins/copy/copy.css")
 
+      const offCopy = ctx.commands.register({
+        id: "plugin:copy:path",
+        title: "Copy file path",
+        hint: "Absolute path of this page",
+        group: "Actions",
+        icon: ICON_COPY,
+        keys: ["c"],
+        run: copyPath,
+      })
+
       handle = ctx.dock.add({
         id: "copy",
         label: "Copy file path",
         icon: ICON_COPY + ICON_CHECK,
         group: "actions",
-        async onClick() {
-          const file = /** @type {DocPage | null} */ (await ctx.rpc.call("docserve:pages:resolve", ctx.page))
-          const text = file?.filePath ?? location.href
-          try {
-            await writeClipboard(text)
-            flash("copied")
-            ctx.ui.announce("File path copied")
-          } catch {
-            ctx.ui.announce("Copy failed")
-          }
-        },
+        command: "plugin:copy:path",
       })
 
       return () => {
+        offCopy()
         if (resetTimer) clearTimeout(resetTimer)
         handle?.remove()
+      }
+
+      async function copyPath() {
+        const file = /** @type {DocPage | null} */ (await ctx.rpc.call("docserve:pages:resolve", ctx.page))
+        const text = file?.filePath ?? location.href
+        try {
+          await writeClipboard(text)
+          flash("copied")
+          ctx.ui.announce("File path copied")
+        } catch {
+          ctx.ui.announce("Copy failed")
+        }
       }
 
       /**

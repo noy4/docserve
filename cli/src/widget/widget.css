@@ -65,6 +65,10 @@ html[data-docserve-panel-left] body {
   padding-left: var(--docserve-panel-left) !important;
 }
 
+html[data-docserve-palette] {
+  overflow: hidden;
+}
+
 .docserve-dock,
 .docserve-dock *,
 .docserve-panel,

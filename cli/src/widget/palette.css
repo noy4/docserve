@@ -1,0 +1,162 @@
+/* Command palette. Colours come from the host's variables in widget.css. */
+
+.docserve-palette {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+}
+
+.docserve-palette[data-open] {
+  display: block;
+}
+
+.docserve-palette__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.28);
+  backdrop-filter: blur(2px);
+}
+
+.docserve-palette__dialog {
+  position: absolute;
+  left: 50%;
+  top: 18vh;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 92vw);
+  max-height: 60vh;
+  overflow: hidden;
+  border: 1px solid var(--docserve-panel-border);
+  border-radius: 14px;
+  background: var(--docserve-panel-bg);
+  color: var(--docserve-panel-text);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.docserve-palette__input {
+  flex: none;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--docserve-panel-border);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+.docserve-palette__list {
+  flex: 1;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.docserve-palette__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.docserve-palette__row[aria-selected="true"] {
+  background: var(--docserve-dock-accent-soft);
+}
+
+.docserve-palette__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--docserve-dock-muted);
+}
+
+.docserve-palette__row[aria-selected="true"] .docserve-palette__icon {
+  color: var(--docserve-dock-accent);
+}
+
+.docserve-palette__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.docserve-palette__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.docserve-palette__title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.docserve-palette__hint {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--docserve-panel-muted);
+  font-size: 12px;
+}
+
+.docserve-palette__keys {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.docserve-palette__key {
+  flex: none;
+  padding: 0 5px;
+  border: 1px solid var(--docserve-panel-border);
+  border-radius: 5px;
+  color: var(--docserve-dock-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.docserve-palette__empty {
+  display: none;
+  margin: 0;
+  padding: 24px 16px;
+  color: var(--docserve-panel-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.docserve-palette__empty[data-visible] {
+  display: block;
+}
+
+.docserve-palette__footer {
+  display: flex;
+  flex: none;
+  gap: 16px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--docserve-panel-border);
+  color: var(--docserve-panel-muted);
+  font-size: 11px;
+}
+
+.docserve-palette__legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.docserve-palette__legend kbd {
+  padding: 0 4px;
+  border: 1px solid var(--docserve-panel-border);
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
