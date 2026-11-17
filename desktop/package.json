@@ -24,7 +24,11 @@
     "extraResources": [
       {
         "from": "../cli",
-        "to": "cli"
+        "to": "cli",
+        "filter": [
+          "**/*",
+          "!node_modules/**"
+        ]
       }
     ],
     "mac": {

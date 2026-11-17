@@ -15,15 +15,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: desktop/package-lock.json
-      - run: npm ci
-        working-directory: desktop
-      - run: npm run dist
-        working-directory: desktop
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C desktop dist
       - run: shasum -a 256 dist/*.dmg | sed 's|dist/||' > dist/sha256sums.txt
         working-directory: desktop
       - run: gh release create "$GITHUB_REF_NAME" dist/Docserve-*.dmg dist/sha256sums.txt --title "Docserve ${GITHUB_REF_NAME#v}" --generate-notes

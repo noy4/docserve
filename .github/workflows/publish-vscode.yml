@@ -17,22 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: vscode/package-lock.json
-      - run: npm ci
-        working-directory: vscode
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Check tag matches package version
         run: |
           node -e "const v=require('./package.json').version;const t=process.env.REF_NAME.replace(/^vscode-v/,'');if(v!==t)throw new Error('tag '+t+' but package is '+v)"
         env:
           REF_NAME: ${{ github.ref_name }}
         working-directory: vscode
-      - run: npx tsc --noEmit
-        working-directory: vscode
-      - run: node esbuild.mjs
-        working-directory: vscode
-      - run: npx @vscode/vsce publish --oidc
-        working-directory: vscode
+      - run: pnpm -C vscode typecheck
+      - run: pnpm -C vscode build
+      - run: pnpm -C vscode exec vsce publish --oidc --no-dependencies

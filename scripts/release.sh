@@ -33,7 +33,7 @@ both)
   ;;
 esac
 
-for dep in git gh node npm; do
+for dep in git gh node npm pnpm; do
   command -v "$dep" >/dev/null || {
     echo "error: $dep not found" >&2
     exit 1
@@ -113,7 +113,7 @@ fi
 
 if ((DO_CLI)); then
   echo "==> running cli tests"
-  (cd cli && npm test)
+  pnpm -C cli test
 fi
 
 set_version() {
