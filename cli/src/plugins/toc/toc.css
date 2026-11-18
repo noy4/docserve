@@ -132,6 +132,17 @@
   font-size: 11px;
 }
 
+.docserve-toc__link iconify-icon,
+.docserve-toc__link svg,
+.docserve-toc__link img {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 5px;
+  vertical-align: -2px;
+  color: inherit;
+}
+
 .docserve-toc__link:hover {
   background: color-mix(in srgb, var(--docserve-panel-text) 6%, transparent);
   color: var(--docserve-panel-text);

@@ -2,6 +2,19 @@ import ICON_CLOSE_RAW from "~icons/lucide/x?raw&width=16&height=16"
 import { el, iconSvg } from "../../widget/lib/dom.js"
 
 const ICON_CLOSE = iconSvg(ICON_CLOSE_RAW)
+const BLOCKED = new Set([
+  "SCRIPT",
+  "STYLE",
+  "LINK",
+  "IFRAME",
+  "OBJECT",
+  "EMBED",
+  "BUTTON",
+  "INPUT",
+  "SELECT",
+  "TEXTAREA",
+  "TEMPLATE",
+])
 
 /**
  * @typedef {object} TocNodeLike
@@ -177,12 +190,20 @@ export function createPanel({ onClose, onNavigate }) {
    * @returns {HTMLElement}
    */
   function createLink(element) {
-    const anchor = el("a", {
-      class: "docserve-toc__link",
-      href: `#${element.id}`,
-      "data-level": String(element.tagName[1]),
-      text: element.textContent?.trim() ?? "",
-    })
+    const anchor = el(
+      "a",
+      {
+        class: "docserve-toc__link",
+        href: `#${element.id}`,
+        "data-level": String(element.tagName[1]),
+      },
+      renderHeading(element),
+    )
+
+    for (const icon of anchor.querySelectorAll("iconify-icon, svg, img")) {
+      icon.removeAttribute("width")
+      icon.removeAttribute("height")
+    }
 
     anchor.addEventListener("click", (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
@@ -192,6 +213,48 @@ export function createPanel({ onClose, onNavigate }) {
 
     links.set(element.id, anchor)
     return anchor
+  }
+
+  /**
+   * Clone the heading's inline content, keeping icons but dropping ids,
+   * handlers and nested interactive elements.
+   * @param {HTMLHeadingElement} element
+   * @returns {DocumentFragment}
+   */
+  function renderHeading(element) {
+    const fragment = document.createDocumentFragment()
+    for (const child of element.childNodes) appendClone(fragment, child)
+    return fragment
+  }
+
+  /**
+   * @param {ParentNode} parent
+   * @param {Node} node
+   */
+  function appendClone(parent, node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parent.append(node.cloneNode(true))
+      return
+    }
+
+    if (!(node instanceof Element) || BLOCKED.has(node.tagName)) return
+
+    if (node.tagName === "A") {
+      for (const child of node.childNodes) appendClone(parent, child)
+      return
+    }
+
+    const copy = /** @type {Element} */ (node.cloneNode(false))
+    copy.removeAttribute("id")
+    copy.removeAttribute("tabindex")
+    copy.removeAttribute("contenteditable")
+    for (const attribute of [...copy.attributes]) {
+      if (attribute.name.toLowerCase().startsWith("on"))
+        copy.removeAttribute(attribute.name)
+    }
+
+    for (const child of node.childNodes) appendClone(copy, child)
+    parent.append(copy)
   }
 
   function destroy() {
