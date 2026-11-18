@@ -69,15 +69,14 @@ export class TrayController {
     const running = [...states].sort(
       (a, b) => (order.get(a.docsDir) ?? Infinity) - (order.get(b.docsDir) ?? Infinity),
     )
-    const recentItem = recents.length && {
+    // Already-running folders are listed above with Open/Stop, so keep them out of Open Recent.
+    const live = new Set(states.map((state) => state.docsDir))
+    const recentDirs = recents.filter((entry) => !live.has(entry.dir))
+    const recentItem = {
       label: "Open Recent",
-      submenu: recents.map(({ dir }) => ({
+      submenu: recentDirs.map(({ dir }) => ({
         label: `${path.basename(dir) || dir} (${tildePath(path.dirname(dir))})`,
-        click: () => {
-          const live = states.find((state) => state.docsDir === dir)
-          if (live) shell.openExternal(live.url)
-          else this.server.start(dir, { open: true })
-        },
+        click: () => this.server.start(dir, { open: true }),
       })),
     }
 
