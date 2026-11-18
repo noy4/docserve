@@ -1,25 +1,50 @@
+.docserve-toc,
+.docserve-toc * {
+  box-sizing: border-box;
+}
+
 .docserve-toc {
-  width: min(260px, 86vw);
-  height: 100%;
-  min-height: 0;
-  overflow: visible;
+  position: fixed;
+  top: 96px;
+  left: max(16px, calc(100% - var(--docserve-panel-right, 0px)));
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  max-height: calc(100vh - 128px);
+  color: var(--docserve-panel-text);
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(12px);
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    visibility 0.18s ease;
+}
+
+.docserve-toc[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
 }
 
 .docserve-toc__head {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 12px 8px 8px 16px;
+  padding: 0 0 8px;
 }
 
 .docserve-toc__title {
   min-width: 0;
   overflow: hidden;
   color: var(--docserve-panel-text);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.01em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -28,22 +53,34 @@
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border: 0;
-  border-radius: 7px;
+  border-radius: 6px;
   background: transparent;
   color: var(--docserve-panel-muted);
   font: inherit;
   line-height: 0;
+  opacity: 0;
+  visibility: hidden;
   appearance: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    visibility 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.docserve-toc:hover .docserve-toc__close,
+.docserve-toc:focus-within .docserve-toc__close {
+  opacity: 1;
+  visibility: visible;
 }
 
 .docserve-toc__close svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .docserve-toc__close:hover {
@@ -59,10 +96,11 @@
 .docserve-toc__scroll {
   flex: 1;
   min-height: 0;
-  padding: 0 8px 32px 16px;
+  padding: 0 4px 4px 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .docserve-toc__scroll::-webkit-scrollbar {
@@ -167,6 +205,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .docserve-toc,
   .docserve-toc__marker,
   .docserve-toc__link,
   .docserve-toc__close {

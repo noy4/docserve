@@ -8,7 +8,6 @@ import { createPanel } from "./panel.js"
 const ICON_TOC = iconSvg(ICON_TOC_RAW)
 const OFFSET = 88
 const PANEL_WIDTH = "260px"
-const DESKTOP = "(min-width: 900px)"
 
 /**
  * @returns {DocservePlugin}
@@ -19,8 +18,6 @@ export function tocPlugin() {
     setup(ctx) {
       const source = document.body ?? document.documentElement
       const html = document.documentElement
-      const desktop = matchMedia(DESKTOP)
-      const shift = !source?.hasAttribute("data-toc-overlay")
       const { headings } = collectOutline(document)
       const open = persistedBool("docserve:toc:open", source?.hasAttribute("data-toc-open") ?? false)
       const cleanup = createDisposables()
@@ -70,7 +67,6 @@ export function tocPlugin() {
 
       const offOpen = open.subscribe(sync)
 
-      desktop.addEventListener("change", sync, { signal })
       window.addEventListener("scroll", scheduleActive, { passive: true, signal })
       window.addEventListener("resize", scheduleActive, { passive: true, signal })
 
@@ -98,13 +94,13 @@ export function tocPlugin() {
       }
 
       function sync() {
-        panel.setOpen(open.value)
+        const isOpen = open.value
 
-        const shifted = open.value && shift && desktop.matches
-        html.toggleAttribute("data-docserve-panel-right", shifted)
-        if (shifted) html.style.setProperty("--docserve-panel-right", PANEL_WIDTH)
+        html.toggleAttribute("data-docserve-panel-right", isOpen)
+        if (isOpen) html.style.setProperty("--docserve-panel-right", PANEL_WIDTH)
         else html.style.removeProperty("--docserve-panel-right")
 
+        panel.setOpen(isOpen)
         dock.update()
       }
 

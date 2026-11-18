@@ -51,8 +51,7 @@ export function createPanel({ onClose, onNavigate }) {
   let frame = 0
 
   const panel = el("aside", {
-    class: "docserve-panel docserve-toc",
-    "data-side": "right",
+    class: "docserve-toc",
     "aria-label": "Table of contents",
   })
 
