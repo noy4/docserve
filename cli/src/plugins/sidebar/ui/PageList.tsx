@@ -83,18 +83,19 @@ function pageKey(page: DocPage): string {
 }
 
 function ListRow({ page, active }: { page: DocPage; active: boolean }) {
+  const date = displayDate(page.created)
+
   return (
     <a
       className="docserve-sidebar__item"
       href={page.url}
-      title={page.title}
+      title={date ? `${page.title} — ${date}` : page.title}
       aria-current={active ? "page" : undefined}
     >
       <span className="docserve-sidebar__title">
         <Favicon src={page.favicon} />
         <span>{pageLabel(page)}</span>
       </span>
-      <span className="docserve-sidebar__date">{displayDate(page.created)}</span>
     </a>
   )
 }
