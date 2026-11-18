@@ -90,11 +90,11 @@ export function sidebarPlugin() {
       cleanup.add(model.open.subscribe(() => item.update()))
 
       // data
-      cleanup.add(ctx.on("change", (change) => {
+      cleanup.add(ctx.events.on("pages:changed", (change) => {
         if (change.pages.length || change.contentSetChanged)
           model.load({ force: true })
       }))
-      cleanup.add(ctx.on("open", () => model.load({ force: true })))
+      cleanup.add(ctx.events.on("live:connected", () => model.load({ force: true })))
 
       model.load()
 

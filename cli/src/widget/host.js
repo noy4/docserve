@@ -63,6 +63,7 @@ export function createHost() {
     docks,
     commands: commands.api,
     ui,
+    events: { on },
     on,
     use,
     start,
@@ -79,12 +80,12 @@ export function createHost() {
     document.documentElement.toggleAttribute("data-docserve-widget", true)
     document.body.append(host)
     reveal()
-    emit("start")
+    emit("host:started")
 
     live = connectLive({
       onOpen() {
         pages.invalidate()
-        emit("open")
+        emit("live:connected")
       },
       onMessage: onLiveMessage,
     })
@@ -127,7 +128,7 @@ export function createHost() {
   function onContentChange(message) {
     if (message.contentSetChanged || message.pages.length)
       pages.invalidate()
-    emit("change", message)
+    emit("pages:changed", message)
 
     // only reload when this page or the gallery template changed
     if (message.pages.includes(page) || message.templateChanged)

@@ -48,15 +48,20 @@ type LiveMessage = ChangeMessage | CssMessage
 
 /** Events a plugin can observe. Values are listener signatures. */
 interface DocserveEventMap {
-  change: (message: ChangeMessage) => void
-  open: () => void
-  start: () => void
+  'pages:changed': (message: ChangeMessage) => void
+  'live:connected': () => void
+  'host:started': () => void
 }
 
 /** A typed event bus, typed after nanoevents. */
 interface Emitter<Events extends Record<string, (...args: any[]) => void>> {
   on: <K extends keyof Events & string>(type: K, handler: Events[K]) => () => void
   emit: <K extends keyof Events & string>(type: K, ...args: Parameters<Events[K]>) => void
+}
+
+/** Read-only view of the widget's event bus: plugins subscribe, core emits. */
+interface DocserveEvents {
+  on: Emitter<DocserveEventMap>['on']
 }
 
 /** A button (or link) in a dock. */
@@ -169,7 +174,10 @@ interface DocserveContext {
   /** Shortcut and palette registry. */
   commands: CommandsContext
   ui: UiContext
-  on: Emitter<DocserveEventMap>['on']
+  /** Event bus; subscribe with `events.on`. */
+  events: DocserveEvents
+  /** @deprecated Use `events.on`. */
+  on: DocserveEvents['on']
   use: (plugin: DocservePlugin) => DocserveContext
   start: () => DocserveContext
 }
