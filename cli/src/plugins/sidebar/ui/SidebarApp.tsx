@@ -8,13 +8,12 @@ import type { SidebarModel } from "../model.js"
 
 export interface SidebarAppProps {
   model: SidebarModel
-  docs?: DocsInfo
-  currentPage: string
   width: string
-  onClose: () => void
 }
 
-export function SidebarApp({ model, docs, currentPage, width, onClose }: SidebarAppProps) {
+export function SidebarApp({ model, width }: SidebarAppProps) {
+  const docs = model.docs
+  const currentPage = model.currentPage
   const previews = useLayoutModel(() => new PreviewModel())
   const pages = model.pages.value
   const status = model.status.value
@@ -54,16 +53,7 @@ export function SidebarApp({ model, docs, currentPage, width, onClose }: Sidebar
       aria-label={docs?.name || "Pages"}
       style={style}
     >
-      <SidebarHeader
-        docs={docs}
-        view={view}
-        grouping={grouping}
-        files={status === "ready" ? pages.length : null}
-        tabsVisible={status !== "error" && pages.length > 0}
-        onView={(next) => model.setView(next)}
-        onGrouping={(next) => model.setGrouping(next)}
-        onClose={onClose}
-      />
+      <SidebarHeader model={model} />
       <nav ref={previews.setRoot} className="docserve-sidebar__list" aria-label="Pages">
         {status === "error"
           ? (

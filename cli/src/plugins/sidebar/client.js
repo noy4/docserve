@@ -16,11 +16,9 @@ export function sidebarPlugin() {
     id: "sidebar",
     setup(ctx) {
       // state
-      const model = new SidebarModel({ rpc: ctx.rpc })
-
+      const model = SidebarModel.fromContext(ctx)
       // styles
       ctx.ui.style("/__docserve/plugins/sidebar/sidebar.css")
-
       // cleanup
       const cleanup = createDisposables()
 
@@ -33,10 +31,7 @@ export function sidebarPlugin() {
       })
       root.render(createElement(SidebarApp, {
         model,
-        docs: ctx.docs,
-        currentPage: ctx.page,
         width: WIDTH,
-        onClose: () => model.setOpen(false),
       }))
 
       // commands

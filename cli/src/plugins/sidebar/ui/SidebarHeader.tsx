@@ -1,19 +1,18 @@
 import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR } from "../icons.js"
-import type { SidebarGrouping, SidebarView } from "../model.js"
+import type { SidebarModel } from "../model.js"
 
 export interface SidebarHeaderProps {
-  docs?: DocsInfo
-  view: SidebarView
-  grouping: SidebarGrouping
-  files: number | null
-  tabsVisible: boolean
-  onView: (view: SidebarView) => void
-  onGrouping: (grouping: SidebarGrouping) => void
-  onClose: () => void
+  model: SidebarModel
 }
 
-export function SidebarHeader({ docs, view, grouping, files, tabsVisible, onView, onGrouping, onClose }: SidebarHeaderProps) {
+export function SidebarHeader({ model }: SidebarHeaderProps) {
+  const docs = model.docs
   const name = docs?.name || "Pages"
+  const view = model.view.value
+  const grouping = model.grouping.value
+  const pages = model.pages.value
+  const files = model.status.value === "ready" ? pages.length : null
+  const tabsVisible = model.status.value !== "error" && pages.length > 0
 
   return (
     <header className="docserve-sidebar__head">
@@ -27,7 +26,7 @@ export function SidebarHeader({ docs, view, grouping, files, tabsVisible, onView
           className="docserve-sidebar__close"
           aria-label="Close sidebar"
           title="Close sidebar"
-          onClick={onClose}
+          onClick={() => model.setOpen(false)}
           dangerouslySetInnerHTML={{ __html: ICON_SIDEBAR }}
         />
       </div>
@@ -45,7 +44,7 @@ export function SidebarHeader({ docs, view, grouping, files, tabsVisible, onView
             aria-label="Group by month"
             title="Group by month"
             aria-pressed={grouping === "month"}
-            onClick={() => onGrouping(grouping === "month" ? "none" : "month")}
+            onClick={() => model.toggleGrouping()}
             dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
           />
           <div className="docserve-sidebar__views" role="group" aria-label="View">
@@ -55,7 +54,7 @@ export function SidebarHeader({ docs, view, grouping, files, tabsVisible, onView
               aria-label="List view"
               title="List view"
               aria-pressed={view === "list"}
-              onClick={() => onView("list")}
+              onClick={() => model.setView("list")}
               dangerouslySetInnerHTML={{ __html: ICON_LIST }}
             />
             <button
@@ -64,7 +63,7 @@ export function SidebarHeader({ docs, view, grouping, files, tabsVisible, onView
               aria-label="Gallery view"
               title="Gallery view"
               aria-pressed={view === "gallery"}
-              onClick={() => onView("gallery")}
+              onClick={() => model.setView("gallery")}
               dangerouslySetInnerHTML={{ __html: ICON_GRID }}
             />
           </div>

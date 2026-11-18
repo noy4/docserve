@@ -7,9 +7,13 @@ export type SidebarStatus = "loading" | "ready" | "error"
 
 export interface SidebarModelOptions {
   rpc: RpcContext
+  docs?: DocsInfo
+  currentPage: string
 }
 
 export class SidebarModel {
+  readonly docs?: DocsInfo
+  readonly currentPage: string
   readonly pages = signal<DocPage[]>([])
   readonly status = signal<SidebarStatus>("loading")
   readonly view = persisted<SidebarView>("docserve:sidebar:view", "list")
@@ -21,6 +25,16 @@ export class SidebarModel {
 
   constructor(options: SidebarModelOptions) {
     this.#rpc = options.rpc
+    this.docs = options.docs
+    this.currentPage = options.currentPage
+  }
+
+  static fromContext(ctx: DocserveContext): SidebarModel {
+    return new SidebarModel({
+      rpc: ctx.rpc,
+      docs: ctx.docs,
+      currentPage: ctx.page,
+    })
   }
 
   setView(next: SidebarView): void {
