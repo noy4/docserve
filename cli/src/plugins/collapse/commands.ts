@@ -7,12 +7,22 @@ const ICON_FOLD = iconSvg(ICON_FOLD_RAW)
 const ICON_UNFOLD = iconSvg(ICON_UNFOLD_RAW)
 
 export function registerCollapseCommands(ctx: DocserveContext, model: CollapseModel): () => void {
+  const offEnabled = ctx.commands.register({
+    id: "plugin:collapse:toggle-enabled",
+    title: "Enable/disable collapse",
+    category: "View",
+    icon: ICON_FOLD,
+    keys: ["Alt+K"],
+    run: () => model.toggleEnabled(),
+  })
+
   const offToggle = ctx.commands.register({
     id: "plugin:collapse:toggle-all",
     title: "Toggle all sections",
     category: "View",
     icon: ICON_FOLD,
     keys: ["k"],
+    when: () => model.enabled.value,
     run: () => model.toggleAll(),
   })
 
@@ -21,6 +31,7 @@ export function registerCollapseCommands(ctx: DocserveContext, model: CollapseMo
     title: "Expand all sections",
     category: "View",
     icon: ICON_UNFOLD,
+    when: () => model.enabled.value,
     run: () => model.expandAll(),
   })
 
@@ -29,6 +40,7 @@ export function registerCollapseCommands(ctx: DocserveContext, model: CollapseMo
     title: "Collapse all sections",
     category: "View",
     icon: ICON_FOLD,
+    when: () => model.enabled.value,
     run: () => model.collapseAll(),
   })
 
@@ -36,22 +48,34 @@ export function registerCollapseCommands(ctx: DocserveContext, model: CollapseMo
     offCollapse()
     offExpand()
     offToggle()
+    offEnabled()
   }
 }
 
 export function registerCollapseDock(ctx: DocserveContext, model: CollapseModel): () => void {
-  const dock = ctx.docks.register({
-    id: "collapse",
-    title: "Toggle all sections",
-    icon: ICON_FOLD,
-    category: "actions",
-    command: "plugin:collapse:toggle-all",
-  })
+  /** @type {DocksItemHandle | null} */
+  let dock = null
 
-  const offCollapsed = model.collapsed.subscribe(() => dock.update())
+  const offEnabled = model.enabled.subscribe(sync)
 
   return () => {
-    offCollapsed()
-    dock.dispose()
+    offEnabled()
+    dock?.dispose()
+    dock = null
+  }
+
+  function sync(): void {
+    if (model.enabled.value && !dock) {
+      dock = ctx.docks.register({
+        id: "collapse",
+        title: "Toggle all sections",
+        icon: ICON_FOLD,
+        category: "actions",
+        command: "plugin:collapse:toggle-all",
+      })
+    } else if (!model.enabled.value && dock) {
+      dock.dispose()
+      dock = null
+    }
   }
 }

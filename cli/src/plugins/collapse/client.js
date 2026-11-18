@@ -3,7 +3,6 @@ import { el } from "../../widget/lib/dom.js"
 import { registerCollapseCommands, registerCollapseDock } from "./commands.js"
 import { CollapseModel } from "./model.js"
 import { collectSections } from "./sections.js"
-import { mountSections } from "./view.js"
 
 /**
  * @returns {DocservePlugin}
@@ -13,8 +12,7 @@ export function collapsePlugin() {
     id: "collapse",
     setup(ctx) {
       // sections
-      const { sections, wrappers } = collectSections(document)
-      if (!sections.length) return
+      const collect = collectSections(document)
 
       // state
       const model = CollapseModel.create(ctx.page)
@@ -30,8 +28,7 @@ export function collapsePlugin() {
       cleanup.add(() => link.remove())
 
       // sections
-      model.load(sections)
-      cleanup.add(mountSections(sections, (id) => model.toggle(id)))
+      model.load(collect)
       cleanup.add(model.subscribe())
 
       // commands
@@ -41,13 +38,6 @@ export function collapsePlugin() {
       // rpc
       cleanup.add(ctx.rpc.register("plugin:collapse:is-collapsed", (id) => model.isCollapsed(id)))
       cleanup.add(ctx.rpc.register("plugin:collapse:expand-ancestors", (id) => model.expandAncestors(id)))
-
-      // teardown
-      cleanup.add(() => {
-        for (const wrapper of wrappers.reverse()) {
-          if (wrapper.isConnected) wrapper.replaceWith(...wrapper.childNodes)
-        }
-      })
 
       return cleanup.dispose
     },

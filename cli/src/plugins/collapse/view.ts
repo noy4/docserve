@@ -40,21 +40,27 @@ export function mountSections(sections: CollapseSection[], onToggle: (id: string
   }
 }
 
-export function applyState(sections: CollapseSection[], collapsed: string[]): void {
+export function applyState(sections: CollapseSection[], collapsed: string[], enabled: boolean): void {
   const collapsedIds = new Set(collapsed)
   const hidden = new Set<Element>()
 
-  for (const section of sections) {
-    if (!collapsedIds.has(section.id)) continue
-    for (const node of section.body) hidden.add(node)
+  if (enabled) {
+    for (const section of sections) {
+      if (!collapsedIds.has(section.id)) continue
+      for (const node of section.body) hidden.add(node)
+    }
   }
 
   for (const section of sections) {
     for (const node of section.body)
-      node.classList.toggle(HIDDEN_CLASS, hidden.has(node))
+      node.classList.toggle(HIDDEN_CLASS, enabled && hidden.has(node))
+
+    section.heading.classList.toggle("docserve-collapse__heading", enabled)
 
     const parent = section.heading.parentElement
-    if (parent?.tagName === "SECTION" && isSectionHead(section.heading))
+    if (!enabled)
+      parent?.classList.remove(SECTION_COLLAPSED_CLASS)
+    else if (parent?.tagName === "SECTION" && isSectionHead(section.heading))
       parent.classList.toggle(SECTION_COLLAPSED_CLASS, collapsedIds.has(section.id))
 
     const button = section.button
