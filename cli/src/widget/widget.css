@@ -70,6 +70,10 @@ html[data-docserve-panel-left] body {
   padding-left: var(--docserve-panel-left) !important;
 }
 
+html[data-docserve-panel-right] {
+  --docserve-panel-right: 260px;
+}
+
 html[data-docserve-panel-right] body {
   padding-right: var(--docserve-panel-right) !important;
 }

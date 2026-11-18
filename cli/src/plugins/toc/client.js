@@ -7,7 +7,6 @@ import { createPanel } from "./panel.js"
 
 const ICON_TOC = iconSvg(ICON_TOC_RAW)
 const OFFSET = 88
-const PANEL_WIDTH = "260px"
 
 /**
  * @returns {DocservePlugin}
@@ -82,7 +81,6 @@ export function tocPlugin() {
       cleanup.add(offCommand)
       cleanup.add(() => {
         html.removeAttribute("data-docserve-panel-right")
-        html.style.removeProperty("--docserve-panel-right")
       })
       cleanup.add(() => panel.destroy())
       cleanup.add(() => mount.remove())
@@ -97,9 +95,6 @@ export function tocPlugin() {
         const isOpen = open.value
 
         html.toggleAttribute("data-docserve-panel-right", isOpen)
-        if (isOpen) html.style.setProperty("--docserve-panel-right", PANEL_WIDTH)
-        else html.style.removeProperty("--docserve-panel-right")
-
         panel.setOpen(isOpen)
         dock.update()
       }
