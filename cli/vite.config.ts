@@ -16,7 +16,6 @@ export default defineConfig({
   build: {
     outDir: "dist/widget",
     emptyOutDir: true,
-    minify: false,
     sourcemap: true,
     lib: {
       entry: "src/widget/index.js",

@@ -18,7 +18,7 @@
     "bin.mjs",
     "index.html",
     "src/",
-    "dist/"
+    "dist/widget/*.js"
   ],
   "devDependencies": {
     "@preact/signals-react": "^3.12.0",
