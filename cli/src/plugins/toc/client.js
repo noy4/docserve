@@ -15,7 +15,7 @@ export function tocPlugin() {
     setup(ctx) {
       // state
       const html = document.documentElement
-      const model = TocModel.create()
+      const model = TocModel.create(ctx.rpc)
       const cleanup = createDisposables()
 
       // styles

@@ -1,0 +1,74 @@
+.docserve-collapse__heading {
+  position: relative;
+}
+
+.docserve-collapse__toggle {
+  position: absolute;
+  top: 50%;
+  left: -24px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 0;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+  transform: translateY(-50%);
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.docserve-collapse__heading:hover .docserve-collapse__toggle,
+.docserve-collapse__heading:focus-within .docserve-collapse__toggle {
+  opacity: 0.55;
+}
+
+.docserve-collapse__toggle svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.15s ease;
+}
+
+.docserve-collapse__toggle[aria-expanded="true"] svg {
+  transform: rotate(90deg);
+}
+
+.docserve-collapse__toggle:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  opacity: 1;
+}
+
+.docserve-collapse__toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .docserve-collapse__toggle {
+    opacity: 0.45;
+  }
+}
+
+.docserve-collapse__hidden {
+  display: none !important;
+}
+
+section.docserve-collapse__collapsed:not(:first-of-type) {
+  margin-top: var(--docserve-collapse-section-gap, 12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docserve-collapse__toggle,
+  .docserve-collapse__toggle svg {
+    transition: none;
+  }
+}

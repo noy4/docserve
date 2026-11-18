@@ -38,6 +38,7 @@ export function sidebarPlugin() {
         title: "Toggle sidebar",
         icon: ICON_SIDEBAR,
         category: "main",
+        order: -1,
         command: "plugin:sidebar:toggle",
         isActive: () => model.open.value,
       })

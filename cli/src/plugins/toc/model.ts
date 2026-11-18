@@ -26,14 +26,16 @@ export class TocModel {
 
   #links = new Map<string, HTMLAnchorElement>()
   #linkRefs = new Map<string, (element: HTMLAnchorElement | null) => void>()
+  #rpc?: RpcContext
 
-  constructor(defaultOpen = false) {
+  constructor(defaultOpen = false, rpc?: RpcContext) {
     this.open = persistedBool("docserve:toc:open", defaultOpen)
+    this.#rpc = rpc
   }
 
-  static create(): TocModel {
+  static create(rpc?: RpcContext): TocModel {
     const source = document.body ?? document.documentElement
-    return new TocModel(source?.hasAttribute("data-toc-open") ?? false)
+    return new TocModel(source?.hasAttribute("data-toc-open") ?? false, rpc)
   }
 
   load(): void {
@@ -77,6 +79,15 @@ export class TocModel {
   navigate(event: MouseEvent<HTMLAnchorElement>, element: HTMLHeadingElement): void {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
     event.preventDefault()
+    void this.#navigateTo(element)
+  }
+
+  async #navigateTo(element: HTMLHeadingElement): Promise<void> {
+    if (this.#rpc?.has("plugin:collapse:expand-ancestors")) {
+      try {
+        await this.#rpc.call("plugin:collapse:expand-ancestors", element.id)
+      } catch {}
+    }
 
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
     const top = window.scrollY + element.getBoundingClientRect().top - HEADING_OFFSET
