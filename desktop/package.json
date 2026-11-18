@@ -6,9 +6,9 @@
   "author": "noy4",
   "main": "src/main.mjs",
   "scripts": {
-    "start": "electron .",
-    "dist": "electron-builder --mac",
-    "dist:dir": "electron-builder --mac dir"
+    "start": "pnpm -C ../cli build && electron .",
+    "dist": "pnpm -C ../cli build && electron-builder --mac",
+    "dist:dir": "pnpm -C ../cli build && electron-builder --mac dir"
   },
   "build": {
     "appId": "dev.docserve.desktop",

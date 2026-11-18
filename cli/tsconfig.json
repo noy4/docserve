@@ -6,12 +6,13 @@
     "moduleResolution": "NodeNext",
     "allowJs": true,
     "checkJs": true,
+    "jsx": "react-jsx",
     "noEmit": true,
     "strict": false,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["bin.mjs", "src", "test"],
+  "include": ["bin.mjs", "src", "test", "scripts", "vite.config.ts"],
   "exclude": ["node_modules"]
 }

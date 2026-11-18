@@ -9,6 +9,7 @@ import { createStaticHandler } from "./serve-static.mjs"
 
 const WIDGET_DIR = resolve(import.meta.dirname, "..", "widget")
 const PLUGINS_DIR = resolve(import.meta.dirname, "..", "plugins")
+const DIST_WIDGET_DIR = resolve(import.meta.dirname, "..", "..", "dist", "widget")
 const INTERNAL_PREFIX = "/__docserve/"
 const WIDGET_PREFIX = `${INTERNAL_PREFIX}widget/`
 const PLUGINS_PREFIX = `${INTERNAL_PREFIX}plugins/`
@@ -52,17 +53,39 @@ export function createHandler({ docsDir }) {
   }
 
   /**
-   * Widget and plugin sources, re-read per request so edits show up live.
+   * Widget bundle and plugin sources, read per request (widget JS comes from dist).
    * @param {Request} request
    * @param {URL} url
    * @returns {Promise<Response>}
    */
   async function serveInternal(request, url) {
     if (url.pathname.startsWith(WIDGET_PREFIX))
-      return serveAsset(WIDGET_DIR, url.pathname.slice(WIDGET_PREFIX.length))
+      return serveWidget(url.pathname.slice(WIDGET_PREFIX.length))
     if (url.pathname.startsWith(PLUGINS_PREFIX))
       return serveAsset(PLUGINS_DIR, url.pathname.slice(PLUGINS_PREFIX.length))
     return new Response("Not Found", { status: 404 })
+  }
+
+  /**
+   * Built widget first, source files (CSS) as the fallback. A JS request that
+   * misses the build is an error: the source entry now has bare imports.
+   * @param {string} relative
+   * @returns {Promise<Response>}
+   */
+  async function serveWidget(relative) {
+    if (!relative) return new Response("Not Found", { status: 404 })
+
+    const built = await serveAsset(DIST_WIDGET_DIR, relative)
+    if (built.status !== 404) return built
+
+    if (/\.m?js$/.test(relative)) {
+      return new Response("Widget bundle missing: run `pnpm -C cli build`", {
+        status: 503,
+        headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
+      })
+    }
+
+    return serveAsset(WIDGET_DIR, relative)
   }
 
   /**

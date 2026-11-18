@@ -138,6 +138,20 @@ describe("docserve server", () => {
     assert.equal(page.split("<!--docserve-widget-->").length, 2, "injected exactly once")
   })
 
+  it("serves the built widget and source stylesheets", async () => {
+    const widget = await fetch(`http://localhost:${port}/__docserve/widget/index.js`)
+    assert.equal(widget.status, 200)
+    assert.match(widget.headers.get("content-type") ?? "", /javascript/)
+    const body = await widget.text()
+    assert.ok(body.includes("docserve-sidebar"), "widget entry comes from the build")
+    assert.ok(!/from\s*["']react["']/.test(body), "React is bundled")
+    assert.ok(!body.includes("process.env"), "browser build has no process globals")
+
+    const css = await fetch(`http://localhost:${port}/__docserve/plugins/sidebar/sidebar.css`)
+    assert.equal(css.status, 200)
+    assert.match(css.headers.get("content-type") ?? "", /text\/css/)
+  })
+
   it("serves the gallery template, not injected", async () => {
     const gallery = await (await fetch(`http://localhost:${port}/`)).text()
     assert.ok(gallery.includes("contentSetChanged"), "gallery ships its own reload client")
