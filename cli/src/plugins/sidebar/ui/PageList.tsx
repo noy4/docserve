@@ -15,9 +15,13 @@ export function PageList({ pages, view, currentPage, previews }: PageListProps) 
 
   return pages.map((page) =>
     view === "gallery"
-      ? <GalleryCard key={page.url} page={page} active={isActive(page, target, currentPage)} previews={previews} />
+      ? <GalleryCard key={pageKey(page)} page={page} active={isActive(page, target, currentPage)} previews={previews} />
       : <ListRow key={page.url} page={page} active={isActive(page, target, currentPage)} />,
   )
+}
+
+function pageKey(page: DocPage): string {
+  return `${page.url}:${page.modified ?? page.created}`
 }
 
 function ListRow({ page, active }: { page: DocPage; active: boolean }) {
