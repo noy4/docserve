@@ -54,7 +54,7 @@ export function sidebarPlugin() {
       cleanup.add(() => dock.dispose())
       cleanup.add(model.open.subscribe(() => dock.update()))
 
-      // data
+      // events
       cleanup.add(ctx.events.on("pages:changed", (change) => {
         if (change.pages.length || change.contentSetChanged)
           model.load({ force: true })

@@ -14,7 +14,7 @@ import { createUi } from "./ui.js"
 
 /**
  * Create the widget without mounting it.
- * @returns {{ ctx: DocserveContext, start: () => DocserveContext, stop: () => void }}
+ * @returns {{ ctx: DocserveContext, start: () => DocserveContext, stop: () => void, use: (plugin: DocservePlugin) => DocserveContext }}
  */
 export function createHost() {
   const script = injectedScript()
@@ -64,11 +64,9 @@ export function createHost() {
     commands: commands.api,
     ui,
     events,
-    use,
-    start,
   }
 
-  return { ctx, start, stop }
+  return { ctx, start, stop, use }
 
   // ---
 

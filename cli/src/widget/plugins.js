@@ -3,7 +3,7 @@
 /**
  * @param {() => DocserveContext} getContext  Resolved when a plugin is set up,
  *   so the registry can exist before the context is fully assembled.
- * @returns {{ use: DocserveContext['use'], dispose: () => void }}
+ * @returns {{ use: (plugin: DocservePlugin) => DocserveContext, dispose: () => void }}
  */
 export function createPlugins(getContext) {
   /** @type {Map<string, () => void>} */

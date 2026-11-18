@@ -184,8 +184,6 @@ interface DocserveContext {
   ui: UiContext
   /** Event bus; subscribe with `events.on`. */
   events: EventEmitter<DocserveEvents>
-  use: (plugin: DocservePlugin) => DocserveContext
-  start: () => DocserveContext
 }
 
 /** A plugin. `setup` runs once; its return value runs on teardown. */
