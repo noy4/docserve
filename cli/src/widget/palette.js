@@ -6,8 +6,8 @@ import { el } from "./lib/dom.js"
 /**
  * @param {object} options
  * @param {ShadowRoot} options.root   Where the overlay is mounted.
- * @param {UiApi} options.ui
- * @param {CommandsApi} options.commands
+ * @param {UiContext} options.ui
+ * @param {CommandsContext} options.commands
  * @param {(listener: () => void) => () => void} options.subscribe
  * @returns {{ open: () => void, close: () => void, destroy: () => void }}
  */

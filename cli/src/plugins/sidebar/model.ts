@@ -6,7 +6,7 @@ export type SidebarGrouping = "none" | "month"
 export type SidebarStatus = "loading" | "ready" | "error"
 
 export interface SidebarModelOptions {
-  rpc: RpcBus
+  rpc: RpcContext
 }
 
 export class SidebarModel {
@@ -16,7 +16,7 @@ export class SidebarModel {
   readonly grouping = persisted<SidebarGrouping>("docserve:sidebar:grouping", "month")
   readonly open = persistedBool("docserve:sidebar:open")
 
-  #rpc: RpcBus
+  #rpc: RpcContext
   #request = 0
 
   constructor(options: SidebarModelOptions) {

@@ -10,7 +10,7 @@ const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)
 /**
  * @param {object} options
  * @param {() => DocserveContext} options.getContext  Resolved when a command runs.
- * @returns {{ api: CommandsApi, onChange: (listener: () => void) => () => void, destroy: () => void }}
+ * @returns {{ api: CommandsContext, onChange: (listener: () => void) => () => void, destroy: () => void }}
  */
 export function createCommands({ getContext }) {
   /** @type {Map<string, DocserveCommand>} */

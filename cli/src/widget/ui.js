@@ -5,7 +5,7 @@ import { el } from "./lib/dom.js"
  * @param {object} options
  * @param {ShadowRoot} options.root
  * @param {HTMLElement} options.status   Live region for `announce`.
- * @returns {UiApi}
+ * @returns {UiContext}
  */
 export function createUi({ root, status }) {
   /** @type {Set<string>} */

@@ -8,7 +8,7 @@ import { el } from "./lib/dom.js"
  * @param {object} options
  * @param {ShadowRoot} options.root
  * @param {() => DocserveContext} options.getContext  Resolved when an item is clicked.
- * @returns {DocksHandle}
+ * @returns {DocksContext}
  */
 export function createDocks({ root, getContext }) {
   /** @type {DockItem[]} */

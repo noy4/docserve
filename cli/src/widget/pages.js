@@ -2,7 +2,7 @@
 import { decoded, pageUrl } from "./lib/dom.js"
 
 /**
- * @param {{ rpc: RpcBus }} options
+ * @param {{ rpc: RpcContext }} options
  */
 export function createPages({ rpc }) {
   /** @type {DocPage[] | null} */

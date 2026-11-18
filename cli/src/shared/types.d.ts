@@ -110,7 +110,7 @@ interface DocserveCommand {
 }
 
 /** Command registry plus the palette it feeds. */
-interface CommandsApi {
+interface CommandsContext {
   /** Throws on a duplicate id; the result unregisters. */
   register: (command: DocserveCommand) => () => void
   /** Rejects when the id is unknown or `when()` is false. */
@@ -126,7 +126,7 @@ interface CommandsApi {
 }
 
 /** The single dock. Plugins register and remove items; only core owns the container. */
-interface DocksHandle {
+interface DocksContext {
   element: HTMLElement
   /** Throws on a duplicate id; the returned handle can update or dispose the item. */
   register: (item: DockItem) => DocksItemHandle
@@ -140,7 +140,7 @@ interface DocksHandle {
  * In-page method bus. Plugins never import each other; they talk through this.
  * `docserve:` is reserved for core methods, plugins use `plugin:<id>:<method>`.
  */
-interface RpcBus {
+interface RpcContext {
   /** Throws on a duplicate name. */
   register: (name: string, handler: (...args: any[]) => any) => () => void
   has: (name: string) => boolean
@@ -148,7 +148,7 @@ interface RpcBus {
   call: (name: string, ...args: any[]) => Promise<any>
 }
 
-interface UiApi {
+interface UiContext {
   /** Appends a layout-neutral host (`display: contents`) to the shadow root. */
   mountPoint: () => HTMLElement
   /** Adds a `<link>` inside the shadow root once. */
@@ -163,12 +163,12 @@ interface DocserveContext {
   page: string
   /** Served folder identity from `data-docs-*`; undefined when unset. */
   docs?: DocsInfo
-  rpc: RpcBus
+  rpc: RpcContext
   /** The one dock every plugin contributes items to. */
-  docks: DocksHandle
+  docks: DocksContext
   /** Shortcut and palette registry. */
-  commands: CommandsApi
-  ui: UiApi
+  commands: CommandsContext
+  ui: UiContext
   on: Emitter<DocserveEventMap>['on']
   use: (plugin: DocservePlugin) => DocserveContext
   start: () => DocserveContext

@@ -2,7 +2,7 @@
 // `plugin:<id>:<method>`.
 
 /**
- * @returns {RpcBus}
+ * @returns {RpcContext}
  */
 export function createRpc() {
   /** @type {Map<string, (...args: any[]) => any>} */
