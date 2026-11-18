@@ -16,7 +16,8 @@ export function PageList({ model, previews }: PageListProps) {
   const currentPage = model.currentPage
   const target = pageUrl(currentPage)
 
-  if (grouping !== "month") return pages.map((page) => renderPage(page, view, target, currentPage, previews))
+  if (grouping !== "month")
+    return pages.map((page) => renderPage(page, view, target, currentPage, previews))
 
   return groupByMonth(pages).map((group) => {
     const id = groupHeadingId(group.key)
