@@ -2,7 +2,6 @@
 import { createElement } from "react"
 import { createRoot } from "react-dom/client"
 import { createDisposables } from "../../widget/lib/disposables.js"
-import { persisted, persistedFlag } from "../../widget/lib/storage.js"
 import { ICON_GRID, ICON_SIDEBAR } from "./icons.js"
 import { SidebarModel } from "./model.js"
 import { SidebarApp } from "./ui/SidebarApp.js"
@@ -16,30 +15,19 @@ export function sidebarPlugin() {
   return {
     id: "sidebar",
     setup(ctx) {
-      const openState = persistedFlag("docserve:sidebar:open")
-      const viewState = persisted("docserve:sidebar:view", /** @type {"list" | "gallery"} */("list"))
-      const groupingState = persisted("docserve:sidebar:grouping", /** @type {"none" | "month"} */("month"))
+      // state
+      const model = new SidebarModel({ rpc: ctx.rpc })
 
-      const model = new SidebarModel({
-        rpc: ctx.rpc,
-        view: viewState.value === "gallery" ? "gallery" : "list",
-        grouping: groupingState.value === "none" ? "none" : "month",
-        open: openState.value,
-        onViewChange(next) {
-          viewState.value = next
-        },
-        onGroupingChange(next) {
-          groupingState.value = next
-        },
-      })
-
+      // styles
       ctx.ui.style("/__docserve/plugins/sidebar/sidebar.css")
 
-      const disposables = createDisposables()
+      // cleanup
+      const cleanup = createDisposables()
 
+      // mount
       const host = ctx.ui.mountPoint()
       const root = createRoot(host)
-      disposables.add(() => {
+      cleanup.add(() => {
         root.unmount()
         host.remove()
       })
@@ -48,28 +36,29 @@ export function sidebarPlugin() {
         docs: ctx.docs,
         currentPage: ctx.page,
         width: WIDTH,
-        onClose: () => setOpen(false),
+        onClose: () => model.setOpen(false),
       }))
 
-      disposables.add(ctx.commands.register({
+      // commands
+      cleanup.add(ctx.commands.register({
         id: "plugin:sidebar:toggle",
         title: "Toggle sidebar",
         group: "View",
         icon: ICON_SIDEBAR,
         keys: ["[", "Alt+B"],
-        run: () => setOpen(!model.open.value),
+        run: () => model.setOpen(!model.open.value),
       }))
 
-      disposables.add(ctx.commands.register({
+      cleanup.add(ctx.commands.register({
         id: "plugin:sidebar:close",
         title: "Close sidebar",
         keys: ["Escape"],
         showInPalette: false,
         when: () => model.open.value,
-        run: () => setOpen(false),
+        run: () => model.setOpen(false),
       }))
 
-      disposables.add(ctx.commands.register({
+      cleanup.add(ctx.commands.register({
         id: "plugin:sidebar:view",
         title: "Toggle sidebar view",
         group: "View",
@@ -79,7 +68,7 @@ export function sidebarPlugin() {
         run: () => model.toggleView(),
       }))
 
-      disposables.add(ctx.commands.register({
+      cleanup.add(ctx.commands.register({
         id: "plugin:sidebar:grouping",
         title: "Toggle month grouping",
         group: "View",
@@ -88,6 +77,7 @@ export function sidebarPlugin() {
         run: () => model.toggleGrouping(),
       }))
 
+      // dock
       const item = ctx.dock.add({
         id: "sidebar",
         label: "Toggle sidebar",
@@ -96,26 +86,19 @@ export function sidebarPlugin() {
         command: "plugin:sidebar:toggle",
         isActive: () => model.open.value,
       })
-      disposables.add(() => item.remove())
+      cleanup.add(() => item.remove())
+      cleanup.add(model.open.subscribe(() => item.update()))
 
-      disposables.add(ctx.on("change", (change) => {
+      // data
+      cleanup.add(ctx.on("change", (change) => {
         if (change.pages.length || change.contentSetChanged)
           model.load({ force: true })
       }))
-      disposables.add(ctx.on("open", () => model.load({ force: true })))
+      cleanup.add(ctx.on("open", () => model.load({ force: true })))
 
       model.load()
 
-      return disposables.dispose
-
-      /**
-       * @param {boolean} next
-       */
-      function setOpen(next) {
-        model.setOpen(next)
-        openState.value = next
-        item.update()
-      }
+      return cleanup.dispose
     },
   }
 }

@@ -1,4 +1,5 @@
 import { signal } from "@preact/signals-react"
+import { persisted, persistedBool } from "../../widget/lib/persisted-signal.js"
 
 export type SidebarView = "list" | "gallery"
 export type SidebarGrouping = "none" | "month"
@@ -6,39 +7,24 @@ export type SidebarStatus = "loading" | "ready" | "error"
 
 export interface SidebarModelOptions {
   rpc: RpcBus
-  view?: SidebarView
-  grouping?: SidebarGrouping
-  open?: boolean
-  onViewChange?: (view: SidebarView) => void
-  onGroupingChange?: (grouping: SidebarGrouping) => void
 }
 
 export class SidebarModel {
   readonly pages = signal<DocPage[]>([])
   readonly status = signal<SidebarStatus>("loading")
-  readonly view = signal<SidebarView>("list")
-  readonly grouping = signal<SidebarGrouping>("none")
-  readonly open = signal(false)
+  readonly view = persisted<SidebarView>("docserve:sidebar:view", "list")
+  readonly grouping = persisted<SidebarGrouping>("docserve:sidebar:grouping", "month")
+  readonly open = persistedBool("docserve:sidebar:open")
 
   #rpc: RpcBus
   #request = 0
-  #onViewChange: ((view: SidebarView) => void) | undefined
-  #onGroupingChange: ((grouping: SidebarGrouping) => void) | undefined
 
   constructor(options: SidebarModelOptions) {
     this.#rpc = options.rpc
-    this.view.value = options.view ?? "list"
-    this.grouping.value = options.grouping ?? "none"
-    this.open.value = options.open ?? false
-    this.#onViewChange = options.onViewChange
-    this.#onGroupingChange = options.onGroupingChange
   }
 
   setView(next: SidebarView): void {
-    const view: SidebarView = next === "gallery" ? "gallery" : "list"
-    if (view === this.view.value) return
-    this.view.value = view
-    this.#onViewChange?.(view)
+    this.view.value = next
   }
 
   toggleView(): void {
@@ -46,10 +32,7 @@ export class SidebarModel {
   }
 
   setGrouping(next: SidebarGrouping): void {
-    const grouping: SidebarGrouping = next === "month" ? "month" : "none"
-    if (grouping === this.grouping.value) return
-    this.grouping.value = grouping
-    this.#onGroupingChange?.(grouping)
+    this.grouping.value = next
   }
 
   toggleGrouping(): void {
@@ -57,7 +40,6 @@ export class SidebarModel {
   }
 
   setOpen(next: boolean): void {
-    if (next === this.open.value) return
     this.open.value = next
   }
 
