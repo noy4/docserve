@@ -1,7 +1,8 @@
 // Dock link back to the gallery.
-import { icon } from "../../widget/lib/dom.js"
+import { iconSvg } from "../../widget/lib/dom.js"
+import ICON_HOME_RAW from "~icons/lucide/house?raw&width=18&height=18"
 
-const ICON_HOME = icon('<path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" />')
+const ICON_HOME = iconSvg(ICON_HOME_RAW)
 
 /**
  * @returns {DocservePlugin}

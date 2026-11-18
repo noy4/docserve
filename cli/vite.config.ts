@@ -1,5 +1,6 @@
 import babel from "@rolldown/plugin-babel"
 import react from "@vitejs/plugin-react"
+import Icons from "unplugin-icons/vite"
 import { defineConfig } from "vite"
 
 export default defineConfig({
@@ -9,6 +10,8 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    // Iconify icons inlined at build time; `?raw` imports stay plain SVG strings.
+    Icons({ compiler: "jsx", jsx: "react" }),
     babel({
       plugins: ["module:@preact/signals-react-transform"],
     }),

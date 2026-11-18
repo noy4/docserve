@@ -28,15 +28,14 @@ export function el(tag, props = {}, children = []) {
 }
 
 /**
- * Inline SVG markup for a dock item icon. Size is an attribute so the icon is
- * already the right size before the stylesheet loads.
- * @param {string} paths  Inner markup, e.g. `<path d="..." />`.
- * @param {{ stroke?: number, class?: string }} [options]
+ * Mark inline SVG as decorative and optionally add a class.
+ * @param {string} svg  `<svg …>…</svg>` markup.
+ * @param {string} [name]
  * @returns {string}
  */
-export function icon(paths, { stroke = 2, class: name = "" } = {}) {
+export function iconSvg(svg, name = "") {
   const cls = name ? ` class="${name}"` : ""
-  return `<svg${cls} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`
+  return svg.replace("<svg ", `<svg aria-hidden="true"${cls} `)
 }
 
 /**
