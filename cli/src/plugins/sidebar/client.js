@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client"
 import { createDisposables } from "../../widget/lib/disposables.js"
 import { ICON_GRID, ICON_SIDEBAR } from "./icons.js"
 import { SidebarModel } from "./model.js"
-import { SidebarApp } from "./ui/SidebarApp.js"
+import { Sidebar } from "./ui/Sidebar.js"
 
 const WIDTH = "min(280px, 86vw)"
 
@@ -29,7 +29,7 @@ export function sidebarPlugin() {
         root.unmount()
         host.remove()
       })
-      root.render(createElement(SidebarApp, {
+      root.render(createElement(Sidebar, {
         model,
         width: WIDTH,
       }))

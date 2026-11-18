@@ -6,12 +6,12 @@ import { SidebarHeader } from "./SidebarHeader.js"
 import { useLayoutModel } from "./useModel.js"
 import type { SidebarModel } from "../model.js"
 
-export interface SidebarAppProps {
+export interface SidebarProps {
   model: SidebarModel
   width: string
 }
 
-export function SidebarApp({ model, width }: SidebarAppProps) {
+export function Sidebar({ model, width }: SidebarProps) {
   const docs = model.docs
   const previews = useLayoutModel(() => new PreviewModel())
   const pages = model.pages.value
