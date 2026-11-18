@@ -62,7 +62,7 @@
   display: none !important;
 }
 
-section.docserve-collapse__collapsed:not(:first-of-type) {
+section.docserve-collapse__collapsed + section {
   margin-top: var(--docserve-collapse-section-gap, 12px);
 }
 

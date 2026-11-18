@@ -1,5 +1,6 @@
 import { createDisposables } from "../../widget/lib/disposables.js"
 import { el } from "../../widget/lib/dom.js"
+import { registerCollapseCommands, registerCollapseDock } from "./commands.js"
 import { CollapseModel } from "./model.js"
 import { collectSections } from "./sections.js"
 import { mountSections } from "./view.js"
@@ -32,6 +33,10 @@ export function collapsePlugin() {
       model.load(sections)
       cleanup.add(mountSections(sections, (id) => model.toggle(id)))
       cleanup.add(model.subscribe())
+
+      // commands
+      cleanup.add(registerCollapseCommands(ctx, model))
+      cleanup.add(registerCollapseDock(ctx, model))
 
       // rpc
       cleanup.add(ctx.rpc.register("plugin:collapse:is-collapsed", (id) => model.isCollapsed(id)))

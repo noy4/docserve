@@ -445,7 +445,7 @@
 │       ├── plugins/              <span class="c"># built-ins, same shape as external ones</span>
 │       │   ├── sidebar/{client.js, model.ts, tree.ts, tree-model.ts, ui/*.tsx, sidebar.css}
 │       │   ├── toc/{client.js, model.ts, commands.ts, scroll-spy.ts, heading-html.ts, outline.js, ui/TocPanel.tsx, toc.css}
-│       │   ├── collapse/{client.js, model.ts, sections.ts, view.ts, collapse.css}
+│       │   ├── collapse/{client.js, model.ts, commands.ts, sections.ts, view.ts, collapse.css}
 │       │   ├── copy/{client.js, copy.css}
 │       │   └── home/client.js
 │       └── shared/types.d.ts     <span class="c"># global types for ctx, docks, commands, rpc</span>
@@ -899,7 +899,7 @@
       The table of contents lists headings from the page root (<code>main</code>, <code>article</code>, <code>.container</code> or <code>data-toc-root</code>), levels 2–3 by default, in a floating column on the right. While open it reserves a 260px gutter and shifts the page left; <code>data-toc-outline="deep"</code> expands to 2–6, <code>data-toc-outline="false"</code> disables it, <code>data-toc-ignore</code> excludes a subtree, and <code>data-toc-open</code> starts it open. <code>t</code> toggles it.
     </p>
     <p class="section-desc">
-      The collapse plugin adds a toggle to each heading and hides its following content up to the next heading at the same or higher level. Levels default to 2–4; <code>data-collapse-levels="2,6"</code> widens the range, <code>data-collapse="false"</code> disables it, and <code>data-collapse-root</code> / <code>data-collapse-ignore</code> scope it. Collapsed headings persist per page, and the table of contents expands hidden ancestors before navigating.
+      The collapse plugin adds a toggle to each heading and hides its following content up to the next heading at the same or higher level. Levels default to 2–4; <code>data-collapse-levels="2,6"</code> widens the range, <code>data-collapse="false"</code> disables it, and <code>data-collapse-root</code> / <code>data-collapse-ignore</code> scope it. Collapsed headings persist per page, <code>k</code> toggles every section, and the table of contents expands hidden ancestors before navigating.
     </p>
 
     <h3><iconify-icon icon="mdi:code-braces" noobserver></iconify-icon>Writing a plugin</h3>
