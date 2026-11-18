@@ -46,22 +46,30 @@ interface CssMessage {
 
 type LiveMessage = ChangeMessage | CssMessage
 
+/** Event map: event name in keys, listener signature in values. */
+interface EventsMap {
+  [event: string]: any
+}
+
+interface EventUnsubscribe {
+  (): void
+}
+
+/** Typed event emitter, ported from devframe's `utils/events.ts`. */
+interface EventEmitter<Events extends EventsMap> {
+  emit: <K extends keyof Events>(event: K, ...args: Parameters<Events[K]>) => void
+  emitOnce: <K extends keyof Events>(event: K, ...args: Parameters<Events[K]>) => void
+  /** @internal */
+  _listeners: Partial<{ [E in keyof Events]: Events[E][] }>
+  on: <K extends keyof Events>(event: K, cb: Events[K]) => EventUnsubscribe
+  once: <K extends keyof Events>(event: K, cb: Events[K]) => EventUnsubscribe
+}
+
 /** Events a plugin can observe. Values are listener signatures. */
-interface DocserveEventMap {
+interface DocserveEvents {
   'pages:changed': (message: ChangeMessage) => void
   'live:connected': () => void
   'host:started': () => void
-}
-
-/** A typed event bus, typed after nanoevents. */
-interface Emitter<Events extends Record<string, (...args: any[]) => void>> {
-  on: <K extends keyof Events & string>(type: K, handler: Events[K]) => () => void
-  emit: <K extends keyof Events & string>(type: K, ...args: Parameters<Events[K]>) => void
-}
-
-/** Read-only view of the widget's event bus: plugins subscribe, core emits. */
-interface DocserveEvents {
-  on: Emitter<DocserveEventMap>['on']
 }
 
 /** A button (or link) in a dock. */
@@ -175,9 +183,7 @@ interface DocserveContext {
   commands: CommandsContext
   ui: UiContext
   /** Event bus; subscribe with `events.on`. */
-  events: DocserveEvents
-  /** @deprecated Use `events.on`. */
-  on: DocserveEvents['on']
+  events: EventEmitter<DocserveEvents>
   use: (plugin: DocservePlugin) => DocserveContext
   start: () => DocserveContext
 }

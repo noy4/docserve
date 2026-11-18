@@ -2,7 +2,7 @@
 import { createCommands } from "./commands.js"
 import { createDocks } from "./docks.js"
 import { el } from "./lib/dom.js"
-import { createEmitter } from "./lib/emitter.js"
+import { createEventEmitter } from "./lib/events.js"
 import { connectLive } from "./live.js"
 import { createPages } from "./pages.js"
 import { createPalette } from "./palette.js"
@@ -32,7 +32,7 @@ export function createHost() {
   // transport
   const rpc = createRpc()
   const pages = createPages({ rpc })
-  const { on, emit } = createEmitter()
+  const events = createEventEmitter()
 
   // context is filled below, services resolve it when called
   const getContext = () => ctx
@@ -63,8 +63,7 @@ export function createHost() {
     docks,
     commands: commands.api,
     ui,
-    events: { on },
-    on,
+    events,
     use,
     start,
   }
@@ -80,12 +79,12 @@ export function createHost() {
     document.documentElement.toggleAttribute("data-docserve-widget", true)
     document.body.append(host)
     reveal()
-    emit("host:started")
+    events.emit("host:started")
 
     live = connectLive({
       onOpen() {
         pages.invalidate()
-        emit("live:connected")
+        events.emit("live:connected")
       },
       onMessage: onLiveMessage,
     })
@@ -128,7 +127,7 @@ export function createHost() {
   function onContentChange(message) {
     if (message.contentSetChanged || message.pages.length)
       pages.invalidate()
-    emit("pages:changed", message)
+    events.emit("pages:changed", message)
 
     // only reload when this page or the gallery template changed
     if (message.pages.includes(page) || message.templateChanged)
