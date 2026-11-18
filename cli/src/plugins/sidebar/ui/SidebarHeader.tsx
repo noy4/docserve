@@ -12,7 +12,6 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
   const grouping = model.grouping.value
   const pages = model.pages.value
   const files = model.status.value === "ready" ? pages.length : null
-  const tabsVisible = model.status.value !== "error" && pages.length > 0
 
   return (
     <header className="docserve-sidebar__head">
@@ -36,39 +35,37 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
           {files == null ? "" : `${files} ${files === 1 ? "file" : "files"}`}
         </span>
       </div>
-      {tabsVisible && (
-        <div className="docserve-sidebar__options">
+      <div className="docserve-sidebar__options">
+        <button
+          type="button"
+          className="docserve-sidebar__view docserve-sidebar__group-toggle"
+          aria-label="Group by month"
+          title="Group by month"
+          aria-pressed={grouping === "month"}
+          onClick={() => model.toggleGrouping()}
+          dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
+        />
+        <div className="docserve-sidebar__views" role="group" aria-label="View">
           <button
             type="button"
-            className="docserve-sidebar__view docserve-sidebar__group-toggle"
-            aria-label="Group by month"
-            title="Group by month"
-            aria-pressed={grouping === "month"}
-            onClick={() => model.toggleGrouping()}
-            dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
+            className="docserve-sidebar__view"
+            aria-label="List view"
+            title="List view"
+            aria-pressed={view === "list"}
+            onClick={() => model.setView("list")}
+            dangerouslySetInnerHTML={{ __html: ICON_LIST }}
           />
-          <div className="docserve-sidebar__views" role="group" aria-label="View">
-            <button
-              type="button"
-              className="docserve-sidebar__view"
-              aria-label="List view"
-              title="List view"
-              aria-pressed={view === "list"}
-              onClick={() => model.setView("list")}
-              dangerouslySetInnerHTML={{ __html: ICON_LIST }}
-            />
-            <button
-              type="button"
-              className="docserve-sidebar__view"
-              aria-label="Gallery view"
-              title="Gallery view"
-              aria-pressed={view === "gallery"}
-              onClick={() => model.setView("gallery")}
-              dangerouslySetInnerHTML={{ __html: ICON_GRID }}
-            />
-          </div>
+          <button
+            type="button"
+            className="docserve-sidebar__view"
+            aria-label="Gallery view"
+            title="Gallery view"
+            aria-pressed={view === "gallery"}
+            onClick={() => model.setView("gallery")}
+            dangerouslySetInnerHTML={{ __html: ICON_GRID }}
+          />
         </div>
-      )}
+      </div>
     </header>
   )
 }
