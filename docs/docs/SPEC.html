@@ -433,7 +433,7 @@
 │       ├── widget/               <span class="c"># injected client (shadow DOM, no build)</span>
 │       │   ├── index.js          <span class="c"># entry: register built-ins · start</span>
 │       │   ├── host.js           <span class="c"># shadow root · lifecycle · reload wiring</span>
-│       │   ├── dock.js  ui.js    <span class="c"># dock items · mount · styles · announce</span>
+│       │   ├── docks.js ui.js    <span class="c"># docks · items · mount · styles · announce</span>
 │       │   ├── placement.js      <span class="c"># four corners · drag · persisted</span>
 │       │   ├── commands.js       <span class="c"># registry · key matching · palette state</span>
 │       │   ├── palette.js        <span class="c"># ⌘K palette: filter · keyboard · execute</span>
@@ -446,7 +446,7 @@
 │       │   ├── sidebar/{client.js, sidebar.css}
 │       │   ├── copy/{client.js, copy.css}
 │       │   └── home/client.js
-│       └── shared/types.d.ts     <span class="c"># global types for ctx, dock, commands, rpc</span>
+│       └── shared/types.d.ts     <span class="c"># global types for ctx, docks, commands, rpc</span>
 └── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
     ├── package.json
     └── src/
@@ -870,7 +870,7 @@
           <iconify-icon icon="mdi:dock-bottom" noobserver></iconify-icon>
           <h4>UI</h4>
         </div>
-        <p><code>commands.register</code>, <code>dock.add</code>, <code>ui.mountPoint</code>, <code>ui.style</code> and <code>ui.announce</code>.</p>
+        <p><code>commands.register</code>, <code>docks.register</code>, <code>ui.mountPoint</code>, <code>ui.style</code> and <code>ui.announce</code>.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -902,7 +902,7 @@
       keys: ["h"],
       run: () =&gt; ctx.ui.announce("Hello"),
     })
-    const item = ctx.dock.add({
+    const item = ctx.docks.register({
       id: "hello",
       label: "Say hello",
       icon: "&lt;svg …&gt;",
@@ -911,7 +911,7 @@
     ctx.ui.style("/__docserve/plugins/hello/hello.css")
     return () =&gt; {
       offCommand()
-      item.remove()
+      item.dispose()
     }
   },
 }</pre>

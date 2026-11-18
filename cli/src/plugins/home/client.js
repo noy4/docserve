@@ -10,14 +10,14 @@ export function homePlugin() {
   return {
     id: "home",
     setup(ctx) {
-      const item = ctx.dock.add({
+      const item = ctx.docks.register({
         id: "home",
         label: "Back to gallery",
         icon: ICON_HOME,
         href: "/",
         group: "actions",
       })
-      return () => item.remove()
+      return () => item.dispose()
     },
   }
 }

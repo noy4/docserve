@@ -1,5 +1,5 @@
-// The dock: one pill that every plugin contributes items to. An item either
-// runs a command or is a link.
+// The docks registry: one pill that every plugin registers items on. An item
+// either runs a command or is a link.
 import { formatKey } from "./commands.js"
 import { el } from "./lib/dom.js"
 
@@ -8,13 +8,13 @@ import { el } from "./lib/dom.js"
  * @param {object} options
  * @param {ShadowRoot} options.root
  * @param {() => DocserveContext} options.getContext  Resolved when an item is clicked.
- * @returns {DockHandle}
+ * @returns {DocksHandle}
  */
-export function createDock({ root, getContext }) {
+export function createDocks({ root, getContext }) {
   /** @type {DockItem[]} */
   const items = []
   const element = el("div", { class: "docserve-dock", role: "toolbar", "aria-label": "docserve" })
-  /** @type {Map<string, DockItemHandle>} */
+  /** @type {Map<string, DocksItemHandle>} */
   const handles = new Map()
 
   root.append(element)
@@ -22,7 +22,7 @@ export function createDock({ root, getContext }) {
 
   return {
     element,
-    add,
+    register,
     remove,
     items() {
       return [...items]
@@ -31,10 +31,10 @@ export function createDock({ root, getContext }) {
 
   /**
    * @param {DockItem} item
-   * @returns {DockItemHandle}
+   * @returns {DocksItemHandle}
    */
-  function add(item) {
-    if (typeof item?.id !== "string" || !item.id) throw new TypeError("dock.add expects an item with an id")
+  function register(item) {
+    if (typeof item?.id !== "string" || !item.id) throw new TypeError("docks.register expects an item with an id")
     if (handles.has(item.id)) throw new Error(`dock item already added: ${item.id}`)
     if (!item.command === !item.href) throw new TypeError(`dock item ${item.id} needs exactly one of command or href`)
 
@@ -44,7 +44,7 @@ export function createDock({ root, getContext }) {
       update() {
         syncDockItem(handle.element, item)
       },
-      remove() {
+      dispose() {
         remove(item.id)
       },
     }

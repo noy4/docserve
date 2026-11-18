@@ -79,12 +79,12 @@ interface DockItem {
   isActive?: () => boolean
 }
 
-interface DockItemHandle {
+interface DocksItemHandle {
   /** Null until the dock is rendered. */
   element: HTMLElement | null
   /** Re-evaluate `isActive`. */
   update: () => void
-  remove: () => void
+  dispose: () => void
 }
 
 /** One command, reachable from a shortcut and from the palette. */
@@ -125,10 +125,11 @@ interface CommandsApi {
   }
 }
 
-/** The single dock. Plugins add and remove items; only core owns the container. */
-interface DockHandle {
+/** The single dock. Plugins register and remove items; only core owns the container. */
+interface DocksHandle {
   element: HTMLElement
-  add: (item: DockItem) => DockItemHandle
+  /** Throws on a duplicate id; the returned handle can update or dispose the item. */
+  register: (item: DockItem) => DocksItemHandle
   /** Removes a single item by id. */
   remove: (id: string) => void
   /** Items currently mounted, in render order. */
@@ -164,7 +165,7 @@ interface DocserveContext {
   docs?: DocsInfo
   rpc: RpcBus
   /** The one dock every plugin contributes items to. */
-  dock: DockHandle
+  docks: DocksHandle
   /** Shortcut and palette registry. */
   commands: CommandsApi
   ui: UiApi

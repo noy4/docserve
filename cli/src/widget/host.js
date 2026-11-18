@@ -1,6 +1,6 @@
 // Widget host
 import { createCommands } from "./commands.js"
-import { createDock } from "./dock.js"
+import { createDocks } from "./docks.js"
 import { el } from "./lib/dom.js"
 import { createEmitter } from "./lib/emitter.js"
 import { connectLive } from "./live.js"
@@ -42,8 +42,8 @@ export function createHost() {
 
   // interface
   const ui = createUi({ root, status })
-  const dock = createDock({ root, getContext })
-  const placement = createPlacement({ host, handle: dock.element })
+  const docks = createDocks({ root, getContext })
+  const placement = createPlacement({ host, handle: docks.element })
   const palette = createPalette({
     root,
     ui,
@@ -60,7 +60,7 @@ export function createHost() {
     page,
     docs,
     rpc,
-    dock,
+    docks,
     commands: commands.api,
     ui,
     on,

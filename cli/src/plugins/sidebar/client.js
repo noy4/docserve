@@ -78,7 +78,7 @@ export function sidebarPlugin() {
       }))
 
       // dock
-      const item = ctx.dock.add({
+      const item = ctx.docks.register({
         id: "sidebar",
         label: "Toggle sidebar",
         icon: ICON_SIDEBAR,
@@ -86,7 +86,7 @@ export function sidebarPlugin() {
         command: "plugin:sidebar:toggle",
         isActive: () => model.open.value,
       })
-      cleanup.add(() => item.remove())
+      cleanup.add(() => item.dispose())
       cleanup.add(model.open.subscribe(() => item.update()))
 
       // data
