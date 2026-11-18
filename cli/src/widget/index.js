@@ -8,10 +8,10 @@ import { createHost } from "./host.js"
 
 const PLUGINS = [
   homePlugin,
+  collapsePlugin,
   copyPlugin,
   sidebarPlugin,
   tocPlugin,
-  collapsePlugin,
 ]
 
 // The server skips iframe previews; this guard covers pages served some other way.

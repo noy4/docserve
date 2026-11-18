@@ -44,8 +44,7 @@ export function registerCollapseDock(ctx: DocserveContext, model: CollapseModel)
     id: "collapse",
     title: "Toggle all sections",
     icon: ICON_FOLD,
-    category: "main",
-    order: 2,
+    category: "actions",
     command: "plugin:collapse:toggle-all",
   })
 
