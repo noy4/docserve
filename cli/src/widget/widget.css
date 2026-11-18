@@ -31,7 +31,12 @@
 /* Four corners: `data-corner` is persisted and rewritten by dragging. Left
    corners follow the sidebar so the pill never sits under an open panel. */
 :host([data-corner="bl"]) { right: auto; left: calc(var(--docserve-inset-l) + var(--docserve-panel-left, 0px)); }
-:host([data-corner="tr"]) { bottom: auto; top: var(--docserve-inset-t); }
+:host([data-corner="br"]) { right: calc(var(--docserve-inset-r) + var(--docserve-panel-right, 0px)); }
+:host([data-corner="tr"]) {
+  bottom: auto;
+  top: var(--docserve-inset-t);
+  right: calc(var(--docserve-inset-r) + var(--docserve-panel-right, 0px));
+}
 :host([data-corner="tl"]) {
   right: auto;
   bottom: auto;
@@ -58,11 +63,15 @@
 }
 
 html[data-docserve-widget] body {
-  transition: padding-left 0.18s ease;
+  transition: padding-left 0.18s ease, padding-right 0.18s ease;
 }
 
 html[data-docserve-panel-left] body {
   padding-left: var(--docserve-panel-left) !important;
+}
+
+html[data-docserve-panel-right] body {
+  padding-right: var(--docserve-panel-right) !important;
 }
 
 html[data-docserve-palette] {

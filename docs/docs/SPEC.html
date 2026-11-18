@@ -444,6 +444,7 @@
 │       │   └── widget.css  palette.css
 │       ├── plugins/              <span class="c"># built-ins, same shape as external ones</span>
 │       │   ├── sidebar/{client.js, model.ts, tree.ts, tree-model.ts, ui/*.tsx, sidebar.css}
+│       │   ├── toc/{client.js, outline.js, panel.js, toc.css}
 │       │   ├── copy/{client.js, copy.css}
 │       │   └── home/client.js
 │       └── shared/types.d.ts     <span class="c"># global types for ctx, docks, commands, rpc</span>
@@ -888,10 +889,13 @@
       </div>
     </div>
 
-    <p class="section-desc">Sidebar, copy and home are built this way.</p>
+    <p class="section-desc">Sidebar, table of contents, copy and home are built this way.</p>
     <p>An action is registered once as a command, which gives it a keyboard shortcut and a row in the <code>⌘K</code> palette; a dock button then just names that command id.</p>
     <p class="section-desc">
       The sidebar renders pages as <code>list</code>, <code>gallery</code> or <code>tree</code> — the tree groups <code>page.url</code> into folders (folders first, natural name order) and persists which folders are collapsed. In list and gallery, a grouping menu picks <code>none</code>, <code>month</code> or <code>folder</code>; folder grouping makes one section per folder that directly holds pages, root first, without nesting.
+    </p>
+    <p class="section-desc">
+      The table of contents lists headings from the page root (<code>main</code>, <code>article</code>, <code>.container</code> or <code>data-toc-root</code>), levels 2–3 by default. <code>data-toc-outline="deep"</code> expands to 2–6, <code>data-toc-outline="false"</code> disables it, <code>data-toc-ignore</code> excludes a subtree, and <code>data-toc-overlay</code> keeps the open panel from shifting the page. <code>t</code> toggles it.
     </p>
 
     <h3><iconify-icon icon="mdi:code-braces" noobserver></iconify-icon>Writing a plugin</h3>
