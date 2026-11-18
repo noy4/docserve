@@ -268,6 +268,38 @@
   background: color-mix(in srgb, var(--docserve-panel-muted) 40%, transparent);
   background-clip: content-box;
 }
+
+.docserve-sidebar__resize {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.docserve-sidebar__resize::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.docserve-sidebar__resize:hover::after,
+.docserve-sidebar[data-resizing] .docserve-sidebar__resize::after {
+  background: var(--docserve-dock-accent);
+}
+
+.docserve-sidebar[data-resizing] {
+  cursor: ew-resize;
+  user-select: none;
+}
+
 /* Gallery view: preview cards */
 .docserve-sidebar[data-view="gallery"] .docserve-sidebar__list {
   gap: 10px;

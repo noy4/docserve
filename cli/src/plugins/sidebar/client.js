@@ -6,8 +6,6 @@ import { ICON_CALENDAR, ICON_GRID, ICON_SIDEBAR } from "./icons.js"
 import { SidebarModel } from "./model.js"
 import { Sidebar } from "./ui/Sidebar.js"
 
-const WIDTH = "min(280px, 86vw)"
-
 /**
  * @returns {DocservePlugin}
  */
@@ -29,10 +27,7 @@ export function sidebarPlugin() {
         root.unmount()
         host.remove()
       })
-      root.render(createElement(Sidebar, {
-        model,
-        width: WIDTH,
-      }))
+      root.render(createElement(Sidebar, { model }))
 
       // commands
       registerCommands(ctx, model, cleanup)

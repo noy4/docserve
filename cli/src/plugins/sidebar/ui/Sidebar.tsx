@@ -8,10 +8,9 @@ import type { SidebarModel } from "../model.js"
 
 export interface SidebarProps {
   model: SidebarModel
-  width: string
 }
 
-export function Sidebar({ model, width }: SidebarProps) {
+export function Sidebar({ model }: SidebarProps) {
   const docs = model.docs
   const previews = useLayoutModel(() => new PreviewModel())
   const pages = model.pages.value
@@ -19,6 +18,9 @@ export function Sidebar({ model, width }: SidebarProps) {
   const view = model.view.value
   const grouping = model.grouping.value
   const open = model.open.value
+  const resizer = model.resizer
+  const resizing = resizer.resizing.value
+  const width = `min(${resizer.width.value}px, 86vw)`
 
   const style = {
     width,
@@ -49,6 +51,7 @@ export function Sidebar({ model, width }: SidebarProps) {
       data-open={open ? "" : undefined}
       data-view={view}
       data-grouping={grouping}
+      data-resizing={resizing ? "" : undefined}
       aria-label={docs?.name || "Pages"}
       style={style}
     >
@@ -73,6 +76,17 @@ export function Sidebar({ model, width }: SidebarProps) {
               ? <PageList model={model} previews={previews} />
               : <p className="docserve-sidebar__empty">No pages</p>}
       </nav>
+      <div
+        className="docserve-sidebar__resize"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize sidebar"
+        onPointerDown={resizer.start}
+        onPointerMove={resizer.move}
+        onPointerUp={resizer.stop}
+        onPointerCancel={resizer.stop}
+        onLostPointerCapture={resizer.end}
+      />
     </aside>
   )
 }

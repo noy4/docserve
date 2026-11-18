@@ -1,5 +1,6 @@
 import { signal } from "@preact/signals-react"
 import { persisted, persistedBool } from "../../widget/lib/persisted-signal.js"
+import { ResizeModel } from "./resize-model.js"
 
 export type SidebarView = "list" | "gallery"
 export type SidebarGrouping = "none" | "month"
@@ -18,6 +19,7 @@ export class SidebarModel {
   readonly status = signal<SidebarStatus>("loading")
   readonly view = persisted<SidebarView>("docserve:sidebar:view", "list")
   readonly grouping = persisted<SidebarGrouping>("docserve:sidebar:grouping", "month")
+  readonly resizer = new ResizeModel()
   readonly open = persistedBool("docserve:sidebar:open")
 
   #rpc: RpcContext
