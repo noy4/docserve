@@ -301,12 +301,17 @@
 }
 
 /* Gallery view: preview cards */
-.docserve-sidebar[data-view="gallery"] .docserve-sidebar__list {
+.docserve-sidebar[data-view="gallery"] .docserve-sidebar__list,
+.docserve-sidebar[data-view="gallery"] .docserve-sidebar__group-body {
+  display: grid;
+  grid-auto-rows: max-content;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
+  align-content: start;
 }
 
-.docserve-sidebar[data-view="gallery"] .docserve-sidebar__group-body {
-  gap: 10px;
+.docserve-sidebar[data-view="gallery"] .docserve-sidebar__group {
+  grid-column: 1 / -1;
 }
 
 .docserve-sidebar[data-view="gallery"][data-grouping="month"] .docserve-sidebar__list {
