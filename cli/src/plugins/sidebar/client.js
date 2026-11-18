@@ -2,7 +2,7 @@
 import { createElement } from "react"
 import { createRoot } from "react-dom/client"
 import { createDisposables } from "../../widget/lib/disposables.js"
-import { ICON_GRID, ICON_SIDEBAR } from "./icons.js"
+import { ICON_CALENDAR, ICON_GRID, ICON_SIDEBAR } from "./icons.js"
 import { SidebarModel } from "./model.js"
 import { Sidebar } from "./ui/Sidebar.js"
 
@@ -102,6 +102,7 @@ function registerCommands(ctx, model, cleanup) {
     id: "plugin:sidebar:grouping",
     title: "Toggle month grouping",
     category: "View",
+    icon: ICON_CALENDAR,
     keys: ["m"],
     when: () => model.open.value,
     run: () => model.toggleGrouping(),
