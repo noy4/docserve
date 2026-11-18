@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useLayoutEffect } from "react"
+import type { CSSProperties } from "react"
 import { PageList } from "./PageList.js"
 import { PreviewModel } from "./preview-model.js"
 import { SidebarHeader } from "./SidebarHeader.js"
@@ -9,10 +10,11 @@ export interface SidebarAppProps {
   model: SidebarModel
   docs?: DocsInfo
   currentPage: string
+  width: string
   onClose: () => void
 }
 
-export function SidebarApp({ model, docs, currentPage, onClose }: SidebarAppProps) {
+export function SidebarApp({ model, docs, currentPage, width, onClose }: SidebarAppProps) {
   const previews = useLayoutModel(() => new PreviewModel())
   const pages = model.pages.value
   const status = model.status.value
@@ -20,13 +22,38 @@ export function SidebarApp({ model, docs, currentPage, onClose }: SidebarAppProp
   const grouping = model.grouping.value
   const open = model.open.value
 
+  const style = {
+    width,
+    ...(docs ? { "--docserve-sidebar-hue": String(docs.hue) } : {}),
+  } as CSSProperties
+
+  useLayoutEffect(() => {
+    if (!open) return
+    const html = document.documentElement
+    html.style.setProperty("--docserve-panel-left", width)
+    html.toggleAttribute("data-docserve-panel-left", true)
+
+    return () => {
+      html.style.removeProperty("--docserve-panel-left")
+      html.toggleAttribute("data-docserve-panel-left", false)
+    }
+  }, [open, width])
+
   useEffect(() => {
     if (!open) return
     previews.element?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest" })
   }, [open, pages, previews, view, grouping])
 
   return (
-    <>
+    <aside
+      className="docserve-panel docserve-sidebar"
+      data-side="left"
+      data-open={open ? "" : undefined}
+      data-view={view}
+      data-grouping={grouping}
+      aria-label={docs?.name || "Pages"}
+      style={style}
+    >
       <SidebarHeader
         docs={docs}
         view={view}
@@ -57,6 +84,6 @@ export function SidebarApp({ model, docs, currentPage, onClose }: SidebarAppProp
               ? <PageList pages={pages} view={view} grouping={grouping} currentPage={currentPage} previews={previews} />
               : <p className="docserve-sidebar__empty">No pages</p>}
       </nav>
-    </>
+    </aside>
   )
 }

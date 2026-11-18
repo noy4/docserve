@@ -135,26 +135,6 @@ interface DockHandle {
   items: () => DockItem[]
 }
 
-interface PanelOptions {
-  /** Default `left`. */
-  side?: 'left' | 'right'
-  /** CSS length; default `280px`. */
-  width?: string
-  /** Default false. */
-  open?: boolean
-  /** Panel contents. */
-  element: HTMLElement
-}
-
-interface PanelHandle {
-  element: HTMLElement
-  side: 'left' | 'right'
-  width: string
-  isOpen: () => boolean
-  setOpen: (open: boolean) => void
-  remove: () => void
-}
-
 /**
  * In-page method bus. Plugins never import each other; they talk through this.
  * `docserve:` is reserved for core methods, plugins use `plugin:<id>:<method>`.
@@ -168,7 +148,8 @@ interface RpcBus {
 }
 
 interface UiApi {
-  panel: (options: PanelOptions) => PanelHandle
+  /** Appends a layout-neutral host (`display: contents`) to the shadow root. */
+  mountPoint: () => HTMLElement
   /** Adds a `<link>` inside the shadow root once. */
   style: (href: string) => void
   /** Writes to the live region. */

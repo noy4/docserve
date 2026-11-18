@@ -433,7 +433,7 @@
 │       ├── widget/               <span class="c"># injected client (shadow DOM, no build)</span>
 │       │   ├── index.js          <span class="c"># entry: register built-ins · start</span>
 │       │   ├── host.js           <span class="c"># shadow root · lifecycle · reload wiring</span>
-│       │   ├── dock.js  ui.js    <span class="c"># dock items · panels · styles · announce</span>
+│       │   ├── dock.js  ui.js    <span class="c"># dock items · mount · styles · announce</span>
 │       │   ├── placement.js      <span class="c"># four corners · drag · persisted</span>
 │       │   ├── commands.js       <span class="c"># registry · key matching · palette state</span>
 │       │   ├── palette.js        <span class="c"># ⌘K palette: filter · keyboard · execute</span>
@@ -870,7 +870,7 @@
           <iconify-icon icon="mdi:dock-bottom" noobserver></iconify-icon>
           <h4>UI</h4>
         </div>
-        <p><code>commands.register</code>, <code>dock.add</code>, <code>ui.panel</code>, <code>ui.style</code> and <code>ui.announce</code>.</p>
+        <p><code>commands.register</code>, <code>dock.add</code>, <code>ui.mountPoint</code>, <code>ui.style</code> and <code>ui.announce</code>.</p>
       </div>
       <div class="card">
         <div class="card-head">

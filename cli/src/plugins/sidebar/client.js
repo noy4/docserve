@@ -1,12 +1,13 @@
 // Dock toggle plus a left panel that lists every page, as rows or preview cards.
 import { createElement } from "react"
 import { createRoot } from "react-dom/client"
-import { el } from "../../widget/lib/dom.js"
 import { createDisposables } from "../../widget/lib/disposables.js"
 import { persisted, persistedFlag } from "../../widget/lib/storage.js"
 import { ICON_GRID, ICON_SIDEBAR } from "./icons.js"
 import { SidebarModel } from "./model.js"
 import { SidebarApp } from "./ui/SidebarApp.js"
+
+const WIDTH = "min(280px, 86vw)"
 
 /**
  * @returns {DocservePlugin}
@@ -19,9 +20,6 @@ export function sidebarPlugin() {
       const viewState = persisted("docserve:sidebar:view", /** @type {"list" | "gallery"} */("list"))
       const groupingState = persisted("docserve:sidebar:grouping", /** @type {"none" | "month"} */("month"))
 
-      const element = el("aside", { class: "docserve-sidebar", "aria-label": ctx.docs?.name || "Pages" })
-      if (ctx.docs) element.style.setProperty("--docserve-sidebar-hue", String(ctx.docs.hue))
-
       const model = new SidebarModel({
         rpc: ctx.rpc,
         view: viewState.value === "gallery" ? "gallery" : "list",
@@ -29,34 +27,27 @@ export function sidebarPlugin() {
         open: openState.value,
         onViewChange(next) {
           viewState.value = next
-          element.dataset.view = next
         },
         onGroupingChange(next) {
           groupingState.value = next
-          element.dataset.grouping = next
         },
       })
-      element.dataset.view = model.view.value
-      element.dataset.grouping = model.grouping.value
 
       ctx.ui.style("/__docserve/plugins/sidebar/sidebar.css")
 
       const disposables = createDisposables()
 
-      const panel = ctx.ui.panel({
-        side: "left",
-        width: "min(280px, 86vw)",
-        open: openState.value,
-        element,
+      const host = ctx.ui.mountPoint()
+      const root = createRoot(host)
+      disposables.add(() => {
+        root.unmount()
+        host.remove()
       })
-      disposables.add(() => panel.remove())
-
-      const root = createRoot(element)
-      disposables.add(() => root.unmount())
       root.render(createElement(SidebarApp, {
         model,
         docs: ctx.docs,
         currentPage: ctx.page,
+        width: WIDTH,
         onClose: () => setOpen(false),
       }))
 
@@ -66,7 +57,7 @@ export function sidebarPlugin() {
         group: "View",
         icon: ICON_SIDEBAR,
         keys: ["[", "Alt+B"],
-        run: () => setOpen(!panel.isOpen()),
+        run: () => setOpen(!model.open.value),
       }))
 
       disposables.add(ctx.commands.register({
@@ -74,7 +65,7 @@ export function sidebarPlugin() {
         title: "Close sidebar",
         keys: ["Escape"],
         showInPalette: false,
-        when: () => panel.isOpen(),
+        when: () => model.open.value,
         run: () => setOpen(false),
       }))
 
@@ -84,7 +75,7 @@ export function sidebarPlugin() {
         group: "View",
         icon: ICON_GRID,
         keys: ["v"],
-        when: () => panel.isOpen(),
+        when: () => model.open.value,
         run: () => model.toggleView(),
       }))
 
@@ -93,7 +84,7 @@ export function sidebarPlugin() {
         title: "Toggle month grouping",
         group: "View",
         keys: ["m"],
-        when: () => panel.isOpen(),
+        when: () => model.open.value,
         run: () => model.toggleGrouping(),
       }))
 
@@ -103,7 +94,7 @@ export function sidebarPlugin() {
         icon: ICON_SIDEBAR,
         group: "main",
         command: "plugin:sidebar:toggle",
-        isActive: () => panel.isOpen(),
+        isActive: () => model.open.value,
       })
       disposables.add(() => item.remove())
 
@@ -121,10 +112,9 @@ export function sidebarPlugin() {
        * @param {boolean} next
        */
       function setOpen(next) {
-        panel.setOpen(next)
-        item.update()
+        model.setOpen(next)
         openState.value = next
-        model.open.value = next
+        item.update()
       }
     },
   }

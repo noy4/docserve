@@ -1,4 +1,4 @@
-// UI helpers handed to plugins: panels, stylesheets, announcements.
+// UI helpers handed to plugins: mount points, stylesheets, announcements.
 import { el } from "./lib/dom.js"
 
 /**
@@ -8,16 +8,26 @@ import { el } from "./lib/dom.js"
  * @returns {UiApi}
  */
 export function createUi({ root, status }) {
-  const panels = createPanels(root)
   /** @type {Set<string>} */
   const added = new Set()
 
   style("/__docserve/widget/widget.css")
 
   return {
-    panel: panels.add,
+    mountPoint,
     style,
     announce,
+  }
+
+  /**
+   * Layout-neutral host in the shadow root for plugin UIs.
+   * @returns {HTMLElement}
+   */
+  function mountPoint() {
+    const element = el("div", { "data-docserve-mount": "" })
+    element.style.display = "contents"
+    root.append(element)
+    return element
   }
 
   /**
@@ -36,67 +46,5 @@ export function createUi({ root, status }) {
    */
   function announce(message) {
     status.textContent = message
-  }
-}
-
-/**
- * Side panels. An open left panel shifts the page with a CSS variable.
- * @param {ShadowRoot} root
- * @returns {{ add: (options: PanelOptions) => PanelHandle }}
- */
-function createPanels(root) {
-  /** @type {PanelHandle[]} */
-  const panels = []
-
-  return { add }
-
-  /**
-   * @param {PanelOptions} options
-   * @returns {PanelHandle}
-   */
-  function add(options) {
-    const side = options.side ?? "left"
-    const width = options.width ?? "280px"
-    const element = options.element
-    element.classList.add("docserve-panel")
-    element.dataset.side = side
-    element.style.width = width
-    element.toggleAttribute("data-open", Boolean(options.open))
-    root.append(element)
-
-    const handle = {
-      element,
-      side,
-      width,
-      isOpen() {
-        return element.hasAttribute("data-open")
-      },
-      setOpen(open) {
-        element.toggleAttribute("data-open", open)
-        syncOffset()
-      },
-      remove() {
-        const index = panels.indexOf(handle)
-        if (index !== -1) panels.splice(index, 1)
-        element.remove()
-        syncOffset()
-      },
-    }
-    panels.push(handle)
-    syncOffset()
-    return handle
-  }
-
-  // The last open left panel wins; right panels never shift the page.
-  function syncOffset() {
-    const open = panels.filter((panel) => panel.side === "left" && panel.isOpen()).at(-1)
-    const html = document.documentElement
-    if (open) {
-      html.style.setProperty("--docserve-panel-left", open.width)
-      html.toggleAttribute("data-docserve-panel-left", true)
-    } else {
-      html.style.removeProperty("--docserve-panel-left")
-      html.toggleAttribute("data-docserve-panel-left", false)
-    }
   }
 }

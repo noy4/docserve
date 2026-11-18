@@ -56,6 +56,11 @@ export class SidebarModel {
     this.setGrouping(this.grouping.value === "month" ? "none" : "month")
   }
 
+  setOpen(next: boolean): void {
+    if (next === this.open.value) return
+    this.open.value = next
+  }
+
   async load({ force = false }: { force?: boolean } = {}): Promise<void> {
     const id = ++this.#request
     if (!this.pages.value.length) this.status.value = "loading"
