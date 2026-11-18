@@ -1,16 +1,18 @@
-import { ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR } from "../icons.js"
-import type { SidebarView } from "../model.js"
+import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR } from "../icons.js"
+import type { SidebarGrouping, SidebarView } from "../model.js"
 
 export interface SidebarHeaderProps {
   docs?: DocsInfo
   view: SidebarView
+  grouping: SidebarGrouping
   files: number | null
   tabsVisible: boolean
   onView: (view: SidebarView) => void
+  onGrouping: (grouping: SidebarGrouping) => void
   onClose: () => void
 }
 
-export function SidebarHeader({ docs, view, files, tabsVisible, onView, onClose }: SidebarHeaderProps) {
+export function SidebarHeader({ docs, view, grouping, files, tabsVisible, onView, onGrouping, onClose }: SidebarHeaderProps) {
   const name = docs?.name || "Pages"
 
   return (
@@ -34,7 +36,18 @@ export function SidebarHeader({ docs, view, files, tabsVisible, onView, onClose 
         <span className="docserve-sidebar__files">
           {files == null ? "" : `${files} ${files === 1 ? "file" : "files"}`}
         </span>
-        {tabsVisible && (
+      </div>
+      {tabsVisible && (
+        <div className="docserve-sidebar__options">
+          <button
+            type="button"
+            className="docserve-sidebar__view docserve-sidebar__group-toggle"
+            aria-label="Group by month"
+            title="Group by month"
+            aria-pressed={grouping === "month"}
+            onClick={() => onGrouping(grouping === "month" ? "none" : "month")}
+            dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
+          />
           <div className="docserve-sidebar__views" role="group" aria-label="View">
             <button
               type="button"
@@ -55,8 +68,8 @@ export function SidebarHeader({ docs, view, files, tabsVisible, onView, onClose 
               dangerouslySetInnerHTML={{ __html: ICON_GRID }}
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   )
 }

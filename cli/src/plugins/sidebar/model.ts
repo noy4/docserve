@@ -1,30 +1,37 @@
 import { signal } from "@preact/signals-react"
 
 export type SidebarView = "list" | "gallery"
+export type SidebarGrouping = "none" | "month"
 export type SidebarStatus = "loading" | "ready" | "error"
 
 export interface SidebarModelOptions {
   rpc: RpcBus
   view?: SidebarView
+  grouping?: SidebarGrouping
   open?: boolean
   onViewChange?: (view: SidebarView) => void
+  onGroupingChange?: (grouping: SidebarGrouping) => void
 }
 
 export class SidebarModel {
   readonly pages = signal<DocPage[]>([])
   readonly status = signal<SidebarStatus>("loading")
   readonly view = signal<SidebarView>("list")
+  readonly grouping = signal<SidebarGrouping>("none")
   readonly open = signal(false)
 
   #rpc: RpcBus
   #request = 0
   #onViewChange: ((view: SidebarView) => void) | undefined
+  #onGroupingChange: ((grouping: SidebarGrouping) => void) | undefined
 
   constructor(options: SidebarModelOptions) {
     this.#rpc = options.rpc
     this.view.value = options.view ?? "list"
+    this.grouping.value = options.grouping ?? "none"
     this.open.value = options.open ?? false
     this.#onViewChange = options.onViewChange
+    this.#onGroupingChange = options.onGroupingChange
   }
 
   setView(next: SidebarView): void {
@@ -36,6 +43,17 @@ export class SidebarModel {
 
   toggleView(): void {
     this.setView(this.view.value === "list" ? "gallery" : "list")
+  }
+
+  setGrouping(next: SidebarGrouping): void {
+    const grouping: SidebarGrouping = next === "month" ? "month" : "none"
+    if (grouping === this.grouping.value) return
+    this.grouping.value = grouping
+    this.#onGroupingChange?.(grouping)
+  }
+
+  toggleGrouping(): void {
+    this.setGrouping(this.grouping.value === "month" ? "none" : "month")
   }
 
   async load({ force = false }: { force?: boolean } = {}): Promise<void> {

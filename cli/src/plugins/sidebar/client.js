@@ -17,6 +17,7 @@ export function sidebarPlugin() {
     setup(ctx) {
       const openState = persistedFlag("docserve:sidebar:open")
       const viewState = persisted("docserve:sidebar:view", /** @type {"list" | "gallery"} */("list"))
+      const groupingState = persisted("docserve:sidebar:grouping", /** @type {"none" | "month"} */("month"))
 
       const element = el("aside", { class: "docserve-sidebar", "aria-label": ctx.docs?.name || "Pages" })
       if (ctx.docs) element.style.setProperty("--docserve-sidebar-hue", String(ctx.docs.hue))
@@ -24,13 +25,19 @@ export function sidebarPlugin() {
       const model = new SidebarModel({
         rpc: ctx.rpc,
         view: viewState.value === "gallery" ? "gallery" : "list",
+        grouping: groupingState.value === "none" ? "none" : "month",
         open: openState.value,
         onViewChange(next) {
           viewState.value = next
           element.dataset.view = next
         },
+        onGroupingChange(next) {
+          groupingState.value = next
+          element.dataset.grouping = next
+        },
       })
       element.dataset.view = model.view.value
+      element.dataset.grouping = model.grouping.value
 
       ctx.ui.style("/__docserve/plugins/sidebar/sidebar.css")
 
@@ -79,6 +86,15 @@ export function sidebarPlugin() {
         keys: ["v"],
         when: () => panel.isOpen(),
         run: () => model.toggleView(),
+      }))
+
+      disposables.add(ctx.commands.register({
+        id: "plugin:sidebar:grouping",
+        title: "Toggle month grouping",
+        group: "View",
+        keys: ["m"],
+        when: () => panel.isOpen(),
+        run: () => model.toggleGrouping(),
       }))
 
       const item = ctx.dock.add({

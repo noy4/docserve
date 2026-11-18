@@ -17,21 +17,24 @@ export function SidebarApp({ model, docs, currentPage, onClose }: SidebarAppProp
   const pages = model.pages.value
   const status = model.status.value
   const view = model.view.value
+  const grouping = model.grouping.value
   const open = model.open.value
 
   useEffect(() => {
     if (!open) return
     previews.element?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest" })
-  }, [open, pages, previews, view])
+  }, [open, pages, previews, view, grouping])
 
   return (
     <>
       <SidebarHeader
         docs={docs}
         view={view}
+        grouping={grouping}
         files={status === "ready" ? pages.length : null}
         tabsVisible={status !== "error" && pages.length > 0}
         onView={(next) => model.setView(next)}
+        onGrouping={(next) => model.setGrouping(next)}
         onClose={onClose}
       />
       <nav ref={previews.setRoot} className="docserve-sidebar__list" aria-label="Pages">
@@ -51,7 +54,7 @@ export function SidebarApp({ model, docs, currentPage, onClose }: SidebarAppProp
           : status === "loading" && !pages.length
             ? <p className="docserve-sidebar__empty">Loading…</p>
             : pages.length
-              ? <PageList pages={pages} view={view} currentPage={currentPage} previews={previews} />
+              ? <PageList pages={pages} view={view} grouping={grouping} currentPage={currentPage} previews={previews} />
               : <p className="docserve-sidebar__empty">No pages</p>}
       </nav>
     </>

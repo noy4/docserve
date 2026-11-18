@@ -1,23 +1,53 @@
 import { useCallback, useState } from "react"
 import { decoded, displayDate, pageUrl } from "../../../widget/lib/dom.js"
+import { groupByMonth } from "../grouping.js"
 import type { PreviewModel } from "./preview-model.js"
-import type { SidebarView } from "../model.js"
+import type { SidebarGrouping, SidebarView } from "../model.js"
 
 export interface PageListProps {
   pages: DocPage[]
   view: SidebarView
+  grouping: SidebarGrouping
   currentPage: string
   previews?: PreviewModel
 }
 
-export function PageList({ pages, view, currentPage, previews }: PageListProps) {
+export function PageList({ pages, view, grouping, currentPage, previews }: PageListProps) {
   const target = pageUrl(currentPage)
 
-  return pages.map((page) =>
-    view === "gallery"
-      ? <GalleryCard key={pageKey(page)} page={page} active={isActive(page, target, currentPage)} previews={previews} />
-      : <ListRow key={page.url} page={page} active={isActive(page, target, currentPage)} />,
-  )
+  if (grouping !== "month") return pages.map((page) => renderPage(page, view, target, currentPage, previews))
+
+  return groupByMonth(pages).map((group) => {
+    const id = groupHeadingId(group.key)
+
+    return (
+      <section key={group.key || "undated"} className="docserve-sidebar__group" aria-labelledby={id}>
+        <h2 className="docserve-sidebar__group-head" id={id}>
+          <span>{group.label}</span>
+          <span className="docserve-sidebar__group-count">{group.pages.length}</span>
+        </h2>
+        <div className="docserve-sidebar__group-body">
+          {group.pages.map((page) => renderPage(page, view, target, currentPage, previews))}
+        </div>
+      </section>
+    )
+  })
+}
+
+function renderPage(
+  page: DocPage,
+  view: SidebarView,
+  target: string,
+  currentPage: string,
+  previews?: PreviewModel,
+) {
+  return view === "gallery"
+    ? <GalleryCard key={pageKey(page)} page={page} active={isActive(page, target, currentPage)} previews={previews} />
+    : <ListRow key={page.url} page={page} active={isActive(page, target, currentPage)} />
+}
+
+function groupHeadingId(key: string): string {
+  return `docserve-sidebar-group-${key || "undated"}`
 }
 
 function pageKey(page: DocPage): string {
