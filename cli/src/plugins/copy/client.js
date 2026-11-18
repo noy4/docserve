@@ -13,33 +13,31 @@ export function copyPlugin() {
     setup(ctx) {
       /** @type {ReturnType<typeof setTimeout> | null} */
       let resetTimer = null
-      /** @type {DocksItemHandle | null} */
-      let handle = null
 
       ctx.ui.style("/__docserve/plugins/copy/copy.css")
 
       const offCopy = ctx.commands.register({
         id: "plugin:copy:path",
         title: "Copy file path",
-        hint: "Absolute path of this page",
-        group: "Actions",
+        description: "Absolute path of this page",
+        category: "Actions",
         icon: ICON_COPY,
         keys: ["c"],
         run: copyPath,
       })
 
-      handle = ctx.docks.register({
+      const dock = ctx.docks.register({
         id: "copy",
-        label: "Copy file path",
+        title: "Copy file path",
         icon: ICON_COPY + ICON_CHECK,
-        group: "actions",
+        category: "actions",
         command: "plugin:copy:path",
       })
 
       return () => {
         offCopy()
         if (resetTimer) clearTimeout(resetTimer)
-        handle?.dispose()
+        dock.dispose()
       }
 
       async function copyPath() {
@@ -58,7 +56,7 @@ export function copyPlugin() {
        * @param {"copied" | ""} state
        */
       function flash(state) {
-        const element = handle?.element
+        const element = dock.element
         if (!element) return
         element.dataset.state = state
         if (resetTimer) clearTimeout(resetTimer)

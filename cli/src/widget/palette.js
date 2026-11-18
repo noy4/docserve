@@ -134,7 +134,7 @@ export function createPalette({ root, ui, commands, subscribe }) {
       command.icon ? el("span", { class: "docserve-palette__icon", html: command.icon }) : null,
       el("span", { class: "docserve-palette__text" }, [
         el("span", { class: "docserve-palette__title", text: command.title }),
-        command.hint ? el("span", { class: "docserve-palette__hint", text: command.hint }) : null,
+        command.description ? el("span", { class: "docserve-palette__hint", text: command.description }) : null,
       ]),
       keys.length
         ? el("span", { class: "docserve-palette__keys" }, keys.map((key) => el("kbd", { class: "docserve-palette__key", text: formatKey(key) })))
@@ -219,7 +219,7 @@ function score(command, query) {
   if (title.startsWith(query)) return 100
   if (title.split(/[\s:/_-]+/).some((word) => word.startsWith(query))) return 80
   if (title.includes(query)) return 60
-  if (`${command.hint ?? ""} ${command.group ?? ""}`.toLowerCase().includes(query)) return 40
+  if (`${command.description ?? ""} ${command.category ?? ""}`.toLowerCase().includes(query)) return 40
   return subsequence(query, title) ? 20 : 0
 }
 

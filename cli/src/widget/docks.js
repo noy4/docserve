@@ -67,14 +67,14 @@ export function createDocks({ root, getContext }) {
 
   function render() {
     element.replaceChildren()
-    let previousGroup
+    let previousCategory
     let first = true
 
     for (const item of sorted()) {
-      if (!first && item.group != null && previousGroup != null && item.group !== previousGroup)
+      if (!first && item.category != null && previousCategory != null && item.category !== previousCategory)
         element.append(el("span", { class: "docserve-dock__divider", "aria-hidden": "true" }))
       first = false
-      previousGroup = item.group
+      previousCategory = item.category
 
       const node = createDockItem(item, getContext())
       const handle = handles.get(item.id)
@@ -98,8 +98,8 @@ function createDockItem(item, ctx) {
   const keys = item.command ? ctx.commands.list().find((command) => command.id === item.command)?.keys ?? [] : []
   const props = {
     class: "docserve-dock__button",
-    title: keys.length ? `${item.label} (${keys.map(formatKey).join(" / ")})` : item.label,
-    "aria-label": item.label,
+    title: keys.length ? `${item.title} (${keys.map(formatKey).join(" / ")})` : item.title,
+    "aria-label": item.title,
     "data-action": item.id,
     html: item.icon ?? "",
   }

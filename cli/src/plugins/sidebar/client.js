@@ -45,9 +45,9 @@ export function sidebarPlugin() {
       // dock
       const dock = ctx.docks.register({
         id: "sidebar",
-        label: "Toggle sidebar",
+        title: "Toggle sidebar",
         icon: ICON_SIDEBAR,
-        group: "main",
+        category: "main",
         command: "plugin:sidebar:toggle",
         isActive: () => model.open.value,
       })
@@ -78,7 +78,7 @@ function registerCommands(ctx, model, cleanup) {
   cleanup.add(ctx.commands.register({
     id: "plugin:sidebar:toggle",
     title: "Toggle sidebar",
-    group: "View",
+    category: "View",
     icon: ICON_SIDEBAR,
     keys: ["[", "Alt+B"],
     run: () => model.setOpen(!model.open.value),
@@ -96,7 +96,7 @@ function registerCommands(ctx, model, cleanup) {
   cleanup.add(ctx.commands.register({
     id: "plugin:sidebar:view",
     title: "Toggle sidebar view",
-    group: "View",
+    category: "View",
     icon: ICON_GRID,
     keys: ["v"],
     when: () => model.open.value,
@@ -106,7 +106,7 @@ function registerCommands(ctx, model, cleanup) {
   cleanup.add(ctx.commands.register({
     id: "plugin:sidebar:grouping",
     title: "Toggle month grouping",
-    group: "View",
+    category: "View",
     keys: ["m"],
     when: () => model.open.value,
     run: () => model.toggleGrouping(),

@@ -76,14 +76,14 @@ interface DocserveEvents {
 interface DockItem {
   /** Unique within the dock; also `data-action`. */
   id: string
-  /** Used for `title` and `aria-label`. */
-  label: string
+  /** Used for the button `title` and `aria-label`. */
+  title: string
   /** Inline SVG markup. */
   icon?: string
   /** Ascending; default 0. */
   order?: number
-  /** Items in different groups get a divider between them. */
-  group?: string
+  /** Items in different categories get a divider between them. */
+  category?: string
   /** Command id run through `ctx.commands`; exactly one of `command` / `href`. */
   command?: string
   /** Rendered as `<a href>` instead of a command button. */
@@ -107,9 +107,9 @@ interface DocserveCommand {
   /** Palette row text and dock `title`. */
   title: string
   /** Optional palette subtitle. */
-  hint?: string
+  description?: string
   /** Optional palette section heading. */
-  group?: string
+  category?: string
   /** Inline SVG markup, shared with dock items. */
   icon?: string
   /** Normalized shortcuts: `"Mod+K"`, `"Alt+B"`, `"Shift+C"`, `"["`. */
