@@ -1,6 +1,7 @@
 import type { TocModel } from "./model.js"
+import { HEADING_OFFSET } from "./model.js"
 
-export function startScrollSpy(model: TocModel, offset = 88): () => void {
+export function startScrollSpy(model: TocModel, offset = HEADING_OFFSET): () => void {
   const controller = new AbortController()
   let frame = 0
 

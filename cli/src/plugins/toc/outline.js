@@ -8,6 +8,51 @@ const ROOT_SELECTORS = ["main", "article", ".container"]
  */
 
 /**
+ * Resolve the page root, its outline range and its headings.
+ * @param {Document} [doc]
+ * @returns {TocOutline}
+ */
+export function collectOutline(doc = document) {
+  const root = findRoot(doc)
+  const source = doc.body ?? doc.documentElement
+  if (!root || !source) return { root: null, range: null, headings: [] }
+
+  const raw = root.getAttribute("data-toc-outline") ?? source.getAttribute("data-toc-outline")
+  const range = resolveRange(parseOutline(raw))
+  if (!range) return { root, range: null, headings: [] }
+
+  const headings = collectHeadings(root, range)
+  ensureIds(headings, doc)
+
+  return { root, range, headings }
+}
+
+/**
+ * Content root: `data-toc-root`, else the first of main / article / .container, else body.
+ * @param {Document} [doc]
+ * @returns {HTMLElement | null}
+ */
+export function findRoot(doc = document) {
+  const source = doc.body ?? doc.documentElement
+  if (!source) return null
+
+  const selector = source.getAttribute("data-toc-root")
+  if (selector) {
+    try {
+      const custom = doc.querySelector(selector)
+      if (custom) return /** @type {HTMLElement} */ (custom)
+    } catch {}
+  }
+
+  for (const candidate of ROOT_SELECTORS) {
+    const element = doc.querySelector(candidate)
+    if (element) return /** @type {HTMLElement} */ (element)
+  }
+
+  return doc.body
+}
+
+/**
  * `data-toc-outline` → `[min, max] | "deep" | false`.
  * @param {string | null | undefined} value
  * @returns {number | number[] | "deep" | false}
@@ -46,31 +91,6 @@ export function resolveRange(outline) {
 }
 
 /**
- * Content root: `data-toc-root`, else the first of main / article / .container, else body.
- * @param {Document} [doc]
- * @returns {HTMLElement | null}
- */
-export function findRoot(doc = document) {
-  const source = doc.body ?? doc.documentElement
-  if (!source) return null
-
-  const selector = source.getAttribute("data-toc-root")
-  if (selector) {
-    try {
-      const custom = doc.querySelector(selector)
-      if (custom) return /** @type {HTMLElement} */ (custom)
-    } catch {}
-  }
-
-  for (const candidate of ROOT_SELECTORS) {
-    const element = doc.querySelector(candidate)
-    if (element) return /** @type {HTMLElement} */ (element)
-  }
-
-  return doc.body
-}
-
-/**
  * Headings inside `root` whose level falls in `range`, in document order.
  * @param {HTMLElement | null} root
  * @param {[number, number] | null} range
@@ -91,6 +111,25 @@ export function collectHeadings(root, range) {
   })
 
   return /** @type {HTMLHeadingElement[]} */ (headings)
+}
+
+/**
+ * @param {Element} element
+ * @returns {boolean}
+ */
+function isHidden(element) {
+  if (element.hasAttribute("hidden") || element.getAttribute("aria-hidden") === "true") return true
+  if (element.closest("details:not([open])")) return true
+
+  const view = element.ownerDocument.defaultView
+  if (!view) return false
+
+  for (let node = element; node; node = node.parentElement) {
+    const style = view.getComputedStyle(node)
+    if (style.display === "none" || style.visibility === "hidden") return true
+  }
+
+  return false
 }
 
 /**
@@ -147,43 +186,4 @@ export function buildTree(headings) {
   }
 
   return roots
-}
-
-/**
- * Resolve the page root, its outline range and its headings.
- * @param {Document} [doc]
- * @returns {TocOutline}
- */
-export function collectOutline(doc = document) {
-  const root = findRoot(doc)
-  const source = doc.body ?? doc.documentElement
-  if (!root || !source) return { root: null, range: null, headings: [] }
-
-  const raw = root.getAttribute("data-toc-outline") ?? source.getAttribute("data-toc-outline")
-  const range = resolveRange(parseOutline(raw))
-  if (!range) return { root, range: null, headings: [] }
-
-  const headings = collectHeadings(root, range)
-  ensureIds(headings, doc)
-
-  return { root, range, headings }
-}
-
-/**
- * @param {Element} element
- * @returns {boolean}
- */
-function isHidden(element) {
-  if (element.hasAttribute("hidden") || element.getAttribute("aria-hidden") === "true") return true
-  if (element.closest("details:not([open])")) return true
-
-  const view = element.ownerDocument.defaultView
-  if (!view) return false
-
-  for (let node = element; node; node = node.parentElement) {
-    const style = view.getComputedStyle(node)
-    if (style.display === "none" || style.visibility === "hidden") return true
-  }
-
-  return false
 }

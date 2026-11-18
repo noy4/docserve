@@ -1,10 +1,10 @@
+import { createElement } from "react"
+import { createRoot } from "react-dom/client"
 import { createDisposables } from "../../widget/lib/disposables.js"
 import { registerTocCommands, registerTocDock } from "./commands.js"
 import { TocModel } from "./model.js"
-import { createPanel } from "./panel.js"
 import { startScrollSpy } from "./scroll-spy.js"
-
-const OFFSET = 88
+import { TocPanel } from "./ui/TocPanel.js"
 
 /**
  * @returns {DocservePlugin}
@@ -22,20 +22,18 @@ export function tocPlugin() {
       ctx.ui.style("/__docserve/plugins/toc/toc.css")
 
       // panel
-      const panel = createPanel({
-        onClose: () => model.setOpen(false),
-        onNavigate: navigate,
-      })
       const mount = ctx.ui.mountPoint()
-      mount.append(panel.element)
+      const root = createRoot(mount)
+      root.render(createElement(TocPanel, { model }))
+      cleanup.add(() => {
+        root.unmount()
+        mount.remove()
+      })
+      cleanup.add(model.subscribe())
 
-      // state bindings
-      cleanup.add(model.tree.subscribe((tree) => panel.setTree(tree)))
-      cleanup.add(model.activeId.subscribe((id) => panel.setActive(id)))
+      // open state
       cleanup.add(model.open.subscribe(() => {
-        const open = model.open.value
-        html.toggleAttribute("data-docserve-panel-right", open)
-        panel.setOpen(open)
+        html.toggleAttribute("data-docserve-panel-right", model.open.value)
       }))
 
       // commands
@@ -43,27 +41,15 @@ export function tocPlugin() {
       cleanup.add(registerTocDock(ctx, model))
 
       // scroll spy
-      cleanup.add(startScrollSpy(model, OFFSET))
+      cleanup.add(startScrollSpy(model))
 
       // teardown
       cleanup.add(() => html.removeAttribute("data-docserve-panel-right"))
-      cleanup.add(() => panel.destroy())
-      cleanup.add(() => mount.remove())
 
       // data
       model.load()
 
       return cleanup.dispose
-
-      // navigation
-      function navigate(element) {
-        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
-        const top = window.scrollY + element.getBoundingClientRect().top - OFFSET
-
-        window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" })
-        history.replaceState(null, "", `#${element.id}`)
-        model.setActive(element.id)
-      }
     },
   }
 }
