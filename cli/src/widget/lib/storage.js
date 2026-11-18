@@ -11,15 +11,19 @@
  * @template T
  * @param {string} key
  * @param {T} [initial]  Returned when the key is absent or cannot be parsed.
+ *   Object values (arrays included) default to JSON parse/serialize; primitives
+ *   default to plain strings.
  * @param {object} [options]
  * @param {(raw: string) => T} [options.parse]
  * @param {(value: T) => string} [options.serialize]
  * @returns {Persisted<T>}
  */
 export function persisted(key, initial = /** @type {any} */ (null), options = {}) {
+  // Object initial values are stored as JSON; primitives as plain strings.
+  const json = initial !== null && typeof initial === "object"
   const {
-    parse = (raw) => /** @type {any} */(raw),
-    serialize = (value) => String(value),
+    parse = json ? (raw) => JSON.parse(raw) : (raw) => /** @type {any} */(raw),
+    serialize = json ? (value) => JSON.stringify(value) : (value) => String(value),
   } = options
 
   function read() {

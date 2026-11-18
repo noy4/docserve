@@ -99,7 +99,7 @@ function registerCommands(ctx, model, cleanup) {
     category: "View",
     icon: ICON_CALENDAR,
     keys: ["m"],
-    when: () => model.open.value,
+    when: () => model.open.value && model.view.value !== "tree",
     run: () => model.toggleGrouping(),
   }))
 }

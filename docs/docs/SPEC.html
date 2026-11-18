@@ -443,7 +443,7 @@
 │       │   ├── lib/              <span class="c"># framework-free: dom.js · events.js · storage.js</span>
 │       │   └── widget.css  palette.css
 │       ├── plugins/              <span class="c"># built-ins, same shape as external ones</span>
-│       │   ├── sidebar/{client.js, sidebar.css}
+│       │   ├── sidebar/{client.js, model.ts, tree.ts, tree-model.ts, sidebar.css}
 │       │   ├── copy/{client.js, copy.css}
 │       │   └── home/client.js
 │       └── shared/types.d.ts     <span class="c"># global types for ctx, docks, commands, rpc</span>
@@ -890,6 +890,9 @@
 
     <p class="section-desc">Sidebar, copy and home are built this way.</p>
     <p>An action is registered once as a command, which gives it a keyboard shortcut and a row in the <code>⌘K</code> palette; a dock button then just names that command id.</p>
+    <p class="section-desc">
+      The sidebar renders pages as <code>list</code>, <code>gallery</code> or <code>tree</code> — the tree groups <code>page.url</code> into folders (folders first, natural name order) and persists which folders are collapsed.
+    </p>
 
     <h3><iconify-icon icon="mdi:code-braces" noobserver></iconify-icon>Writing a plugin</h3>
 

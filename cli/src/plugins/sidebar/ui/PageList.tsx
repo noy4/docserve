@@ -125,7 +125,7 @@ function GalleryCard({ page, active, previews }: { page: DocPage; active: boolea
   )
 }
 
-function Favicon({ src }: { src?: string }) {
+export function Favicon({ src }: { src?: string }) {
   const [failed, setFailed] = useState(false)
   if (!src || failed) return null
 

@@ -3,6 +3,7 @@ import type { CSSProperties } from "react"
 import { PageList } from "./PageList.js"
 import { PreviewModel } from "./preview-model.js"
 import { SidebarHeader } from "./SidebarHeader.js"
+import { TreeList } from "./TreeList.js"
 import { useLayoutModel } from "./useModel.js"
 import type { SidebarModel } from "../model.js"
 
@@ -73,7 +74,9 @@ export function Sidebar({ model }: SidebarProps) {
           : status === "loading" && !pages.length
             ? <p className="docserve-sidebar__empty">Loading…</p>
             : pages.length
-              ? <PageList model={model} previews={previews} />
+              ? view === "tree"
+                ? <TreeList model={model.tree} currentPage={model.currentPage} />
+                : <PageList model={model} previews={previews} />
               : <p className="docserve-sidebar__empty">No pages</p>}
       </nav>
       <div

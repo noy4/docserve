@@ -1,8 +1,9 @@
 import { signal } from "@preact/signals-react"
 import { persisted, persistedBool } from "../../widget/lib/persisted-signal.js"
 import { ResizeModel } from "./resize-model.js"
+import { TreeModel } from "./tree-model.js"
 
-export type SidebarView = "list" | "gallery"
+export type SidebarView = "list" | "gallery" | "tree"
 export type SidebarGrouping = "none" | "month"
 export type SidebarStatus = "loading" | "ready" | "error"
 
@@ -19,6 +20,7 @@ export class SidebarModel {
   readonly status = signal<SidebarStatus>("loading")
   readonly view = persisted<SidebarView>("docserve:sidebar:view", "list")
   readonly grouping = persisted<SidebarGrouping>("docserve:sidebar:grouping", "month")
+  readonly tree = new TreeModel(this.pages)
   readonly resizer = new ResizeModel()
   readonly open = persistedBool("docserve:sidebar:open")
 
@@ -44,7 +46,7 @@ export class SidebarModel {
   }
 
   toggleView(): void {
-    this.setView(this.view.value === "list" ? "gallery" : "list")
+    this.setView(nextView(this.view.value))
   }
 
   setGrouping(next: SidebarGrouping): void {
@@ -73,4 +75,11 @@ export class SidebarModel {
       this.status.value = "error"
     }
   }
+}
+
+const VIEWS: SidebarView[] = ["list", "gallery", "tree"]
+
+function nextView(current: SidebarView): SidebarView {
+  const index = VIEWS.indexOf(current)
+  return VIEWS[(index + 1) % VIEWS.length]
 }

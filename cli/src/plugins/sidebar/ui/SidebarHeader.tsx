@@ -1,4 +1,4 @@
-import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR } from "../icons.js"
+import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR, ICON_TREE } from "../icons.js"
 import type { SidebarModel } from "../model.js"
 
 export interface SidebarHeaderProps {
@@ -36,15 +36,17 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
         </span>
       </div>
       <div className="docserve-sidebar__options">
-        <button
-          type="button"
-          className="docserve-sidebar__view docserve-sidebar__group-toggle"
-          aria-label="Group by month"
-          title="Group by month"
-          aria-pressed={grouping === "month"}
-          onClick={() => model.toggleGrouping()}
-          dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
-        />
+        {view !== "tree" && (
+          <button
+            type="button"
+            className="docserve-sidebar__view docserve-sidebar__group-toggle"
+            aria-label="Group by month"
+            title="Group by month"
+            aria-pressed={grouping === "month"}
+            onClick={() => model.toggleGrouping()}
+            dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
+          />
+        )}
         <div className="docserve-sidebar__views" role="group" aria-label="View">
           <button
             type="button"
@@ -63,6 +65,15 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
             aria-pressed={view === "gallery"}
             onClick={() => model.setView("gallery")}
             dangerouslySetInnerHTML={{ __html: ICON_GRID }}
+          />
+          <button
+            type="button"
+            className="docserve-sidebar__view"
+            aria-label="Tree view"
+            title="Tree view"
+            aria-pressed={view === "tree"}
+            onClick={() => model.setView("tree")}
+            dangerouslySetInnerHTML={{ __html: ICON_TREE }}
           />
         </div>
       </div>
