@@ -108,9 +108,16 @@ function TreeRow({ node, depth, collapsed, model, target, currentPage }: TreeRow
       title={page.title}
       style={style}
     >
-      <span className="docserve-sidebar__tree-slot docserve-sidebar__tree-icon">
-        {page.favicon ? <Favicon src={page.favicon} /> : <span dangerouslySetInnerHTML={{ __html: ICON_FILE }} />}
-      </span>
+      {page.favicon ? (
+        <span className="docserve-sidebar__tree-slot docserve-sidebar__tree-icon">
+          <Favicon src={page.favicon} />
+        </span>
+      ) : (
+        <span
+          className="docserve-sidebar__tree-slot docserve-sidebar__tree-icon"
+          dangerouslySetInnerHTML={{ __html: ICON_FILE }}
+        />
+      )}
       <span className="docserve-sidebar__tree-label">{node.name}</span>
     </a>
   )
