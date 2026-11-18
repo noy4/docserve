@@ -1,11 +1,11 @@
 import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_ROWS, ICON_SIDEBAR, ICON_TREE } from "../icons.js"
-import type { SidebarModel } from "../model.js"
+import type { SidebarGrouping, SidebarModel } from "../model.js"
 
-const GROUPING = {
-  none: { icon: ICON_ROWS, label: "No grouping" },
-  month: { icon: ICON_CALENDAR, label: "By month" },
-  folder: { icon: ICON_FOLDER, label: "By folder" },
-}
+const GROUPING = [
+  { id: "none", icon: ICON_ROWS, label: "No grouping" },
+  { id: "month", icon: ICON_CALENDAR, label: "By month" },
+  { id: "folder", icon: ICON_FOLDER, label: "By folder" },
+] satisfies { id: SidebarGrouping; icon: string; label: string }[]
 
 export interface SidebarHeaderProps {
   model: SidebarModel
@@ -16,7 +16,6 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
   const name = docs?.name || "Pages"
   const view = model.view.value
   const grouping = model.grouping.value
-  const groupingMeta = GROUPING[grouping]
   const pages = model.pages.value
   const files = model.status.value === "ready" ? pages.length : null
 
@@ -44,15 +43,20 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
       </div>
       <div className="docserve-sidebar__options">
         {view !== "tree" && (
-          <button
-            type="button"
-            className="docserve-sidebar__view docserve-sidebar__group-toggle"
-            aria-label={`Grouping: ${groupingMeta.label}`}
-            title={`Grouping: ${groupingMeta.label}`}
-            aria-pressed={grouping !== "none"}
-            onClick={() => model.toggleGrouping()}
-            dangerouslySetInnerHTML={{ __html: groupingMeta.icon }}
-          />
+          <div className="docserve-sidebar__views" role="group" aria-label="Grouping">
+            {GROUPING.map(({ id, icon, label }) => (
+              <button
+                key={id}
+                type="button"
+                className="docserve-sidebar__view"
+                aria-label={label}
+                title={label}
+                aria-pressed={grouping === id}
+                onClick={() => model.setGrouping(id)}
+                dangerouslySetInnerHTML={{ __html: icon }}
+              />
+            ))}
+          </div>
         )}
         <div className="docserve-sidebar__views" role="group" aria-label="View">
           <button

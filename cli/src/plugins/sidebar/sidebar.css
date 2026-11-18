@@ -421,29 +421,6 @@
   color: var(--docserve-panel-text);
 }
 
-.docserve-sidebar__group-toggle {
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--docserve-panel-text) 6%, transparent);
-  color: var(--docserve-panel-muted);
-}
-
-.docserve-sidebar__group-toggle svg {
-  width: 14px;
-  height: 14px;
-}
-
-.docserve-sidebar__group-toggle:hover {
-  background: color-mix(in srgb, var(--docserve-panel-text) 12%, transparent);
-  color: var(--docserve-panel-text);
-}
-
-.docserve-sidebar__group-toggle[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--docserve-dock-accent) 14%, transparent);
-  color: var(--docserve-dock-accent);
-}
-
 /* Tree view: nested folders and pages, VS Code explorer style */
 .docserve-sidebar__tree,
 .docserve-sidebar__tree-group,
