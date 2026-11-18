@@ -1,8 +1,8 @@
-import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_ROWS, ICON_SIDEBAR, ICON_TREE } from "../icons.js"
+import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR, ICON_TREE, ICON_UNGROUP } from "../icons.js"
 import type { SidebarGrouping, SidebarModel } from "../model.js"
 
 const GROUPING = [
-  { id: "none", icon: ICON_ROWS, label: "No grouping" },
+  { id: "none", icon: ICON_UNGROUP, label: "No grouping" },
   { id: "month", icon: ICON_CALENDAR, label: "By month" },
   { id: "folder", icon: ICON_FOLDER, label: "By folder" },
 ] satisfies { id: SidebarGrouping; icon: string; label: string }[]
