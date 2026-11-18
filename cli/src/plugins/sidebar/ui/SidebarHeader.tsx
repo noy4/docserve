@@ -1,5 +1,11 @@
-import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR, ICON_TREE } from "../icons.js"
+import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_ROWS, ICON_SIDEBAR, ICON_TREE } from "../icons.js"
 import type { SidebarModel } from "../model.js"
+
+const GROUPING = {
+  none: { icon: ICON_ROWS, label: "No grouping" },
+  month: { icon: ICON_CALENDAR, label: "By month" },
+  folder: { icon: ICON_FOLDER, label: "By folder" },
+}
 
 export interface SidebarHeaderProps {
   model: SidebarModel
@@ -10,6 +16,7 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
   const name = docs?.name || "Pages"
   const view = model.view.value
   const grouping = model.grouping.value
+  const groupingMeta = GROUPING[grouping]
   const pages = model.pages.value
   const files = model.status.value === "ready" ? pages.length : null
 
@@ -40,11 +47,11 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
           <button
             type="button"
             className="docserve-sidebar__view docserve-sidebar__group-toggle"
-            aria-label="Group by month"
-            title="Group by month"
-            aria-pressed={grouping === "month"}
+            aria-label={`Grouping: ${groupingMeta.label}`}
+            title={`Grouping: ${groupingMeta.label}`}
+            aria-pressed={grouping !== "none"}
             onClick={() => model.toggleGrouping()}
-            dangerouslySetInnerHTML={{ __html: ICON_CALENDAR }}
+            dangerouslySetInnerHTML={{ __html: groupingMeta.icon }}
           />
         )}
         <div className="docserve-sidebar__views" role="group" aria-label="View">

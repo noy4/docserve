@@ -6,6 +6,7 @@ import ICON_FILE_RAW from "~icons/lucide/file-text?raw&width=18&height=18"
 import ICON_FOLDER_RAW from "~icons/lucide/folder?raw&width=18&height=18"
 import ICON_GRID_RAW from "~icons/lucide/layout-grid?raw&width=18&height=18"
 import ICON_LIST_RAW from "~icons/lucide/list?raw&width=18&height=18"
+import ICON_ROWS_RAW from "~icons/lucide/rows-3?raw&width=18&height=18"
 import ICON_SIDEBAR_RAW from "~icons/lucide/panel-left?raw&width=18&height=18"
 import ICON_TREE_RAW from "~icons/lucide/list-tree?raw&width=18&height=18"
 
@@ -15,5 +16,6 @@ export const ICON_FILE = iconSvg(ICON_FILE_RAW)
 export const ICON_FOLDER = iconSvg(ICON_FOLDER_RAW)
 export const ICON_GRID = iconSvg(ICON_GRID_RAW)
 export const ICON_LIST = iconSvg(ICON_LIST_RAW)
+export const ICON_ROWS = iconSvg(ICON_ROWS_RAW)
 export const ICON_SIDEBAR = iconSvg(ICON_SIDEBAR_RAW)
 export const ICON_TREE = iconSvg(ICON_TREE_RAW)

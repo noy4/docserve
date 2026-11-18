@@ -95,7 +95,7 @@ function registerCommands(ctx, model, cleanup) {
 
   cleanup.add(ctx.commands.register({
     id: "plugin:sidebar:grouping",
-    title: "Toggle month grouping",
+    title: "Cycle sidebar grouping",
     category: "View",
     icon: ICON_CALENDAR,
     keys: ["m"],

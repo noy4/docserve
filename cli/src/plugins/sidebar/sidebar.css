@@ -180,6 +180,14 @@
   text-align: center;
 }
 
+/* Folder paths can be long; keep them on one line next to the count. */
+.docserve-sidebar__group-head > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .docserve-sidebar__group-body {
   display: flex;
   flex-direction: column;

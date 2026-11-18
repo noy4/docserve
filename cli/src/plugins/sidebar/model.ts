@@ -4,7 +4,7 @@ import { ResizeModel } from "./resize-model.js"
 import { TreeModel } from "./tree-model.js"
 
 export type SidebarView = "list" | "gallery" | "tree"
-export type SidebarGrouping = "none" | "month"
+export type SidebarGrouping = "none" | "month" | "folder"
 export type SidebarStatus = "loading" | "ready" | "error"
 
 export interface SidebarModelOptions {
@@ -54,7 +54,7 @@ export class SidebarModel {
   }
 
   toggleGrouping(): void {
-    this.setGrouping(this.grouping.value === "month" ? "none" : "month")
+    this.setGrouping(nextGrouping(this.grouping.value))
   }
 
   setOpen(next: boolean): void {
@@ -78,8 +78,14 @@ export class SidebarModel {
 }
 
 const VIEWS: SidebarView[] = ["list", "gallery", "tree"]
+const GROUPINGS: SidebarGrouping[] = ["none", "month", "folder"]
 
 function nextView(current: SidebarView): SidebarView {
   const index = VIEWS.indexOf(current)
   return VIEWS[(index + 1) % VIEWS.length]
+}
+
+function nextGrouping(current: SidebarGrouping): SidebarGrouping {
+  const index = GROUPINGS.indexOf(current)
+  return GROUPINGS[(index + 1) % GROUPINGS.length]
 }

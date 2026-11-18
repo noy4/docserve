@@ -891,7 +891,7 @@
     <p class="section-desc">Sidebar, copy and home are built this way.</p>
     <p>An action is registered once as a command, which gives it a keyboard shortcut and a row in the <code>⌘K</code> palette; a dock button then just names that command id.</p>
     <p class="section-desc">
-      The sidebar renders pages as <code>list</code>, <code>gallery</code> or <code>tree</code> — the tree groups <code>page.url</code> into folders (folders first, natural name order) and persists which folders are collapsed.
+      The sidebar renders pages as <code>list</code>, <code>gallery</code> or <code>tree</code> — the tree groups <code>page.url</code> into folders (folders first, natural name order) and persists which folders are collapsed. In list and gallery, grouping cycles through <code>none</code>, <code>month</code> and <code>folder</code>; folder grouping makes one section per folder that directly holds pages, root first, without nesting.
     </p>
 
     <h3><iconify-icon icon="mdi:code-braces" noobserver></iconify-icon>Writing a plugin</h3>

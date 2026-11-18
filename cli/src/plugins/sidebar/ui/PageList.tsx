@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 import { decoded, displayDate, pageUrl } from "../../../widget/lib/dom.js"
-import { groupByMonth } from "../grouping.js"
+import { groupByFolder, groupByMonth } from "../grouping.js"
 import type { PreviewModel } from "./preview-model.js"
 import type { SidebarModel, SidebarView } from "../model.js"
 
@@ -16,7 +16,7 @@ export function PageList({ model, previews }: PageListProps) {
   const currentPage = model.currentPage
   const target = pageUrl(currentPage)
 
-  if (grouping !== "month")
+  if (grouping === "none")
     return pages.map((page) => (
       <PageItem
         key={itemKey(page, view)}
@@ -28,13 +28,16 @@ export function PageList({ model, previews }: PageListProps) {
       />
     ))
 
-  return groupByMonth(pages).map((group) => {
-    const id = groupHeadingId(group.key)
+  const groups = grouping === "folder" ? groupByFolder(pages) : groupByMonth(pages)
+
+  return groups.map((group) => {
+    const id = groupHeadingId(grouping, group.key)
+    const label = grouping === "folder" ? decoded(group.key) || "/" : group.label
 
     return (
-      <section key={group.key || "undated"} className="docserve-sidebar__group" aria-labelledby={id}>
+      <section key={group.key || "root"} className="docserve-sidebar__group" aria-labelledby={id}>
         <h2 className="docserve-sidebar__group-head" id={id}>
-          <span>{group.label}</span>
+          <span>{label}</span>
           <span className="docserve-sidebar__group-count">{group.pages.length}</span>
         </h2>
         <div className="docserve-sidebar__group-body">
@@ -74,8 +77,9 @@ function itemKey(page: DocPage, view: SidebarView): string {
   return view === "gallery" ? pageKey(page) : page.url
 }
 
-function groupHeadingId(key: string): string {
-  return `docserve-sidebar-group-${key || "undated"}`
+function groupHeadingId(grouping: string, key: string): string {
+  const name = key ? key.replace(/[^\w.-]+/g, "-") : grouping === "folder" ? "root" : "undated"
+  return `docserve-sidebar-group-${grouping}-${name}`
 }
 
 function pageKey(page: DocPage): string {

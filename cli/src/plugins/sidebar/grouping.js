@@ -2,8 +2,8 @@
 
 /**
  * @typedef {object} PageGroup
- * @property {string} key    `YYYY-MM`; empty for pages without a valid date.
- * @property {string} label  Heading text, e.g. `2026/04`.
+ * @property {string} key    Month `YYYY-MM`, or folder path with a trailing slash.
+ * @property {string} label  Heading text, e.g. `2026/04`, `guides/` or `/`.
  * @property {DocPage[]} pages
  */
 
@@ -67,4 +67,42 @@ export function groupByMonth(pages) {
 function toDate(value) {
   const date = new Date(typeof value === "number" ? value * 1000 : value)
   return Number.isNaN(date.getTime()) ? null : date
+}
+
+/**
+ * Folder that directly holds a page, with a trailing slash; `""` for the root.
+ * @param {string} url  Root-absolute page URL, e.g. `/guides/intro.html`.
+ * @returns {string}
+ */
+export function folderOf(url) {
+  const parts = url.split("/").filter(Boolean)
+  parts.pop()
+  return parts.length ? `${parts.join("/")}/` : ""
+}
+
+/**
+ * Group pages by the folder that directly holds them, root first. Folders
+ * without pages of their own never appear, and groups do not nest.
+ * @param {DocPage[]} pages
+ * @returns {PageGroup[]}
+ */
+export function groupByFolder(pages) {
+  /** @type {Map<string, PageGroup>} */
+  const groups = new Map()
+
+  for (const page of pages) {
+    const key = folderOf(page.url)
+    let group = groups.get(key)
+    if (!group) {
+      group = { key, label: key || "/", pages: [] }
+      groups.set(key, group)
+    }
+    group.pages.push(page)
+  }
+
+  return [...groups.values()].sort((a, b) => {
+    if (!a.key) return b.key ? -1 : 0
+    if (!b.key) return 1
+    return a.key.localeCompare(b.key, undefined, { numeric: true, sensitivity: "base" })
+  })
 }
