@@ -40,42 +40,7 @@ export function sidebarPlugin() {
       }))
 
       // commands
-      cleanup.add(ctx.commands.register({
-        id: "plugin:sidebar:toggle",
-        title: "Toggle sidebar",
-        group: "View",
-        icon: ICON_SIDEBAR,
-        keys: ["[", "Alt+B"],
-        run: () => model.setOpen(!model.open.value),
-      }))
-
-      cleanup.add(ctx.commands.register({
-        id: "plugin:sidebar:close",
-        title: "Close sidebar",
-        keys: ["Escape"],
-        showInPalette: false,
-        when: () => model.open.value,
-        run: () => model.setOpen(false),
-      }))
-
-      cleanup.add(ctx.commands.register({
-        id: "plugin:sidebar:view",
-        title: "Toggle sidebar view",
-        group: "View",
-        icon: ICON_GRID,
-        keys: ["v"],
-        when: () => model.open.value,
-        run: () => model.toggleView(),
-      }))
-
-      cleanup.add(ctx.commands.register({
-        id: "plugin:sidebar:grouping",
-        title: "Toggle month grouping",
-        group: "View",
-        keys: ["m"],
-        when: () => model.open.value,
-        run: () => model.toggleGrouping(),
-      }))
+      registerCommands(ctx, model, cleanup)
 
       // dock
       const dock = ctx.docks.register({
@@ -101,4 +66,49 @@ export function sidebarPlugin() {
       return cleanup.dispose
     },
   }
+}
+
+/**
+ * Register every sidebar command; each one is unregistered by `cleanup`.
+ * @param {DocserveContext} ctx
+ * @param {SidebarModel} model
+ * @param {import("../../widget/lib/disposables.js").Disposables} cleanup
+ */
+function registerCommands(ctx, model, cleanup) {
+  cleanup.add(ctx.commands.register({
+    id: "plugin:sidebar:toggle",
+    title: "Toggle sidebar",
+    group: "View",
+    icon: ICON_SIDEBAR,
+    keys: ["[", "Alt+B"],
+    run: () => model.setOpen(!model.open.value),
+  }))
+
+  cleanup.add(ctx.commands.register({
+    id: "plugin:sidebar:close",
+    title: "Close sidebar",
+    keys: ["Escape"],
+    showInPalette: false,
+    when: () => model.open.value,
+    run: () => model.setOpen(false),
+  }))
+
+  cleanup.add(ctx.commands.register({
+    id: "plugin:sidebar:view",
+    title: "Toggle sidebar view",
+    group: "View",
+    icon: ICON_GRID,
+    keys: ["v"],
+    when: () => model.open.value,
+    run: () => model.toggleView(),
+  }))
+
+  cleanup.add(ctx.commands.register({
+    id: "plugin:sidebar:grouping",
+    title: "Toggle month grouping",
+    group: "View",
+    keys: ["m"],
+    when: () => model.open.value,
+    run: () => model.toggleGrouping(),
+  }))
 }
