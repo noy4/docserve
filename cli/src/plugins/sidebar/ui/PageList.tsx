@@ -17,7 +17,16 @@ export function PageList({ model, previews }: PageListProps) {
   const target = pageUrl(currentPage)
 
   if (grouping !== "month")
-    return pages.map((page) => renderPage(page, view, target, currentPage, previews))
+    return pages.map((page) => (
+      <PageItem
+        key={itemKey(page, view)}
+        page={page}
+        view={view}
+        target={target}
+        currentPage={currentPage}
+        previews={previews}
+      />
+    ))
 
   return groupByMonth(pages).map((group) => {
     const id = groupHeadingId(group.key)
@@ -29,23 +38,40 @@ export function PageList({ model, previews }: PageListProps) {
           <span className="docserve-sidebar__group-count">{group.pages.length}</span>
         </h2>
         <div className="docserve-sidebar__group-body">
-          {group.pages.map((page) => renderPage(page, view, target, currentPage, previews))}
+          {group.pages.map((page) => (
+            <PageItem
+              key={itemKey(page, view)}
+              page={page}
+              view={view}
+              target={target}
+              currentPage={currentPage}
+              previews={previews}
+            />
+          ))}
         </div>
       </section>
     )
   })
 }
 
-function renderPage(
-  page: DocPage,
-  view: SidebarView,
-  target: string,
-  currentPage: string,
-  previews?: PreviewModel,
-) {
+interface PageItemProps {
+  page: DocPage
+  view: SidebarView
+  target: string
+  currentPage: string
+  previews?: PreviewModel
+}
+
+function PageItem({ page, view, target, currentPage, previews }: PageItemProps) {
+  const active = isActive(page, target, currentPage)
+
   return view === "gallery"
-    ? <GalleryCard key={pageKey(page)} page={page} active={isActive(page, target, currentPage)} previews={previews} />
-    : <ListRow key={page.url} page={page} active={isActive(page, target, currentPage)} />
+    ? <GalleryCard page={page} active={active} previews={previews} />
+    : <ListRow page={page} active={active} />
+}
+
+function itemKey(page: DocPage, view: SidebarView): string {
+  return view === "gallery" ? pageKey(page) : page.url
 }
 
 function groupHeadingId(key: string): string {
