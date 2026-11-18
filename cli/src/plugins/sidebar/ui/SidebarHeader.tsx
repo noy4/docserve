@@ -1,11 +1,13 @@
 import { ICON_CALENDAR, ICON_FOLDER, ICON_GRID, ICON_LIST, ICON_SIDEBAR, ICON_TREE, ICON_UNGROUP } from "../icons.js"
 import type { SidebarGrouping, SidebarModel } from "../model.js"
+import { RadioMenu } from "./RadioMenu.js"
+import type { RadioMenuOption } from "./RadioMenu.js"
 
-const GROUPING = [
+const GROUPING_OPTIONS: RadioMenuOption<SidebarGrouping>[] = [
   { id: "none", icon: ICON_UNGROUP, label: "No grouping" },
   { id: "month", icon: ICON_CALENDAR, label: "By month" },
   { id: "folder", icon: ICON_FOLDER, label: "By folder" },
-] satisfies { id: SidebarGrouping; icon: string; label: string }[]
+]
 
 export interface SidebarHeaderProps {
   model: SidebarModel
@@ -43,20 +45,12 @@ export function SidebarHeader({ model }: SidebarHeaderProps) {
       </div>
       <div className="docserve-sidebar__options">
         {view !== "tree" && (
-          <div className="docserve-sidebar__views" role="group" aria-label="Grouping">
-            {GROUPING.map(({ id, icon, label }) => (
-              <button
-                key={id}
-                type="button"
-                className="docserve-sidebar__view"
-                aria-label={label}
-                title={label}
-                aria-pressed={grouping === id}
-                onClick={() => model.setGrouping(id)}
-                dangerouslySetInnerHTML={{ __html: icon }}
-              />
-            ))}
-          </div>
+          <RadioMenu
+            label="Grouping"
+            value={grouping}
+            options={GROUPING_OPTIONS}
+            onChange={(next) => model.setGrouping(next)}
+          />
         )}
         <div className="docserve-sidebar__views" role="group" aria-label="View">
           <button
