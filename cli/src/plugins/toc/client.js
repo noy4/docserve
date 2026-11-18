@@ -15,6 +15,7 @@ export function tocPlugin() {
   return {
     id: "toc",
     setup(ctx) {
+      // state
       const source = document.body ?? document.documentElement
       const html = document.documentElement
       const { headings } = collectOutline(document)
@@ -25,8 +26,10 @@ export function tocPlugin() {
 
       let activeFrame = 0
 
+      // styles
       ctx.ui.style("/__docserve/plugins/toc/toc.css")
 
+      // panel
       const panel = createPanel({
         onClose: () => setOpen(false),
         onNavigate: navigate,
@@ -36,6 +39,7 @@ export function tocPlugin() {
       const mount = ctx.ui.mountPoint()
       mount.append(panel.element)
 
+      // commands
       const offCommand = ctx.commands.register({
         id: "plugin:toc:toggle",
         title: "Toggle table of contents",
@@ -54,6 +58,7 @@ export function tocPlugin() {
         run: () => setOpen(false),
       })
 
+      // dock
       const dock = ctx.docks.register({
         id: "toc",
         title: "Toggle table of contents",
@@ -64,13 +69,16 @@ export function tocPlugin() {
         isActive: () => open.value,
       })
 
+      // open state
       const offOpen = open.subscribe(sync)
 
+      // scroll spy
       window.addEventListener("scroll", scheduleActive, { passive: true, signal })
       window.addEventListener("resize", scheduleActive, { passive: true, signal })
 
       scheduleActive()
 
+      // teardown
       cleanup.add(() => controller.abort())
       cleanup.add(() => {
         if (activeFrame) cancelAnimationFrame(activeFrame)
@@ -87,6 +95,7 @@ export function tocPlugin() {
 
       return cleanup.dispose
 
+      // open / close
       function setOpen(next) {
         open.value = next
       }
@@ -99,6 +108,7 @@ export function tocPlugin() {
         dock.update()
       }
 
+      // active heading
       function scheduleActive() {
         if (activeFrame) return
         activeFrame = requestAnimationFrame(() => {
@@ -116,6 +126,7 @@ export function tocPlugin() {
         panel.setActive(current?.id ?? null)
       }
 
+      // navigation
       function navigate(element) {
         const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches
         const top = window.scrollY + element.getBoundingClientRect().top - OFFSET
