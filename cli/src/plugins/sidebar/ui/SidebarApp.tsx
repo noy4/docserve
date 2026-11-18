@@ -13,7 +13,6 @@ export interface SidebarAppProps {
 
 export function SidebarApp({ model, width }: SidebarAppProps) {
   const docs = model.docs
-  const currentPage = model.currentPage
   const previews = useLayoutModel(() => new PreviewModel())
   const pages = model.pages.value
   const status = model.status.value
@@ -71,7 +70,7 @@ export function SidebarApp({ model, width }: SidebarAppProps) {
           : status === "loading" && !pages.length
             ? <p className="docserve-sidebar__empty">Loading…</p>
             : pages.length
-              ? <PageList pages={pages} view={view} grouping={grouping} currentPage={currentPage} previews={previews} />
+              ? <PageList model={model} previews={previews} />
               : <p className="docserve-sidebar__empty">No pages</p>}
       </nav>
     </aside>

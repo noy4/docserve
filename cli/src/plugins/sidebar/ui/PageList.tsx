@@ -2,17 +2,18 @@ import { useCallback, useState } from "react"
 import { decoded, displayDate, pageUrl } from "../../../widget/lib/dom.js"
 import { groupByMonth } from "../grouping.js"
 import type { PreviewModel } from "./preview-model.js"
-import type { SidebarGrouping, SidebarView } from "../model.js"
+import type { SidebarModel, SidebarView } from "../model.js"
 
 export interface PageListProps {
-  pages: DocPage[]
-  view: SidebarView
-  grouping: SidebarGrouping
-  currentPage: string
+  model: SidebarModel
   previews?: PreviewModel
 }
 
-export function PageList({ pages, view, grouping, currentPage, previews }: PageListProps) {
+export function PageList({ model, previews }: PageListProps) {
+  const pages = model.pages.value
+  const view = model.view.value
+  const grouping = model.grouping.value
+  const currentPage = model.currentPage
   const target = pageUrl(currentPage)
 
   if (grouping !== "month") return pages.map((page) => renderPage(page, view, target, currentPage, previews))
