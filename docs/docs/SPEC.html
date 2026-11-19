@@ -402,7 +402,7 @@
           <iconify-icon icon="mdi:package-variant-closed" noobserver></iconify-icon>
           <h4>Zero dependencies</h4>
         </div>
-        <p>Node stdlib only (<code>http</code> / <code>fs.watch</code> / <code>crypto</code>). No <code>npm install</code>.</p>
+        <p>Node stdlib only at runtime. <code>cac</code> and <code>h3</code> are bundled into <code>dist/node/cli.mjs</code> at build time — no <code>npm install</code>.</p>
       </div>
     </div>
   </section>
@@ -414,12 +414,18 @@
     <pre>docserve/
 ├── 📦 cli/                       <span class="c"># npm package: docserve</span>
 │   ├── package.json              <span class="c"># "bin": { "docserve": "./bin.mjs" }</span>
-│   ├── bin.mjs                   <span class="c"># CLI entry: args · start/stop/spawn</span>
+│   ├── bin.mjs                   <span class="c"># node entry: load dist/node/cli.mjs</span>
 │   ├── index.html                <span class="c"># gallery template, served at /</span>
+│   ├── scripts/
+│   │   └── build-node.mjs        <span class="c"># esbuild → dist/node/cli.mjs</span>
+│   ├── dist/                     <span class="c"># built node bundle + widget</span>
 │   └── src/
 │       ├── node/
+│       │   ├── cli.mjs           <span class="c"># cac commands · start/stop/background</span>
+│       │   ├── app.mjs           <span class="c"># h3 app · request routes</span>
+│       │   ├── paths.mjs         <span class="c"># package-root paths</span>
 │       │   ├── server.mjs        <span class="c"># listen · port fallback · lifecycle</span>
-│       │   ├── routes.mjs        <span class="c"># HTTP routes</span>
+│       │   ├── routes.mjs        <span class="c"># HTTP handlers</span>
 │       │   ├── assets.mjs        <span class="c"># MIME + widget/plugin files</span>
 │       │   ├── gallery.mjs       <span class="c"># gallery template response</span>
 │       │   ├── state.mjs         <span class="c"># per-instance state files · pid liveness</span>
@@ -430,7 +436,7 @@
 │       │   ├── inject.mjs        <span class="c"># widget tags · idempotent insertion</span>
 │       │   ├── websocket.mjs     <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
 │       │   └── watch.mjs         <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
-│       ├── widget/               <span class="c"># injected client (shadow DOM, no build)</span>
+│       ├── widget/               <span class="c"># injected client (shadow DOM, Vite build)</span>
 │       │   ├── index.js          <span class="c"># entry: register built-ins · start</span>
 │       │   ├── host.js           <span class="c"># shadow root · lifecycle · reload wiring</span>
 │       │   ├── docks.js ui.js    <span class="c"># docks · items · mount · styles · announce</span>

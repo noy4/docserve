@@ -1,15 +1,12 @@
 // HTTP routing: an ordered table of handlers over one docs static handler.
 // Nothing here knows about listening, signals or sockets.
-import { resolve } from "node:path"
 import { serveAsset } from "./assets.mjs"
 import { apiFiles } from "./files.mjs"
 import { galleryResponse } from "./gallery.mjs"
 import { injectIntoHtml } from "./inject.mjs"
+import { PLUGINS_SOURCE_DIR, WIDGET_DIST_DIR, WIDGET_SOURCE_DIR } from "./paths.mjs"
 import { createStaticHandler } from "./serve-static.mjs"
 
-const WIDGET_DIR = resolve(import.meta.dirname, "..", "widget")
-const PLUGINS_DIR = resolve(import.meta.dirname, "..", "plugins")
-const DIST_WIDGET_DIR = resolve(import.meta.dirname, "..", "..", "dist", "widget")
 const INTERNAL_PREFIX = "/__docserve/"
 const WIDGET_PREFIX = `${INTERNAL_PREFIX}widget/`
 const PLUGINS_PREFIX = `${INTERNAL_PREFIX}plugins/`
@@ -62,7 +59,7 @@ export function createHandler({ docsDir }) {
     if (url.pathname.startsWith(WIDGET_PREFIX))
       return serveWidget(url.pathname.slice(WIDGET_PREFIX.length))
     if (url.pathname.startsWith(PLUGINS_PREFIX))
-      return serveAsset(PLUGINS_DIR, url.pathname.slice(PLUGINS_PREFIX.length))
+      return serveAsset(PLUGINS_SOURCE_DIR, url.pathname.slice(PLUGINS_PREFIX.length))
     return new Response("Not Found", { status: 404 })
   }
 
@@ -75,7 +72,7 @@ export function createHandler({ docsDir }) {
   async function serveWidget(relative) {
     if (!relative) return new Response("Not Found", { status: 404 })
 
-    const built = await serveAsset(DIST_WIDGET_DIR, relative)
+    const built = await serveAsset(WIDGET_DIST_DIR, relative)
     if (built.status !== 404) return built
 
     if (/\.m?js$/.test(relative)) {
@@ -85,7 +82,7 @@ export function createHandler({ docsDir }) {
       })
     }
 
-    return serveAsset(WIDGET_DIR, relative)
+    return serveAsset(WIDGET_SOURCE_DIR, relative)
   }
 
   /**

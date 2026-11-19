@@ -214,7 +214,7 @@ importers:
         version: 0.8.3(@babel/core@8.1.2)(react@19.3.1)(supports-color@7.2.0)
       '@rolldown/plugin-babel':
         specifier: ^0.2.4
-        version: 0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+        version: 0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))
       '@types/node':
         specifier: ^22.10.0
         version: 22.20.5
@@ -226,7 +226,16 @@ importers:
         version: 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react':
         specifier: ^6.1.1
-        version: 6.3.0(@rolldown/plugin-babel@0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+        version: 6.3.0(@rolldown/plugin-babel@0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))
+      cac:
+        specifier: ^7.1.0
+        version: 7.1.0
+      esbuild:
+        specifier: ^0.24.2
+        version: 0.24.2
+      h3:
+        specifier: ^2.0.8
+        version: 2.0.8
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -238,10 +247,10 @@ importers:
         version: 5.9.3
       unplugin-icons:
         specifier: ^24.0.0
-        version: 24.0.0(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+        version: 24.0.0(esbuild@0.24.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))
       vite:
         specifier: ^8.3.2
-        version: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)
+        version: 8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)
 
   desktop:
     devDependencies:
@@ -1209,6 +1218,10 @@ packages:
     resolution: {integrity: sha512-U1Z/ob71V/bXfVABvNr/Kumf5VyeQRBEm6Txb0PQ6S7V5GpBM3w4Cbqz/xPDicR5tN0uvDifng8C+5qECeGwyQ==}
     engines: {node: '>=6.0.0'}
 
+  cac@7.1.0:
+    resolution: {integrity: sha512-LMDU/U2yA4IPIY8KT0NsNPWEYZvAMkbgyspxJ6btJaYV+WMDOHAZCmB0lsTObiHaRS1V/ztKAl7+TSkTqXyeoA==}
+    engines: {node: '>=20.19.0'}
+
   cacheable-lookup@5.0.4:
     resolution: {integrity: sha512-2/kNscPhpcxrOigMZzbiWF7dz8ilhb/nIHU3EyZiXWXpeq/au8qJ8VhdftMkty3n7Gj6HIGalQG8oiBNB3AJgA==}
     engines: {node: '>=10.6.0'}
@@ -1580,6 +1593,19 @@ packages:
 
   graceful-fs@4.2.12:
     resolution: {integrity: sha512-iuyGF2E4oafQfPsRrG2wtY2ILupMhvtdrhzrxB+0VcjsPpSPttpfYdjnGFGsTi5MaJFjI1jOKHPQ6UTbTj9TAw==}
+
+  h3@2.0.8:
+    resolution: {integrity: sha512-ENuKlF9kC6E6PrvY1PUyE0qkrnnPTIt2/v48uyEEfTVfgoiqBCE0uwwf++2XrWwT1gxjQBDLQ8PAsmZVniKvTw==}
+    engines: {node: '>=20.19.0'}
+    hasBin: true
+    peerDependencies:
+      crossws: ^0.4.12
+      ocache: '>=0.3.0'
+    peerDependenciesMeta:
+      crossws:
+        optional: true
+      ocache:
+        optional: true
 
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
@@ -2162,6 +2188,10 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
+  rou3@1.0.0:
+    resolution: {integrity: sha512-ySeaQkSrua+ut9g+65I7FHqOFBaY8tV0FmccXItoq0q21se32Q3u4YiW7/RqXSosWgYJaaKwRHXy3BST9PeCNQ==}
+    engines: {node: '>=20.19.0'}
+
   run-applescript@7.1.0:
     resolution: {integrity: sha512-DPe5pVFaAsinSaV6QjQ6gdiedWDcRCbUuiQfQa2wmWV7+xC9bGulGI8+TdRmoFkAPaBXk8CrAbnlY2ISniJ47Q==}
     engines: {node: '>=18'}
@@ -2251,6 +2281,11 @@ packages:
 
   sprintf-js@1.1.3:
     resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
+
+  srvx@1.0.8:
+    resolution: {integrity: sha512-ngFS/J6St4PJfHRHGjr78xkPPtbyXtdMOLNE4x/XZunEK3OhV7aGUWMHf9WTUEy6wm1U0W4okkd82ZFFWRVQTw==}
+    engines: {node: '>=20.16.0'}
+    hasBin: true
 
   stat-mode@1.0.0:
     resolution: {integrity: sha512-jH9EhtKIjuXZ2cWxmXS8ZP80XyC3iasQxMDV8jzhNJpfDb7VbQLVW4Wvsxz9QZvzV+G4YoSfBUVKDOyxLzi/sg==}
@@ -3203,13 +3238,13 @@ snapshots:
   '@rolldown/binding-win32-x64-msvc@1.2.19':
     optional: true
 
-  '@rolldown/plugin-babel@0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))':
+  '@rolldown/plugin-babel@0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))':
     dependencies:
       '@babel/core': 8.1.2
       picomatch: 4.0.7
       rolldown: 1.2.19
     optionalDependencies:
-      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)
+      vite: 8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)
 
   '@rolldown/pluginutils@1.1.1': {}
 
@@ -3310,12 +3345,12 @@ snapshots:
       - kerberos
       - supports-color
 
-  '@vitejs/plugin-react@6.3.0(@rolldown/plugin-babel@0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)))(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))':
+  '@vitejs/plugin-react@6.3.0(@rolldown/plugin-babel@0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))':
     dependencies:
       '@rolldown/pluginutils': 1.1.1
-      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)
+      vite: 8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)
     optionalDependencies:
-      '@rolldown/plugin-babel': 0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      '@rolldown/plugin-babel': 0.2.4(@babel/core@8.1.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))
 
   '@vscode/vsce-sign-alpine-arm64@2.0.8':
     optional: true
@@ -3559,6 +3594,8 @@ snapshots:
       run-applescript: 7.1.0
 
   bytestreamjs@2.0.1: {}
+
+  cac@7.1.0: {}
 
   cacheable-lookup@5.0.4: {}
 
@@ -4000,6 +4037,11 @@ snapshots:
       responselike: 2.0.1
 
   graceful-fs@4.2.12: {}
+
+  h3@2.0.8:
+    dependencies:
+      rou3: 1.0.0
+      srvx: 1.0.8
 
   has-flag@4.0.0: {}
 
@@ -4549,6 +4591,8 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.19
       '@rolldown/binding-win32-x64-msvc': 1.2.19
 
+  rou3@1.0.0: {}
+
   run-applescript@7.1.0: {}
 
   safe-buffer@5.1.2: {}
@@ -4630,6 +4674,8 @@ snapshots:
 
   sprintf-js@1.1.3:
     optional: true
+
+  srvx@1.0.8: {}
 
   stat-mode@1.0.0: {}
 
@@ -4738,13 +4784,13 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-icons@24.0.0(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
+  unplugin-icons@24.0.0(esbuild@0.24.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)):
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@iconify/utils': 3.1.7
       local-pkg: 1.2.1
       obug: 2.2.1
-      unplugin: 3.7.0(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0))
+      unplugin: 3.7.0(esbuild@0.24.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@rsbuild/core'
@@ -4757,15 +4803,16 @@ snapshots:
       - vite
       - webpack
 
-  unplugin@3.7.0(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0)):
+  unplugin@3.7.0(esbuild@0.24.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@rolldown/pluginutils': 1.1.1
       picomatch: 4.0.7
       webpack-virtual-modules: 0.6.2
     optionalDependencies:
+      esbuild: 0.24.2
       rolldown: 1.2.19
-      vite: 8.3.8(@types/node@22.20.5)(jiti@2.7.0)
+      vite: 8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0)
 
   unzipper@0.12.5:
     dependencies:
@@ -4795,7 +4842,7 @@ snapshots:
 
   version-range@4.15.0: {}
 
-  vite@8.3.8(@types/node@22.20.5)(jiti@2.7.0):
+  vite@8.3.8(@types/node@22.20.5)(esbuild@0.24.2)(jiti@2.7.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
@@ -4804,6 +4851,7 @@ snapshots:
       tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 22.20.5
+      esbuild: 0.24.2
       fsevents: 2.3.3
       jiti: 2.7.0
 

@@ -1,10 +1,10 @@
 // The gallery template served at / and /index.html. Every other HTML file comes
 // from the docs folder and is injected instead.
 import { readFile } from "node:fs/promises"
-import { resolve } from "node:path"
 import { docsInfo } from "./docs-info.mjs"
+import { GALLERY_TEMPLATE } from "./paths.mjs"
 
-export const INDEX_TEMPLATE = resolve(import.meta.dirname, "..", "..", "index.html")
+export const INDEX_TEMPLATE = GALLERY_TEMPLATE
 
 /**
  * @param {string} docsDir

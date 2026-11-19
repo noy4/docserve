@@ -9,9 +9,9 @@
 // └──────────────────────────────────────────────────────────┘
 import { exec } from "node:child_process"
 import { createServer } from "node:http"
-import { createNodeServerAdapter } from "./adapter.mjs"
-import { INDEX_TEMPLATE } from "./gallery.mjs"
-import { createHandler } from "./routes.mjs"
+import { toNodeHandler } from "h3/node"
+import { createApp } from "./app.mjs"
+import { GALLERY_TEMPLATE } from "./paths.mjs"
 import { clearState, writeState } from "./state.mjs"
 import { FileWatcher } from "./watch.mjs"
 import { WebSocketServer } from "./websocket.mjs"
@@ -24,11 +24,11 @@ const MAX_PORT_TRIES = 20 // on conflict, try the next port up to 20 times
  */
 export async function runServer({ docsDir, port: initialPort, open = false }) {
   const wss = new WebSocketServer({ path: WS_PATH })
-  const fileWatcher = new FileWatcher({ wss, docsDir, templatePath: INDEX_TEMPLATE })
+  const fileWatcher = new FileWatcher({ wss, docsDir, templatePath: GALLERY_TEMPLATE })
   let port = initialPort
   let closed = false
 
-  const server = createServer(createNodeServerAdapter(createHandler({ docsDir })))
+  const server = createServer(toNodeHandler(createApp({ docsDir })))
   wss.attach(server)
 
   const close = () => {

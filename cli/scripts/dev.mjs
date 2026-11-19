@@ -1,10 +1,11 @@
-import { spawn } from "node:child_process"
+import { execFileSync, spawn } from "node:child_process"
 import { fileURLToPath } from "node:url"
 import { build } from "vite"
 
 const root = fileURLToPath(new URL("..", import.meta.url))
 const configFile = fileURLToPath(new URL("../vite.config.ts", import.meta.url))
 const bin = fileURLToPath(new URL("../bin.mjs", import.meta.url))
+const buildNode = fileURLToPath(new URL("./build-node.mjs", import.meta.url))
 
 const argv = process.argv.slice(2)
 const forwarded = argv[0] === "--" ? argv.slice(1) : argv
@@ -22,6 +23,7 @@ process.on("SIGINT", () => shutdown(0))
 process.on("SIGTERM", () => shutdown(0))
 
 try {
+  execFileSync(process.execPath, [buildNode], { cwd: root, stdio: "inherit" })
   watcher = await build({ configFile, root, build: { watch: {} } })
   await firstBuild(watcher)
 
