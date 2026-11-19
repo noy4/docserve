@@ -1,6 +1,6 @@
 // Public contracts for the docserve widget and its plugins.
 
-/** One HTML page as returned by `GET /api/files`. */
+/** One HTML page returned by `docserve:pages:list`. */
 interface DocPage {
   /** Title from `<title>`, else the file name. */
   title: string
@@ -14,6 +14,22 @@ interface DocPage {
   modified?: number
   /** Data URL or absolute URL. */
   favicon?: string
+}
+
+/** One live server returned by `docserve:servers:list`. */
+interface DocServer {
+  /** Folder name. */
+  name: string
+  /** Display path with the home directory collapsed to `~`. */
+  path: string
+  /** Deterministic hue (0-359) shared with the gallery favicon. */
+  hue: number
+  /** Origin URL, e.g. `http://localhost:4242/`. */
+  url: string
+  /** Bound port. */
+  port: number
+  /** True for the server handling this request. */
+  current: boolean
 }
 
 /** Identity of the served folder, from the injected script's data attributes. */

@@ -4,7 +4,7 @@
 // (name = sanitized folder name), written once the port is bound and removed
 // on clean shutdown. Readers verify the PID is alive and treat dead-PID state
 // as stale (removed in place). DOCSERVE_HOME overrides the docserve home
-// (test isolation).
+// (test isolation). Newest instances are listed first by startedAt.
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
@@ -43,7 +43,10 @@ function readStateFile(file) {
       typeof state?.url === "string" &&
       typeof state?.docsDir === "string"
     ) {
-      return state
+      return {
+        ...state,
+        startedAt: typeof state.startedAt === "number" ? state.startedAt : 0,
+      }
     }
     return null
   } catch {
@@ -62,9 +65,10 @@ export function isProcessAlive(pid) {
 
 export function writeState(state) {
   fs.mkdirSync(stateDir(), { recursive: true })
-  const file = path.join(stateDir(), fileName(state))
+  const record = { ...state, startedAt: state.startedAt ?? Date.now() }
+  const file = path.join(stateDir(), fileName(record))
   const tmp = `${file}.${process.pid}.tmp`
-  fs.writeFileSync(tmp, JSON.stringify(state, null, 2) + "\n")
+  fs.writeFileSync(tmp, JSON.stringify(record, null, 2) + "\n")
   fs.renameSync(tmp, file)
   ownFile = file
 }
@@ -106,7 +110,7 @@ export function listLiveStates() {
     }
     states.push(state)
   }
-  return states.sort((a, b) => a.port - b.port)
+  return states.sort((a, b) => b.startedAt - a.startedAt || b.port - a.port)
 }
 
 export function findByDir(docsDir) {

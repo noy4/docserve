@@ -2,6 +2,7 @@ import { H3, readBody } from "h3/node"
 import { createHandler } from "./routes.mjs"
 import { registerFiles } from "./rpc/files.mjs"
 import { createRpc, RpcError } from "./rpc/index.mjs"
+import { registerServers } from "./rpc/servers.mjs"
 
 /**
  * @param {{ docsDir: string }} options
@@ -11,6 +12,7 @@ export function createApp({ docsDir }) {
   const app = new H3()
   const rpc = createRpc()
   registerFiles(rpc, { docsDir })
+  registerServers(rpc, { docsDir })
 
   app.post("/__docserve/rpc", async (event) => {
     let payload

@@ -8,6 +8,7 @@ export interface DocserveState {
   port: number
   url: string
   docsDir: string
+  startedAt: number
 }
 
 // Same as the CLI: <DOCSERVE_HOME | ~/.docserve>/state.
@@ -16,8 +17,8 @@ export function stateDir(): string {
   return path.join(override || path.join(os.homedir(), ".docserve"), "state")
 }
 
-// Live instances sorted by port. Stale entries (dead pid) are skipped —
-// pruning is the CLI's job; the extension is a read-only client.
+// Live instances, newest first by startedAt. Stale entries (dead pid) are
+// skipped — pruning is the CLI's job; the extension is a read-only client.
 export function listLiveStates(): DocserveState[] {
   let entries: string[] = []
   try {
@@ -31,7 +32,7 @@ export function listLiveStates(): DocserveState[] {
     const state = readStateFile(path.join(stateDir(), entry))
     if (state && isProcessAlive(state.pid)) states.push(state)
   }
-  return states.sort((a, b) => a.port - b.port)
+  return states.sort((a, b) => b.startedAt - a.startedAt || b.port - a.port)
 }
 
 // fs.watch + 5s poll as a safety net, debounced. The watcher re-arms once
@@ -92,7 +93,10 @@ function readStateFile(file: string): DocserveState | null {
       typeof state?.url === "string" &&
       typeof state?.docsDir === "string"
     ) {
-      return state
+      return {
+        ...state,
+        startedAt: typeof state.startedAt === "number" ? state.startedAt : 0,
+      }
     }
     return null
   } catch {

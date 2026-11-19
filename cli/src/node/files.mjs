@@ -1,4 +1,4 @@
-// /api/files payload: page metadata composed from scanning, head parsing and
+// docserve:pages:list payload: page metadata composed from scanning, head parsing and
 // git dates.
 import { realpathSync } from "node:fs"
 import { stat } from "node:fs/promises"

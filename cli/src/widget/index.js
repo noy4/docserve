@@ -2,6 +2,7 @@
 import { collapsePlugin } from "../plugins/collapse/client.js"
 import { copyPlugin } from "../plugins/copy/client.js"
 import { homePlugin } from "../plugins/home/client.js"
+import { serversPlugin } from "../plugins/servers/client.js"
 import { sidebarPlugin } from "../plugins/sidebar/client.js"
 import { tocPlugin } from "../plugins/toc/client.js"
 import { createHost } from "./host.js"
@@ -12,6 +13,7 @@ const PLUGINS = [
   copyPlugin,
   sidebarPlugin,
   tocPlugin,
+  serversPlugin,
 ]
 
 // The server skips iframe previews; this guard covers pages served some other way.

@@ -449,6 +449,7 @@
 │       │   ├── styles.js         <span class="c"># stylesheet load wait · cache-busted refetch</span>
 │       │   ├── rpc.js  pages.js  <span class="c"># method bus · page cache</span>
 │       │   ├── rpc-client.js     <span class="c"># callServer(method, args)</span>
+│       │   ├── servers.js        <span class="c"># docserve:servers:list cache</span>
 │       │   ├── live.js  plugins.js
 │       │   ├── lib/              <span class="c"># framework-free: dom.js · events.js · storage.js</span>
 │       │   └── widget.css  palette.css
@@ -457,6 +458,7 @@
 │       │   ├── toc/{client.js, model.ts, commands.ts, scroll-spy.ts, heading-html.ts, outline.js, ui/TocPanel.tsx, toc.css}
 │       │   ├── collapse/{client.js, model.ts, commands.ts, sections.ts, view.ts, collapse.css}
 │       │   ├── copy/{client.js, copy.css}
+│       │   ├── servers/{client.js, model.ts, commands.ts, ui/ServersPopover.tsx, servers.css}
 │       │   └── home/client.js
 │       └── shared/types.d.ts     <span class="c"># global types for ctx, docks, commands, rpc</span>
 └── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
@@ -541,7 +543,7 @@
         <rect class="node" x="280" y="340" width="256" height="52" rx="6"/>
         <image href="https://api.iconify.design/mdi/file-cog-outline.svg?height=18&color=%237E8A9E" x="292" y="357" width="18" height="18"/>
         <text class="tt" x="316" y="362" style="font-family: var(--mono); font-size: 11px;">state/&lt;port&gt;-&lt;name&gt;.json</text>
-        <text class="tm" x="316" y="378">{pid, port, url, docsDir} · per instance</text>
+        <text class="tm" x="316" y="378">{pid, port, url, docsDir, startedAt} · per instance</text>
       </svg>
     </div>
 
@@ -556,7 +558,7 @@
           <iconify-icon icon="mdi:file-check-outline" noobserver></iconify-icon>
           <h4>Lifecycle</h4>
         </div>
-        <p>Written once the port is bound, removed on clean shutdown.</p>
+        <p>Written once the port is bound, removed on clean shutdown. <code>startedAt</code> is epoch ms; readers list newest first.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -662,6 +664,19 @@
       Unknown methods respond <code>404</code>, malformed JSON or non-array args respond <code>400</code>. Malformed paths respond <code>400</code>, paths escaping <code>docsDir</code> respond <code>403</code>, missing files respond <code>404</code>.
     </p>
 
+    <h3><iconify-icon icon="mdi:server-network" noobserver></iconify-icon>docserve:servers:list</h3>
+    <pre>{ "result": [
+  {
+    "name": "reports",
+    "path": "~/reports/reports",
+    "hue": 210,
+    "url": "http://localhost:4242/",
+    "port": 4242,
+    "current": true
+  }
+] }</pre>
+    <p class="section-desc">Live instances only. The current server is first, then name order; <code>pid</code> and absolute paths are omitted.</p>
+
     <div class="grid-2">
       <div class="card">
         <div class="card-head">
@@ -727,6 +742,7 @@
           <h4>Card list</h4>
         </div>
         <p>Fetched via <code>docserve:pages:list</code> on load — sorted by created date, newest first.</p>
+        <p>The header's <strong>Running (N)</strong> menu lists every live instance. The current row is marked and the others link to their origin; it refreshes every 5s while open.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -903,11 +919,11 @@
           <iconify-icon icon="mdi:file-document-multiple-outline" noobserver></iconify-icon>
           <h4>Page data</h4>
         </div>
-        <p><code>docserve:pages:list</code> fetches via <code>/__docserve/rpc</code>; <code>docserve:pages:resolve</code> derives from it.</p>
+        <p><code>docserve:pages:list</code> fetches via <code>/__docserve/rpc</code>; <code>docserve:pages:resolve</code> derives from it; <code>docserve:servers:list</code> returns live instances.</p>
       </div>
     </div>
 
-    <p class="section-desc">Sidebar, table of contents, collapse, copy and home are built this way.</p>
+    <p class="section-desc">Sidebar, table of contents, collapse, copy, home and servers are built this way.</p>
     <p>An action is registered once as a command, which gives it a keyboard shortcut and a row in the <code>⌘K</code> palette; a dock button then just names that command id.</p>
     <p class="section-desc">
       The sidebar renders pages as <code>list</code>, <code>gallery</code> or <code>tree</code> — the tree groups <code>page.url</code> into folders (folders first, natural name order) and persists which folders are collapsed. In list and gallery, a grouping menu picks <code>none</code>, <code>month</code> or <code>folder</code>; folder grouping makes one section per folder that directly holds pages, root first, without nesting.

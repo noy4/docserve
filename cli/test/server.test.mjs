@@ -169,7 +169,7 @@ describe("docserve server", () => {
     assert.ok(gallery.includes("contentSetChanged"), "gallery ships its own reload client")
     assert.ok(gallery.includes(content), "docsDir is substituted")
     assert.ok(gallery.includes(`<title>${basename(content)}</title>`), "gallery title uses the folder name")
-    assert.ok(gallery.includes(`    ${basename(content)}\n  </h1>`), "gallery heading uses the folder name")
+    assert.ok(gallery.includes(`    ${basename(content)}\n    <details class="servers"`), "gallery heading uses the folder name")
     assert.ok(!gallery.includes("const pageId"))
     assert.ok(!gallery.includes("__DOCS_DIR"))
     assert.ok(!gallery.includes("__FAVICON_HUE__"), "favicon hue is substituted")
@@ -198,6 +198,36 @@ describe("docserve server", () => {
 
     const entities = files.find((f) => f.filePath.endsWith("entities.html"))
     assert.equal(entities.title, "Q&A <draft> '26", "title entities are decoded for the gallery")
+  })
+
+  it("lists live servers with current first on docserve:servers:list", async () => {
+    const otherState = join(home, "state", "45998-other.json")
+    writeFileSync(
+      otherState,
+      JSON.stringify({
+        pid: process.pid,
+        port: 45998,
+        url: "http://localhost:45998/",
+        docsDir: otherDir,
+      }),
+    )
+
+    try {
+      const servers = await rpc(port, "docserve:servers:list", [true])
+      assert.ok(Array.isArray(servers))
+      assert.equal(servers.length, 2)
+      assert.equal(servers[0].current, true, "the current server is first")
+      assert.equal(servers[0].name, basename(content))
+      assert.equal(servers[1].name, basename(otherDir))
+      assert.equal(servers[1].current, false)
+      assert.deepEqual(Object.keys(servers[0]).sort(), ["current", "hue", "name", "path", "port", "url"])
+      assert.equal(servers[0].pid, undefined)
+      assert.equal(servers[0].docsDir, undefined)
+      assert.equal(servers[0].port, port)
+      assert.equal(typeof servers[0].hue, "number")
+    } finally {
+      rmSync(otherState, { force: true })
+    }
   })
 
   it("returns 404 for unknown RPC methods", async () => {
@@ -418,6 +448,13 @@ describe("docserve multi-instance", () => {
     const b = await (await fetch(`http://localhost:${portB}/b.html`)).text()
     assert.ok(a.includes("<body>A"), "folder A serves its own page")
     assert.ok(b.includes("<body>B"), "folder B serves its own page")
+
+    const stateFiles = readdirSync(join(home, "state")).filter((file) => file.endsWith(".json"))
+    assert.equal(stateFiles.length, 2)
+    for (const file of stateFiles) {
+      const state = JSON.parse(readFileSync(join(home, "state", file), "utf8"))
+      assert.equal(typeof state.startedAt, "number", "startedAt is persisted")
+    }
   })
 
   it("keeps reload broadcasts per folder", async () => {
@@ -464,6 +501,30 @@ describe("docserve multi-instance", () => {
     assert.match(stopAll.stdout, new RegExp(`localhost:${portB}`))
     await assertDown(portB)
     assert.equal(spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" }).status, 1)
+  })
+
+  it("lists newest instances first by startedAt", () => {
+    const sortHome = mkdtempSync(join(tmpdir(), "docserve-sort-"))
+    const oldDir = join(sortHome, "old")
+    const newDir = join(sortHome, "new")
+    mkdirSync(join(sortHome, "state"), { recursive: true })
+    writeFileSync(
+      join(sortHome, "state", "46001-old.json"),
+      JSON.stringify({ pid: process.pid, port: 46001, url: "http://localhost:46001/", docsDir: oldDir, startedAt: 1000 }),
+    )
+    writeFileSync(
+      join(sortHome, "state", "46000-new.json"),
+      JSON.stringify({ pid: process.pid, port: 46000, url: "http://localhost:46000/", docsDir: newDir, startedAt: 2000 }),
+    )
+
+    try {
+      const sortEnv = { ...process.env, DOCSERVE_HOME: sortHome }
+      const status = spawnSync(process.execPath, [CLI, "status"], { env: sortEnv, encoding: "utf8" })
+      assert.equal(status.status, 0)
+      assert.ok(status.stdout.indexOf(newDir) < status.stdout.indexOf(oldDir), "newest instance is listed first")
+    } finally {
+      rmSync(sortHome, { recursive: true, force: true })
+    }
   })
 
   it("prunes stale instance files with dead pids", () => {

@@ -1,0 +1,144 @@
+.docserve-servers,
+.docserve-servers * {
+  box-sizing: border-box;
+}
+
+.docserve-servers {
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  max-height: min(320px, calc(100vh - 24px));
+  overflow: hidden;
+  color: var(--docserve-panel-text);
+  font-size: 0.78rem;
+  line-height: normal;
+  background: var(--docserve-panel-bg);
+  border: 1px solid var(--docserve-panel-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-100%);
+  animation: docserve-servers-in 0.14s ease-out;
+}
+
+@keyframes docserve-servers-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-100% + 4px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-100%);
+  }
+}
+
+.docserve-servers__head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 7px 10px 6px;
+  border-bottom: 1px solid var(--docserve-panel-border);
+  color: var(--docserve-panel-text);
+  font-weight: 600;
+}
+
+.docserve-servers__count {
+  color: var(--docserve-panel-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.docserve-servers__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  padding: 3px;
+  overflow: auto;
+}
+
+.docserve-servers__note {
+  margin: 0;
+  padding: 12px 8px;
+  color: var(--docserve-panel-muted);
+  text-align: center;
+}
+
+.docserve-servers__row {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 6px minmax(0, 1fr) auto auto;
+  column-gap: 6px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 5px 6px;
+  border-radius: 7px;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.docserve-servers__row:hover {
+  background: var(--docserve-dock-hover);
+}
+
+a.docserve-servers__row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--docserve-dock-accent);
+}
+
+.docserve-servers__row.is-current {
+  color: var(--docserve-panel-muted);
+}
+
+.docserve-servers__dot {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--docserve-dock-border);
+}
+
+.docserve-servers__row.is-current .docserve-servers__dot {
+  background: var(--docserve-dock-accent);
+}
+
+.docserve-servers__name {
+  grid-row: 1;
+  grid-column: 2;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docserve-servers__row.is-current .docserve-servers__name {
+  color: var(--docserve-panel-text);
+}
+
+.docserve-servers__path {
+  grid-row: 2;
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--docserve-panel-muted);
+  font-size: 0.62rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docserve-servers__port {
+  grid-row: 2;
+  grid-column: 3;
+  color: var(--docserve-panel-muted);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.docserve-servers__check {
+  grid-row: 1 / span 2;
+  grid-column: 4;
+  color: var(--docserve-dock-accent);
+  font-size: 0.65rem;
+}

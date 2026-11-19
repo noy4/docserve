@@ -1,5 +1,5 @@
 // Title, created_at and favicon extracted from the head of a document, cached
-// by path + mtime so repeated /api/files calls only re-read changed files.
+// by path + mtime so repeated docserve:pages:list calls only re-read changed files.
 import { open } from "node:fs/promises"
 import { dirname, join } from "node:path"
 import { isWithin, normalizedRelative } from "./scan.mjs"

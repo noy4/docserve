@@ -9,6 +9,7 @@ import { createPalette } from "./palette.js"
 import { createPlacement } from "./placement.js"
 import { createPlugins } from "./plugins.js"
 import { createRpc } from "./rpc.js"
+import { createServers } from "./servers.js"
 import { reloadStyles, settled } from "./styles.js"
 import { createUi } from "./ui.js"
 
@@ -32,6 +33,7 @@ export function createHost() {
   // transport
   const rpc = createRpc()
   const pages = createPages({ rpc })
+  createServers({ rpc })
   const events = createEventEmitter()
 
   // context is filled below, services resolve it when called

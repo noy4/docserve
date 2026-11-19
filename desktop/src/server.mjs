@@ -264,8 +264,8 @@ export class ServerManager {
   }
 }
 
-// Instance states from the state dir, sorted by port (dead pids are
-// filtered by getStates()).
+// Instance states from the state dir, newest first by startedAt (dead pids
+// are filtered by getStates()).
 function readStates() {
   let entries = []
   try {
@@ -282,11 +282,14 @@ function readStates() {
         typeof state?.url === "string" &&
         typeof state?.docsDir === "string"
       ) {
-        states.push(state)
+        states.push({
+          ...state,
+          startedAt: typeof state.startedAt === "number" ? state.startedAt : 0,
+        })
       }
     } catch { }
   }
-  return states.sort((a, b) => a.port - b.port)
+  return states.sort((a, b) => b.startedAt - a.startedAt || b.port - a.port)
 }
 
 function readJson(file) {
