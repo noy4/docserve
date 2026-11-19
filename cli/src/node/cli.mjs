@@ -1,8 +1,7 @@
-import { exec } from "node:child_process"
+import { execFile, spawn } from "node:child_process"
 import fs from "node:fs"
 import path from "node:path"
 import cac from "cac"
-import { startBackground } from "./cli/background.mjs"
 import { runServer } from "./http/server.mjs"
 import { findByDir, listLiveStates, removeState } from "./instances/state.mjs"
 import { PACKAGE_JSON } from "./paths.mjs"
@@ -45,6 +44,8 @@ export async function main(argv = process.argv) {
   cli.parse(argv, { run: false })
   await cli.runMatchedCommand()
 }
+
+// --- commands ---
 
 async function startServer(dir, options) {
   const docsDir = path.resolve(dir ?? ".")
@@ -100,6 +101,39 @@ function showStatus() {
   }
 }
 
+async function startBackground({ docsDir, port, open }) {
+  const entry = process.argv[1]
+  if (!entry) throw new Error("[docserve] Cannot locate the CLI entry for --background.")
+
+  const childArgs = [entry, docsDir]
+  if (open) childArgs.push("--open")
+  childArgs.push("--port", String(port))
+
+  const child = spawn(process.execPath, childArgs, { detached: true, stdio: "ignore" })
+  child.unref()
+
+  const state = await waitForState(child.pid)
+  if (!state) throw new Error("[docserve] Server did not report startup (no state file). Try running in the foreground.")
+
+  console.log("docserve started in the background")
+  console.log(`  pid  : ${state.pid}`)
+  console.log(`  url  : ${state.url}`)
+  console.log(`  docs : ${state.docsDir}`)
+  console.log("  stop : docserve stop")
+}
+
+async function waitForState(pid, { timeoutMs = 10000, intervalMs = 200 } = {}) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    const state = listLiveStates().find((entry) => entry.pid === pid)
+    if (state) return state
+    await new Promise((resolve) => setTimeout(resolve, intervalMs))
+  }
+  return null
+}
+
+// --- utils ---
+
 function parsePort(value) {
   const port = Number(value ?? DEFAULT_PORT)
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
@@ -109,7 +143,7 @@ function parsePort(value) {
 }
 
 function openBrowser(url) {
-  if (process.platform === "darwin") exec(`open ${url}`)
+  if (process.platform === "darwin") execFile("open", [url], () => { })
 }
 
 function isDirectory(target) {
