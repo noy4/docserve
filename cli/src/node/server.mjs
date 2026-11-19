@@ -3,7 +3,7 @@
 //
 // ┌──────────────────────────────────────────────────────────┐
 // │ runServer()                                              │
-// │ ├─ createServer ──▶ adapter(createHandler())             │
+// │ ├─ createServer ──▶ toNodeHandler(createApp())            │
 // │ ├─ WebSocketServer("/__reload") ◀─ FileWatcher           │
 // │ └─ listen ──▶ watcher.start() + writeState()             │
 // └──────────────────────────────────────────────────────────┘

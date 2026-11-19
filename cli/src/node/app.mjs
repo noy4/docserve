@@ -1,5 +1,5 @@
 import { H3, readBody } from "h3/node"
-import { createHandler } from "./routes.mjs"
+import { registerRoutes } from "./routes.mjs"
 import { registerFiles } from "./rpc/files.mjs"
 import { createRpc, RpcError } from "./rpc/index.mjs"
 import { registerServers } from "./rpc/servers.mjs"
@@ -39,8 +39,7 @@ export function createApp({ docsDir }) {
     }
   })
 
-  const handler = createHandler({ docsDir })
-  app.all("/**", (event) => handler(event.req))
+  registerRoutes(app, { docsDir })
   return app
 }
 
