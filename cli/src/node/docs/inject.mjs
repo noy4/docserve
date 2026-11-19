@@ -1,7 +1,7 @@
 // Injection: every HTML response from the docs root gets the widget tags before
 // the last </body>. The gallery template is served separately and never reaches
 // this module.
-import { docsInfo } from "./docs-info.mjs"
+import { docsInfo } from "./info.mjs"
 
 export const WS_PATH = "/__reload"
 

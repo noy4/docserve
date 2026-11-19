@@ -3,8 +3,8 @@ import fs from "node:fs"
 import path from "node:path"
 import cac from "cac"
 import { PACKAGE_JSON } from "./paths.mjs"
-import { runServer } from "./server.mjs"
-import { findByDir, listLiveStates, removeState } from "./state.mjs"
+import { runServer } from "./http/server.mjs"
+import { findByDir, listLiveStates, removeState } from "./instances/state.mjs"
 
 const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8"))
 const VERSION = pkg.version

@@ -1,6 +1,6 @@
 // Widget and plugin assets: the same static handler as the docs tree, rooted
 // at src/widget and src/plugins and read per request so edits need no restart.
-import { notFound } from "./http.mjs"
+import { notFound } from "./response.mjs"
 import { createStaticHandler } from "./serve-static.mjs"
 
 export { MIME } from "./serve-static.mjs"

@@ -1,5 +1,5 @@
-import { publicServers } from "../servers.mjs"
-import { listLiveStates } from "../state.mjs"
+import { publicServers } from "../instances/view.mjs"
+import { listLiveStates } from "../instances/state.mjs"
 
 export function registerServers(rpc, { docsDir, ttl = 1000 }) {
   let cached = null

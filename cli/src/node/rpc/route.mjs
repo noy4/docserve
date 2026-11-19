@@ -1,5 +1,5 @@
 import { readBody } from "h3/node"
-import { json } from "../http.mjs"
+import { json } from "../http/response.mjs"
 import { RpcError } from "./index.mjs"
 
 /**

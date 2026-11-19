@@ -1,5 +1,5 @@
 import { resolve } from "node:path"
-import { docsInfo } from "./docs-info.mjs"
+import { docsInfo } from "../docs/info.mjs"
 
 /**
  * @param {Array<{ docsDir: string, port: number, url: string }>} states

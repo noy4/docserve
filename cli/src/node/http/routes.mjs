@@ -2,9 +2,9 @@
 // handler. Nothing here knows about listening, signals or sockets.
 import { serveAsset } from "./assets.mjs"
 import { galleryResponse } from "./gallery.mjs"
-import { notFound, text } from "./http.mjs"
-import { injectIntoHtml } from "./inject.mjs"
-import { PLUGINS_SOURCE_DIR, WIDGET_DIST_DIR, WIDGET_SOURCE_DIR } from "./paths.mjs"
+import { notFound, text } from "./response.mjs"
+import { injectIntoHtml } from "../docs/inject.mjs"
+import { PLUGINS_SOURCE_DIR, WIDGET_DIST_DIR, WIDGET_SOURCE_DIR } from "../paths.mjs"
 import { createStaticHandler } from "./serve-static.mjs"
 
 const INTERNAL_PREFIX = "/__docserve/"

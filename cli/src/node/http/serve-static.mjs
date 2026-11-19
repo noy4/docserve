@@ -7,7 +7,7 @@ import { createReadStream } from "node:fs"
 import { readFile, realpath, stat } from "node:fs/promises"
 import { extname, resolve, sep } from "node:path"
 import { Readable } from "node:stream"
-import { isWithin, normalizedRelative } from "./scan.mjs"
+import { isWithin, normalizedRelative } from "../docs/scan.mjs"
 
 export const MIME = {
   ".html": "text/html",

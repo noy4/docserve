@@ -11,11 +11,11 @@ import { exec } from "node:child_process"
 import { createServer } from "node:http"
 import { toNodeHandler } from "h3/node"
 import { createApp } from "./app.mjs"
-import { GALLERY_TEMPLATE } from "./paths.mjs"
-import { clearState, writeState } from "./state.mjs"
-import { FileWatcher } from "./watch.mjs"
-import { WebSocketServer } from "./websocket.mjs"
-import { WS_PATH } from "./inject.mjs"
+import { GALLERY_TEMPLATE } from "../paths.mjs"
+import { clearState, writeState } from "../instances/state.mjs"
+import { FileWatcher } from "../live/watch.mjs"
+import { WebSocketServer } from "../live/websocket.mjs"
+import { WS_PATH } from "../docs/inject.mjs"
 
 const MAX_PORT_TRIES = 20 // on conflict, try the next port up to 20 times
 

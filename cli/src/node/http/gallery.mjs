@@ -1,9 +1,9 @@
 // The gallery template served at / and /index.html. Every other HTML file comes
 // from the docs folder and is injected instead.
 import { readFile } from "node:fs/promises"
-import { docsInfo } from "./docs-info.mjs"
-import { text } from "./http.mjs"
-import { GALLERY_TEMPLATE } from "./paths.mjs"
+import { docsInfo } from "../docs/info.mjs"
+import { text } from "./response.mjs"
+import { GALLERY_TEMPLATE } from "../paths.mjs"
 
 /**
  * @param {string} docsDir
