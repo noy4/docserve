@@ -1,7 +1,7 @@
 import { effect, signal } from "@preact/signals-react"
 import { useEffect } from "react"
 import { ICON_CHECK, ICON_CHEVRON_DOWN } from "../icons.js"
-import { useModel } from "./useModel.js"
+import { useModel } from "#shared/client/use-model.js"
 
 export interface RadioMenuOption<T extends string> {
   id: T

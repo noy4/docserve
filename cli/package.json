@@ -6,11 +6,15 @@
   "bin": {
     "docserve": "./bin.mjs"
   },
+  "imports": {
+    "#shared/*": "./src/shared/*"
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "npm run build:node && npm run build:widget",
+    "build": "npm run build:node && npm run build:widget && npm run build:gallery",
     "build:node": "node scripts/build-node.mjs",
     "build:widget": "vite build",
+    "build:gallery": "vite build --config vite.gallery.config.ts",
     "test": "npm run build && node --test --test-timeout=60000",
     "typecheck": "tsc --noEmit",
     "pack:check": "npm pack --dry-run",
@@ -18,10 +22,10 @@
   },
   "files": [
     "bin.mjs",
-    "index.html",
     "src/",
     "dist/node/**",
-    "dist/widget/*.js"
+    "dist/widget/*.js",
+    "dist/gallery/**"
   ],
   "devDependencies": {
     "@iconify/json": "^2.2.558",

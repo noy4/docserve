@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "types": ["node", "unplugin-icons/types/raw"]
   },
-  "include": ["bin.mjs", "src", "test", "scripts", "vite.config.ts"],
+  "include": ["bin.mjs", "src", "app", "test", "scripts", "vite.config.ts"],
   "exclude": ["node_modules"]
 }

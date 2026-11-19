@@ -4,6 +4,7 @@ import { build } from "vite"
 
 const root = fileURLToPath(new URL("..", import.meta.url))
 const configFile = fileURLToPath(new URL("../vite.config.ts", import.meta.url))
+const galleryConfig = fileURLToPath(new URL("../vite.gallery.config.ts", import.meta.url))
 const bin = fileURLToPath(new URL("../bin.mjs", import.meta.url))
 const buildNode = fileURLToPath(new URL("./build-node.mjs", import.meta.url))
 
@@ -16,6 +17,7 @@ const serverArgs = forwarded.length === 0
     : forwarded
 
 let watcher = null
+let galleryWatcher = null
 let server = null
 let stopping = false
 
@@ -25,7 +27,8 @@ process.on("SIGTERM", () => shutdown(0))
 try {
   execFileSync(process.execPath, [buildNode], { cwd: root, stdio: "inherit" })
   watcher = await build({ configFile, root, build: { watch: {} } })
-  await firstBuild(watcher)
+  galleryWatcher = await build({ configFile: galleryConfig, build: { watch: {} } })
+  await Promise.all([firstBuild(watcher), firstBuild(galleryWatcher)])
 
   server = spawn(process.execPath, [bin, ...serverArgs], { cwd: root, stdio: "inherit" })
   server.once("exit", (code) => shutdown(code ?? 0))
@@ -61,6 +64,7 @@ async function shutdown(code) {
 
   await Promise.all([
     watcher?.close(),
+    galleryWatcher?.close(),
     new Promise((resolve) => {
       if (!server || server.exitCode !== null || server.signalCode !== null) {
         resolve()

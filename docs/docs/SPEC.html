@@ -415,10 +415,11 @@
 ├── 📦 cli/                       <span class="c"># npm package: docserve</span>
 │   ├── package.json              <span class="c"># "bin": { "docserve": "./bin.mjs" }</span>
 │   ├── bin.mjs                   <span class="c"># node entry: load dist/node/cli.mjs</span>
-│   ├── index.html                <span class="c"># gallery template, served at /</span>
+│   ├── app/                      <span class="c"># gallery SPA (Vite): index.html · main.tsx · App.tsx</span>
+│   ├── vite.gallery.config.ts    <span class="c"># gallery SPA → dist/gallery</span>
 │   ├── scripts/
 │   │   └── build-node.mjs        <span class="c"># esbuild → dist/node/cli.mjs</span>
-│   ├── dist/                     <span class="c"># built node bundle + widget</span>
+│   ├── dist/                     <span class="c"># built node bundle + widget + gallery</span>
 │   └── src/
 │       ├── node/
 │       │   ├── cli.mjs           <span class="c"># cac commands · default dir · background</span>
@@ -430,7 +431,7 @@
 │       │   │   ├── response.mjs  <span class="c"># json · text · notFound</span>
 │       │   │   ├── assets.mjs    <span class="c"># MIME + widget/plugin files</span>
 │       │   │   ├── serve-static.mjs <span class="c"># path guards · MIME · stream</span>
-│       │   │   └── gallery.mjs   <span class="c"># gallery template response</span>
+│       │   │   └── gallery.mjs   <span class="c"># SPA shell response</span>
 │       │   ├── docs/
 │       │   │   ├── files.mjs     <span class="c"># page metadata composition</span>
 │       │   │   ├── scan.mjs      <span class="c"># *.html listing · path guards</span>
@@ -631,7 +632,7 @@
   <section>
     <h2><iconify-icon icon="mdi:file-send-outline" width="24" noobserver></iconify-icon>Serving</h2>
     <p class="section-desc">
-      The gallery is an embedded template served at <code>/</code>; every other file is served raw from <code>docsDir</code>.
+      The gallery is a built React SPA (<code>dist/gallery</code>) served at <code>/</code>; every other file is served raw from <code>docsDir</code>.
     </p>
 
     <h3><iconify-icon icon="mdi:routes" noobserver></iconify-icon>Routes</h3>
@@ -642,7 +643,8 @@
           <tr><th>URL</th><th>Response</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched via <code>docserve:pages:list</code>; <code>docsDir/index.html</code> is excluded</td></tr>
+          <tr><td><code>/</code>, <code>/index.html</code></td><td>Gallery SPA shell. Folder name, display path and hue are substituted into its <code>data-docs-*</code> attributes; the card list is fetched via <code>docserve:pages:list</code>; <code>docsDir/index.html</code> is excluded</td></tr>
+          <tr><td><code>/__docserve/gallery/**</code></td><td>Built gallery assets (JS/CSS) with <code>cache-control: no-store</code></td></tr>
           <tr><td><code>POST /__docserve/rpc</code></td><td>Method-dispatch endpoint: <code>{ method, args }</code> → <code>{ result }</code> or <code>{ error }</code></td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td><code>/sub/</code></td><td>That directory's <code>index.html</code>; <code>/sub</code> redirects here (<code>301</code>) so relative links resolve</td></tr>
@@ -828,7 +830,7 @@
   "type": "change",
   "pages": ["foo.html", "sub/bar.html"],   <span class="c">// docsDir-relative paths touched in the batch</span>
   "contentSetChanged": false,              <span class="c">// true when a file was added or removed</span>
-  "templateChanged": false                 <span class="c">// true when the gallery template itself was edited</span>
+  "templateChanged": false                 <span class="c">// true when the gallery shell (dist/gallery/index.html) was rebuilt</span>
 }</pre>
 
     <pre>{
@@ -846,7 +848,7 @@
         <tbody>
           <tr><td>Page tab</td><td>Its own path appears in <code>pages</code>, or a <code>css</code> message refreshes its stylesheets</td></tr>
           <tr><td>Dock</td><td>Never reloads the page; it refetches <code>docserve:pages:list</code> on <code>change</code> and on reconnect</td></tr>
-          <tr><td>Gallery tab</td><td><code>contentSetChanged</code> or <code>templateChanged</code> is <code>true</code></td></tr>
+          <tr><td>Gallery tab</td><td>Refetches <code>docserve:pages:list</code> on any <code>change</code> (no page reload); reloads only when <code>templateChanged</code> is <code>true</code></td></tr>
           <tr><td>iframe preview</td><td>Never connects — the <code>window.self !== window.top</code> guard keeps edits from reloading previews</td></tr>
         </tbody>
       </table>
@@ -857,7 +859,7 @@
   <section>
     <h2><iconify-icon icon="mdi:needle" width="24" noobserver></iconify-icon>Injection</h2>
     <p class="section-desc">
-      Every <code>text/html</code> response gets two tags before the last <code>&lt;/body&gt;</code>: a stylesheet and one module script. Iframes are skipped — the gallery template ships its own client.
+      Every <code>text/html</code> response gets two tags before the last <code>&lt;/body&gt;</code>: a stylesheet and one module script. Iframes are skipped — the gallery SPA ships its own client.
     </p>
 
     <div class="grid-2">

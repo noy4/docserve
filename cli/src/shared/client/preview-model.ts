@@ -1,7 +1,12 @@
 import { effect, signal } from "@preact/signals-react"
 
 export const THUMB_W = 960
-const MAX_PREVIEWS = 2
+
+export interface PreviewModelOptions {
+  max?: number
+  rootMargin?: string
+  scope?: "element" | "viewport"
+}
 
 interface QueueItem {
   iframe: HTMLIFrameElement
@@ -9,6 +14,9 @@ interface QueueItem {
 }
 
 export class PreviewModel {
+  readonly #max: number
+  readonly #rootMargin: string
+  readonly #scope: "element" | "viewport"
   #root = signal<HTMLElement | null>(null)
 
   readonly setRoot = (element: HTMLElement | null): void => {
@@ -26,10 +34,16 @@ export class PreviewModel {
   #loads = new Map<HTMLIFrameElement, () => void>()
   #active = 0
 
+  constructor(options: PreviewModelOptions = {}) {
+    this.#max = options.max ?? 2
+    this.#rootMargin = options.rootMargin ?? "150px"
+    this.#scope = options.scope ?? "element"
+  }
+
   subscribe(): () => void {
     const stop = effect(() => {
       const root = this.#root.value
-      if (!root) return
+      if (!root && this.#scope === "element") return
 
       const observer = new IntersectionObserver((entries) => {
         for (const entry of entries) {
@@ -41,7 +55,7 @@ export class PreviewModel {
           this.#queue.push({ iframe, src })
           this.#pump()
         }
-      }, { root, rootMargin: "150px" })
+      }, { root, rootMargin: this.#rootMargin })
 
       const resize = new ResizeObserver((entries) => {
         for (const entry of entries) {
@@ -97,7 +111,7 @@ export class PreviewModel {
   }
 
   #pump(): void {
-    while (this.#active < MAX_PREVIEWS && this.#queue.length) {
+    while (this.#active < this.#max && this.#queue.length) {
       const item = this.#queue.shift()
       if (!item || !item.iframe.isConnected) continue
       this.#active++

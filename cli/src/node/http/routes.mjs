@@ -4,12 +4,13 @@ import { serveAsset } from "./assets.mjs"
 import { galleryResponse } from "./gallery.mjs"
 import { notFound, text } from "./response.mjs"
 import { injectIntoHtml } from "../docs/inject.mjs"
-import { PLUGINS_SOURCE_DIR, WIDGET_DIST_DIR, WIDGET_SOURCE_DIR } from "../paths.mjs"
+import { PLUGINS_SOURCE_DIR, GALLERY_DIST_DIR, WIDGET_DIST_DIR, WIDGET_SOURCE_DIR } from "../paths.mjs"
 import { createStaticHandler } from "./serve-static.mjs"
 
 const INTERNAL_PREFIX = "/__docserve/"
 const WIDGET_PREFIX = `${INTERNAL_PREFIX}widget/`
 const PLUGINS_PREFIX = `${INTERNAL_PREFIX}plugins/`
+const GALLERY_PREFIX = `${INTERNAL_PREFIX}gallery/`
 
 /**
  * @param {import("h3/node").H3} app
@@ -25,6 +26,8 @@ export function registerRoutes(app, { docsDir }) {
   app.get(`${WIDGET_PREFIX}**`, (event) => serveWidget(event.url.pathname.slice(WIDGET_PREFIX.length)))
 
   app.get(`${PLUGINS_PREFIX}**`, (event) => serveAsset(PLUGINS_SOURCE_DIR, event.url.pathname.slice(PLUGINS_PREFIX.length)))
+
+  app.get(`${GALLERY_PREFIX}**`, (event) => serveAsset(GALLERY_DIST_DIR, event.url.pathname.slice(GALLERY_PREFIX.length)))
 
   app.all(`${INTERNAL_PREFIX}**`, () => notFound())
 

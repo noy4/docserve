@@ -164,16 +164,22 @@ describe("docserve server", () => {
     assert.match(css.headers.get("content-type") ?? "", /text\/css/)
   })
 
-  it("serves the gallery template, not injected", async () => {
-    const gallery = await (await fetch(`http://localhost:${port}/`)).text()
-    assert.ok(gallery.includes("contentSetChanged"), "gallery ships its own reload client")
-    assert.ok(gallery.includes(content), "docsDir is substituted")
+  it("serves the built gallery shell, not injected", async () => {
+    const response = await fetch(`http://localhost:${port}/`)
+    assert.equal(response.status, 200)
+    const gallery = await response.text()
+    assert.ok(gallery.includes('id="app"'), "gallery is the SPA shell")
+    assert.ok(gallery.includes('data-docs-name="'), "folder identity ships with the shell")
+    assert.ok(gallery.includes("/__docserve/gallery/assets/"), "assets resolve under the internal prefix")
     assert.ok(gallery.includes(`<title>${basename(content)}</title>`), "gallery title uses the folder name")
-    assert.ok(gallery.includes(`    ${basename(content)}\n    <details class="servers"`), "gallery heading uses the folder name")
-    assert.ok(!gallery.includes("const pageId"))
-    assert.ok(!gallery.includes("__DOCS_DIR"))
-    assert.ok(!gallery.includes("__FAVICON_HUE__"), "favicon hue is substituted")
-    assert.ok(gallery.includes("hsl("), "folder favicon gets a path-derived hue")
+    assert.ok(!gallery.includes("__DOCS_NAME__"), "folder name is substituted")
+    assert.ok(!gallery.includes("__DOCS_HUE__"), "folder hue is substituted")
+
+    const script = /src="([^"]*\/__docserve\/gallery\/assets\/[^"]+)"/.exec(gallery)?.[1]
+    assert.ok(script, "shell references a built asset")
+    const asset = await fetch(`http://localhost:${port}${script}`)
+    assert.equal(asset.status, 200)
+    assert.match(asset.headers.get("content-type") ?? "", /javascript/)
   })
 
   it("lists html files with resolved metadata on docserve:pages:list", async () => {

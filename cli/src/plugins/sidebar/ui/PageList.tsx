@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react"
 import { decoded, displayDate, pageUrl } from "../../../widget/lib/dom.js"
 import { groupByFolder, groupByMonth } from "../grouping.js"
-import type { PreviewModel } from "./preview-model.js"
+import type { PreviewModel } from "#shared/client/preview-model.js"
 import type { SidebarModel, SidebarView } from "../model.js"
 
 export interface PageListProps {
