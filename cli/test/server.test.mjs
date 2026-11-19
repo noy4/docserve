@@ -240,6 +240,12 @@ describe("docserve server", () => {
     assert.match((await response.json()).error.message, /Unknown RPC method/)
   })
 
+  it("returns 404 for unknown internal paths", async () => {
+    assert.equal((await fetch(`http://localhost:${port}/__docserve/nope`)).status, 404)
+    assert.equal((await fetch(`http://localhost:${port}/__docserve/rpc`)).status, 404)
+    assert.equal((await fetch(`http://localhost:${port}/__docserve/nope`, { method: "POST" })).status, 404)
+  })
+
   it("answers 403, 400 and 404 for bad paths", async () => {
     assert.equal((await fetch(`http://localhost:${port}/..%2F..%2Fetc%2Fpasswd`)).status, 403)
     assert.equal((await fetch(`http://localhost:${port}/%zz`)).status, 400)

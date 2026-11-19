@@ -422,13 +422,16 @@
 │   └── src/
 │       ├── node/
 │       │   ├── cli.mjs           <span class="c"># cac commands · start/stop/background</span>
-│       │   ├── app.mjs           <span class="c"># h3 app · POST /__docserve/rpc</span>
+│       │   ├── app.mjs           <span class="c"># composition root · h3 app</span>
 │       │   ├── paths.mjs         <span class="c"># package-root paths</span>
 │       │   ├── rpc/
 │       │   │   ├── index.mjs     <span class="c"># method registry · dispatch</span>
-│       │   │   └── files.mjs     <span class="c"># docserve:pages:list</span>
+│       │   │   ├── route.mjs     <span class="c"># POST /__docserve/rpc</span>
+│       │   │   ├── files.mjs     <span class="c"># docserve:pages:list</span>
+│       │   │   └── servers.mjs   <span class="c"># docserve:servers:list</span>
 │       │   ├── server.mjs        <span class="c"># listen · port fallback · lifecycle</span>
-│       │   ├── routes.mjs        <span class="c"># HTTP handlers</span>
+│       │   ├── routes.mjs        <span class="c"># h3 route registration</span>
+│       │   ├── http.mjs          <span class="c"># json · text · notFound</span>
 │       │   ├── assets.mjs        <span class="c"># MIME + widget/plugin files</span>
 │       │   ├── gallery.mjs       <span class="c"># gallery template response</span>
 │       │   ├── state.mjs         <span class="c"># per-instance state files · pid liveness</span>

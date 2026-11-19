@@ -2,9 +2,8 @@
 // from the docs folder and is injected instead.
 import { readFile } from "node:fs/promises"
 import { docsInfo } from "./docs-info.mjs"
+import { text } from "./http.mjs"
 import { GALLERY_TEMPLATE } from "./paths.mjs"
-
-export const INDEX_TEMPLATE = GALLERY_TEMPLATE
 
 /**
  * @param {string} docsDir
@@ -13,14 +12,14 @@ export const INDEX_TEMPLATE = GALLERY_TEMPLATE
 export async function galleryResponse(docsDir) {
   try {
     const { name, path, hue } = docsInfo(docsDir)
-    let html = await readFile(INDEX_TEMPLATE, "utf8")
+    let html = await readFile(GALLERY_TEMPLATE, "utf8")
     html = html
       .replaceAll("__DOCS_DIR_NAME__", escapeHtml(name))
       .replaceAll("__DOCS_DIR__", escapeHtml(path))
       .replaceAll("__FAVICON_HUE__", String(hue))
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } })
   } catch {
-    return new Response("Gallery template missing", { status: 500 })
+    return text("Gallery template missing", 500)
   }
 }
 
