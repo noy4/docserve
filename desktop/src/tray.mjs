@@ -27,15 +27,46 @@ export class TrayController {
   }
 
   #checkForUpdate() {
-    const check = async () => {
-      const rel = await latestRelease()
-      if (rel && isNewer(rel.version, app.getVersion()) && this.tray) {
-        this.updateAvailable = rel
-        this.update()
-      }
+    this.#refreshUpdate()
+    setInterval(() => this.#refreshUpdate(), 12 * 60 * 60 * 1000).unref()
+  }
+
+  // Quietly refreshes updateAvailable; `notify` also reports the result in a dialog.
+  async #refreshUpdate(notify = false) {
+    const rel = await latestRelease()
+    if (rel && isNewer(rel.version, app.getVersion()) && this.tray) {
+      this.updateAvailable = rel
+      this.update()
     }
-    check()
-    setInterval(check, 12 * 60 * 60 * 1000).unref()
+    if (!notify) return
+    // LSUIElement app: the dialog would otherwise open behind Finder.
+    if (process.platform === "darwin") {
+      app.focus({ steal: true })
+      await sleep(100)
+    }
+    const current = app.getVersion()
+    if (this.updateAvailable) {
+      const { response } = await dialog.showMessageBox({
+        type: "info",
+        title: "docserve — Check for Updates",
+        message: `New version available — v${this.updateAvailable.version}`,
+        detail: `You're on v${current}.`,
+        buttons: ["Open Release Page", "Later"],
+        defaultId: 0,
+        cancelId: 1,
+      })
+      if (response === 0) shell.openExternal(this.updateAvailable.url)
+      return
+    }
+    await dialog.showMessageBox({
+      type: rel ? "info" : "warning",
+      title: "docserve — Check for Updates",
+      message: rel ? "You're up to date" : "Couldn't check for updates",
+      detail: rel
+        ? `docserve v${current} is the latest version.`
+        : "GitHub could not be reached. Try again later.",
+      buttons: ["OK"],
+    })
   }
 
   update() {
@@ -60,8 +91,8 @@ export class TrayController {
         label: `New version available — v${this.updateAvailable.version}`,
         click: () => shell.openExternal(this.updateAvailable.url),
       })
-      updateItems.push(___)
     }
+    updateItems.push({ label: "Check for Updates...", click: () => this.#refreshUpdate(true) })
 
     const recents = this.server.readRecents()
     // Running rows follow Open Recent order (most recently started first).
