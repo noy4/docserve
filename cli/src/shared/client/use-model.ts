@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 export interface Subscribable {
   subscribe(): (() => void) | void
@@ -8,13 +8,6 @@ export interface Subscribable {
 export function useModel<T extends object>(create: () => T): T {
   const [model] = useState(create)
   useEffect(() => subscribe(model), [model])
-  return model
-}
-
-/** Create a model once and run its `subscribe()` before paint. */
-export function useLayoutModel<T extends object>(create: () => T): T {
-  const [model] = useState(create)
-  useLayoutEffect(() => subscribe(model), [model])
   return model
 }
 

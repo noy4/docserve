@@ -4,7 +4,7 @@ import { PageList } from "./PageList.js"
 import { PreviewModel } from "#shared/client/preview-model.js"
 import { SidebarHeader } from "./SidebarHeader.js"
 import { TreeList } from "./TreeList.js"
-import { useLayoutModel } from "#shared/client/use-model.js"
+import { useModel } from "#shared/client/use-model.js"
 import type { SidebarModel } from "../model.js"
 
 export interface SidebarProps {
@@ -13,7 +13,7 @@ export interface SidebarProps {
 
 export function Sidebar({ model }: SidebarProps) {
   const docs = model.docs
-  const previews = useLayoutModel(() => new PreviewModel())
+  const previews = useModel(() => new PreviewModel())
   const pages = model.pages.value
   const status = model.status.value
   const view = model.view.value

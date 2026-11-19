@@ -4,11 +4,11 @@ import { GalleryHeader } from "./components/GalleryHeader.js"
 import { PageGrid } from "./components/PageGrid.js"
 import { GalleryModel } from "./model.js"
 import { PreviewModel } from "#shared/client/preview-model.js"
-import { useLayoutModel, useModel } from "#shared/client/use-model.js"
+import { useModel } from "#shared/client/use-model.js"
 
 export function App() {
   const model = useModel(() => new GalleryModel())
-  const previews = useLayoutModel(() => new PreviewModel({ max: 3, rootMargin: "400px", scope: "viewport" }))
+  const previews = useModel(() => new PreviewModel({ max: 3, rootMargin: "400px", scope: "viewport" }))
 
   const pages = model.pages.value
   const status = model.status.value
