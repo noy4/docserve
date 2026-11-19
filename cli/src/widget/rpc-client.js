@@ -1,14 +1,16 @@
 /**
  * @param {string} method
  * @param {any[]} [args]
+ * @param {{ signal?: AbortSignal }} [options]
  * @returns {Promise<any>}
  */
-export async function callServer(method, args = []) {
+export async function callServer(method, args = [], options = {}) {
   const response = await fetch("/__docserve/rpc", {
     method: "POST",
     cache: "no-store",
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ method, args }),
+    signal: options.signal,
   })
 
   let payload = null

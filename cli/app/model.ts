@@ -13,8 +13,7 @@ export class GalleryModel {
   readonly docs = readDocsInfo()
   readonly serversOpen = signal(false)
 
-  #request = 0
-  #serversRequest = 0
+  #inflight = new Map<string, AbortController>()
   #live: { close: () => void } | null = null
   #serversTimer: ReturnType<typeof setInterval> | null = null
   #onVisibility: (() => void) | null = null
@@ -39,6 +38,8 @@ export class GalleryModel {
     return () => {
       this.#live?.close()
       this.#live = null
+      for (const [, controller] of this.#inflight) controller.abort()
+      this.#inflight.clear()
       if (this.#onVisibility) {
         document.removeEventListener("visibilitychange", this.#onVisibility)
         this.#onVisibility = null
@@ -60,29 +61,38 @@ export class GalleryModel {
   }
 
   async load({ force = false }: { force?: boolean } = {}): Promise<void> {
-    const id = ++this.#request
     if (!this.pages.value.length) this.status.value = "loading"
 
+    const signal = this.#start("pages")
+
     try {
-      const result = await callServer("docserve:pages:list", force ? [{ force: true }] : [])
-      if (id !== this.#request) return
+      const result = await callServer("docserve:pages:list", force ? [{ force: true }] : [], { signal })
       this.pages.value = Array.isArray(result) ? (result as DocPage[]) : []
       this.status.value = "ready"
     } catch {
-      if (id !== this.#request) return
+      if (signal.aborted) return
       this.status.value = "error"
     }
   }
 
   async loadServers({ force = false }: { force?: boolean } = {}): Promise<void> {
-    const id = ++this.#serversRequest
+    const signal = this.#start("servers")
 
     try {
-      const result = await callServer("docserve:servers:list", force ? [true] : [])
-      if (id !== this.#serversRequest) return
-      const servers = Array.isArray(result) ? (result as DocServer[]) : []
-      this.servers.value = servers
+      const result = await callServer("docserve:servers:list", force ? [true] : [], { signal })
+      this.servers.value = Array.isArray(result) ? (result as DocServer[]) : []
     } catch { }
+  }
+
+  /**
+   * Abort the in-flight request registered under `key` and start a new one.
+   * @returns the new request's signal
+   */
+  #start(key: string): AbortSignal {
+    this.#inflight.get(key)?.abort()
+    const controller = new AbortController()
+    this.#inflight.set(key, controller)
+    return controller.signal
   }
 
   #startServersPoll(): void {
