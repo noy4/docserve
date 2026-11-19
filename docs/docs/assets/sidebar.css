@@ -1,3 +1,8 @@
+.sidebar,
+.sidebar * {
+  box-sizing: border-box;
+}
+
 .sidebar {
   --content-width: 720px;
   --gutter: 96px;
