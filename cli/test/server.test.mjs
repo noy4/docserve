@@ -369,6 +369,12 @@ describe("docserve server", () => {
     assert.equal(spawnSync(process.execPath, [CLI, "status"], { env, encoding: "utf8" }).status, 1)
   })
 
+  it("rejects an invalid --port", () => {
+    const result = spawnSync(process.execPath, [CLI, content, "--port", "0"], { env, encoding: "utf8" })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /--port expects an integer/)
+  })
+
   it("gracefully shuts down by closing active sockets and releasing the port", async () => {
     const testDir = mkdtempSync(join(tmpdir(), "docserve-graceful-"))
     const testPort = 35000 + Math.floor(Math.random() * 10000)

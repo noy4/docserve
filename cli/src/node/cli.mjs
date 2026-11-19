@@ -3,13 +3,13 @@ import fs from "node:fs"
 import path from "node:path"
 import cac from "cac"
 import { startBackground } from "./cli/background.mjs"
-import { DEFAULT_PORT, parsePort } from "./cli/args.mjs"
 import { runServer } from "./http/server.mjs"
 import { findByDir, listLiveStates, removeState } from "./instances/state.mjs"
 import { PACKAGE_JSON } from "./paths.mjs"
 
 const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf8"))
 const VERSION = pkg.version
+const DEFAULT_PORT = 4242
 
 export async function main(argv = process.argv) {
   const cli = cac("docserve")
@@ -98,6 +98,14 @@ function showStatus() {
     console.log(state.url)
     console.log(`docs : ${state.docsDir}`)
   }
+}
+
+function parsePort(value) {
+  const port = Number(value ?? DEFAULT_PORT)
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error(`[docserve] --port expects an integer between 1 and 65535, got "${value}"`)
+  }
+  return port
 }
 
 function openBrowser(url) {

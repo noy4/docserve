@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process"
 import { listLiveStates } from "../instances/state.mjs"
-import { DEFAULT_PORT } from "./args.mjs"
 
 /**
  * @param {{ docsDir: string, port: number, open: boolean }} options
@@ -11,7 +10,7 @@ export async function startBackground({ docsDir, port, open }) {
 
   const childArgs = [entry, docsDir]
   if (open) childArgs.push("--open")
-  if (port !== DEFAULT_PORT) childArgs.push("--port", String(port))
+  childArgs.push("--port", String(port))
 
   const child = spawn(process.execPath, childArgs, { detached: true, stdio: "ignore" })
   child.unref()
