@@ -14,7 +14,7 @@
     "build": "npm run build:node && npm run build:widget && npm run build:gallery",
     "build:node": "node scripts/build-node.mjs",
     "build:widget": "vite build",
-    "build:gallery": "vite build --config vite.gallery.config.ts",
+    "build:gallery": "vite build --config app/vite.config.ts",
     "test": "npm run build && node --test --test-timeout=60000",
     "typecheck": "tsc --noEmit",
     "pack:check": "npm pack --dry-run",

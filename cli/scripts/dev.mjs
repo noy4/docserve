@@ -4,7 +4,7 @@ import { build } from "vite"
 
 const root = fileURLToPath(new URL("..", import.meta.url))
 const configFile = fileURLToPath(new URL("../vite.config.ts", import.meta.url))
-const galleryConfig = fileURLToPath(new URL("../vite.gallery.config.ts", import.meta.url))
+const galleryConfig = fileURLToPath(new URL("../app/vite.config.ts", import.meta.url))
 const bin = fileURLToPath(new URL("../bin.mjs", import.meta.url))
 const buildNode = fileURLToPath(new URL("./build-node.mjs", import.meta.url))
 

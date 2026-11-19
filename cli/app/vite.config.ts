@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url"
 import { defineConfig } from "vite"
 
 export default defineConfig({
-  root: fileURLToPath(new URL("./app", import.meta.url)),
+  root: fileURLToPath(new URL(".", import.meta.url)),
   // Served at `/` by the docserve server, so assets resolve absolutely under
   // the internal prefix.
   base: "/__docserve/gallery/",
@@ -20,7 +20,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: fileURLToPath(new URL("./dist/gallery", import.meta.url)),
+    outDir: fileURLToPath(new URL("../dist/gallery", import.meta.url)),
     emptyOutDir: true,
     sourcemap: true,
   },
