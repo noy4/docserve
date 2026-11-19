@@ -1,6 +1,6 @@
 import { signal } from "@preact/signals-react"
-import { connectLive } from "../src/widget/live.js"
-import { callServer } from "../src/widget/rpc-client.js"
+import { connectLive } from "../src/widget/api/live.js"
+import { callServer } from "../src/widget/api/rpc-client.js"
 
 export type GalleryStatus = "loading" | "ready" | "error"
 

@@ -1,5 +1,5 @@
 // Page listing for the widget: docserve:pages:list, cached until a change arrives.
-import { decoded, pageUrl } from "./lib/dom.js"
+import { decoded, pageUrl } from "../lib/dom.js"
 import { callServer } from "./rpc-client.js"
 
 /**

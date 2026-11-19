@@ -1,17 +1,17 @@
 // Widget host
 import { createCommands } from "./commands.js"
-import { createDocks } from "./docks.js"
+import { createDocks } from "./shell/docks.js"
 import { el } from "./lib/dom.js"
 import { createEventEmitter } from "./lib/events.js"
-import { connectLive } from "./live.js"
-import { createPages } from "./pages.js"
-import { createPalette } from "./palette.js"
-import { createPlacement } from "./placement.js"
+import { connectLive } from "./api/live.js"
+import { createPages } from "./api/pages.js"
+import { createPalette } from "./shell/palette.js"
+import { createPlacement } from "./shell/placement.js"
 import { createPlugins } from "./plugins.js"
-import { createRpc } from "./rpc.js"
-import { createServers } from "./servers.js"
-import { reloadStyles, settled } from "./styles.js"
-import { createUi } from "./ui.js"
+import { createRpc } from "./api/rpc.js"
+import { createServers } from "./api/servers.js"
+import { reloadStyles, settled } from "./shell/styles.js"
+import { createUi } from "./shell/ui.js"
 
 /**
  * Create the widget without mounting it.

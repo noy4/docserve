@@ -413,72 +413,38 @@
 
     <pre>docserve/
 ├── 📦 cli/                       <span class="c"># npm package: docserve</span>
-│   ├── package.json              <span class="c"># "bin": { "docserve": "./bin.mjs" }</span>
+│   ├── package.json              <span class="c"># bin · imports (#shared/*) · build scripts</span>
 │   ├── bin.mjs                   <span class="c"># node entry: load dist/node/cli.mjs</span>
-│   ├── app/                      <span class="c"># gallery SPA (Vite): index.html · main.tsx · App.tsx</span>
-│   ├── vite.gallery.config.ts    <span class="c"># gallery SPA → dist/gallery</span>
-│   ├── scripts/
-│   │   └── build-node.mjs        <span class="c"># esbuild → dist/node/cli.mjs</span>
+│   ├── app/                      <span class="c"># gallery SPA: index.html · main.tsx · App.tsx · model.ts</span>
+│   ├── scripts/                  <span class="c"># build-node.mjs (esbuild) · dev.mjs (watch)</span>
 │   ├── dist/                     <span class="c"># built node bundle + widget + gallery</span>
 │   └── src/
-│       ├── node/
+│       ├── node/                 <span class="c"># server side — h3, no DOM</span>
 │       │   ├── cli.mjs           <span class="c"># cac commands · default dir · background</span>
 │       │   ├── paths.mjs         <span class="c"># package-root paths</span>
-│       │   ├── http/
-│       │   │   ├── app.mjs       <span class="c"># composition root · h3 app</span>
-│       │   │   ├── server.mjs    <span class="c"># listen · port fallback · lifecycle</span>
-│       │   │   ├── routes.mjs    <span class="c"># h3 route registration</span>
-│       │   │   ├── response.mjs  <span class="c"># json · text · notFound</span>
-│       │   │   ├── assets.mjs    <span class="c"># MIME + widget/plugin files</span>
-│       │   │   ├── serve-static.mjs <span class="c"># path guards · MIME · stream</span>
-│       │   │   └── gallery.mjs   <span class="c"># SPA shell response</span>
-│       │   ├── docs/
-│       │   │   ├── files.mjs     <span class="c"># page metadata composition</span>
-│       │   │   ├── scan.mjs      <span class="c"># *.html listing · path guards</span>
-│       │   │   ├── meta.mjs      <span class="c"># title · created_at · favicon</span>
-│       │   │   ├── dates.mjs     <span class="c"># git created/modified dates</span>
-│       │   │   ├── info.mjs      <span class="c"># folder name · display path · hue</span>
-│       │   │   └── inject.mjs    <span class="c"># widget tags · idempotent insertion</span>
-│       │   ├── live/
-│       │   │   ├── watch.mjs     <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
-│       │   │   └── websocket.mjs <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
-│       │   ├── instances/
-│       │   │   ├── state.mjs     <span class="c"># registry · pid liveness · startedAt</span>
-│       │   │   └── view.mjs      <span class="c"># state → public DocServer rows</span>
-│       │   └── rpc/
-│       │       ├── index.mjs     <span class="c"># method registry · dispatch</span>
-│       │       ├── route.mjs     <span class="c"># POST /__docserve/rpc</span>
-│       │       ├── files.mjs     <span class="c"># docserve:pages:list</span>
-│       │       └── servers.mjs   <span class="c"># docserve:servers:list</span>
-│       ├── widget/               <span class="c"># injected client (shadow DOM, Vite build)</span>
+│       │   ├── http/             <span class="c"># app · server · routes · assets · static · gallery</span>
+│       │   ├── docs/             <span class="c"># scan · meta · dates · info · files · inject</span>
+│       │   ├── live/             <span class="c"># fs.watch debounce · RFC 6455 websocket</span>
+│       │   ├── instances/        <span class="c"># state registry · pid liveness · public view</span>
+│       │   └── rpc/              <span class="c"># registry · POST route · pages/servers methods</span>
+│       ├── widget/               <span class="c"># injected client — shadow DOM, Vite bundle</span>
 │       │   ├── index.js          <span class="c"># entry: register built-ins · start</span>
 │       │   ├── host.js           <span class="c"># shadow root · lifecycle · reload wiring</span>
-│       │   ├── docks.js ui.js    <span class="c"># docks · items · mount · styles · announce</span>
-│       │   ├── placement.js      <span class="c"># four corners · drag · persisted</span>
 │       │   ├── commands.js       <span class="c"># registry · key matching · palette state</span>
-│       │   ├── palette.js        <span class="c"># ⌘K palette: filter · keyboard · execute</span>
-│       │   ├── styles.js         <span class="c"># stylesheet load wait · cache-busted refetch</span>
-│       │   ├── rpc.js  pages.js  <span class="c"># method bus · page cache</span>
-│       │   ├── rpc-client.js     <span class="c"># callServer(method, args)</span>
-│       │   ├── servers.js        <span class="c"># docserve:servers:list cache</span>
-│       │   ├── live.js  plugins.js
-│       │   ├── lib/              <span class="c"># framework-free: dom.js · events.js · storage.js</span>
-│       │   └── widget.css  palette.css
-│       ├── plugins/              <span class="c"># built-ins, same shape as external ones</span>
-│       │   ├── sidebar/{client.js, model.ts, tree.ts, tree-model.ts, ui/*.tsx, sidebar.css}
-│       │   ├── toc/{client.js, model.ts, commands.ts, scroll-spy.ts, heading-html.ts, outline.js, ui/TocPanel.tsx, toc.css}
-│       │   ├── collapse/{client.js, model.ts, commands.ts, sections.ts, view.ts, collapse.css}
-│       │   ├── copy/{client.js, copy.css}
-│       │   ├── servers/{client.js, model.ts, commands.ts, ui/ServersPopover.tsx, servers.css}
-│       │   └── home/client.js
-│       └── shared/types.d.ts     <span class="c"># global types for ctx, docks, commands, rpc</span>
-└── 🖥️ desktop/                   <span class="c"># Electron menubar app</span>
-    ├── package.json
+│       │   ├── plugins.js        <span class="c"># plugin registry · setup/teardown</span>
+│       │   ├── api/              <span class="c"># server I/O — pages · servers · rpc · rpc-client · live</span>
+│       │   ├── shell/            <span class="c"># UI chrome — docks · ui · placement · palette · styles</span>
+│       │   ├── lib/              <span class="c"># dom · events · storage · disposables · headings</span>
+│       │   └── widget.css  <span class="c"># base styles (palette.css lives in shell/)</span>
+│       ├── plugins/              <span class="c"># built-ins: sidebar · toc · collapse · copy · servers</span>
+│       └── shared/               <span class="c"># types.d.ts · client/{preview-model, use-model}.ts</span>
+└── 🖥️ desktop/                  <span class="c"># Electron menu bar app</span>
     └── src/
         ├── main.mjs              <span class="c"># App · single instance lock · wiring</span>
         ├── server.mjs            <span class="c"># spawn/stop CLI · state file liveness</span>
         ├── state.mjs             <span class="c"># fs.watch + 2 s polling → menu rebuild</span>
         ├── tray.mjs              <span class="c"># tray menu · icons · Open Folder…</span>
+        ├── update.mjs            <span class="c"># release check → menu notice</span>
         └── assets/               <span class="c"># tray icons (running / stopped)</span></pre>
   </section>
 
@@ -645,6 +611,8 @@
         <tbody>
           <tr><td><code>/</code>, <code>/index.html</code></td><td>Gallery SPA shell. Folder name, display path and hue are substituted into its <code>data-docs-*</code> attributes; the card list is fetched via <code>docserve:pages:list</code>; <code>docsDir/index.html</code> is excluded</td></tr>
           <tr><td><code>/__docserve/gallery/**</code></td><td>Built gallery assets (JS/CSS) with <code>cache-control: no-store</code></td></tr>
+          <tr><td><code>/__docserve/widget/**</code></td><td>Built widget bundle; source CSS as the fallback</td></tr>
+          <tr><td><code>/__docserve/plugins/**</code></td><td>Plugin assets read from <code>src/plugins</code> per request</td></tr>
           <tr><td><code>POST /__docserve/rpc</code></td><td>Method-dispatch endpoint: <code>{ method, args }</code> → <code>{ result }</code> or <code>{ error }</code></td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td><code>/sub/</code></td><td>That directory's <code>index.html</code>; <code>/sub</code> redirects here (<code>301</code>) so relative links resolve</td></tr>

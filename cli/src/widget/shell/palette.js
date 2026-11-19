@@ -1,7 +1,7 @@
 // Command palette overlay: filter, arrow keys and selection. It owns no
 // state — both the open flag and the registry live in `commands.js`.
-import { formatKey } from "./commands.js"
-import { el } from "./lib/dom.js"
+import { formatKey } from "../commands.js"
+import { el } from "../lib/dom.js"
 
 /**
  * @param {object} options
@@ -39,7 +39,7 @@ export function createPalette({ root, ui, commands, subscribe }) {
   const overlay = el("div", { class: "docserve-palette" }, [backdrop, dialog])
 
   root.append(overlay)
-  ui.style("/__docserve/widget/palette.css")
+  ui.style("/__docserve/widget/shell/palette.css")
 
   /** @type {DocserveCommand[]} */
   let items = []

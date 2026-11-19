@@ -1,6 +1,6 @@
 // Placement: four viewport corners, drag the pill to move between them, and the
 // choice is remembered across loads.
-import { persisted } from "./lib/storage.js"
+import { persisted } from "../lib/storage.js"
 
 const STORAGE_KEY = "docserve:dock-corner"
 /** Travel before a press counts as a drag, so clicks still click. */

@@ -1,7 +1,7 @@
 // The docks registry: one pill that every plugin registers items on. An item
 // either runs a command or is a link.
-import { formatKey } from "./commands.js"
-import { el } from "./lib/dom.js"
+import { formatKey } from "../commands.js"
+import { el } from "../lib/dom.js"
 
 /**
  * Build the dock and mount it into the shadow root.

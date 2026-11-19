@@ -1,5 +1,5 @@
 // UI helpers handed to plugins: mount points, stylesheets, announcements.
-import { el } from "./lib/dom.js"
+import { el } from "../lib/dom.js"
 
 /**
  * @param {object} options
