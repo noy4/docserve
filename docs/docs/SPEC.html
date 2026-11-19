@@ -180,6 +180,7 @@
     background: var(--surface);
   }
   tr:last-child td { border-bottom: none; }
+  td code { white-space: nowrap; }
 
   /* Callout */
   .callout {
@@ -617,6 +618,7 @@
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td><code>/sub/</code></td><td>That directory's <code>index.html</code>; <code>/sub</code> redirects here (<code>301</code>) so relative links resolve</td></tr>
           <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
+          <tr><td>malformed · escaping · missing</td><td><code>400</code> · <code>403</code> · <code>404</code> (non-GET: <code>405</code>)</td></tr>
         </tbody>
       </table>
     </div>
@@ -639,11 +641,10 @@
 ] }
 
 404
-{ "error": { "message": "Unknown RPC method: docserve:missing" } }</pre>
+{ "error": { "message": "Unknown RPC method: docserve:missing" } }
 
-    <p class="section-desc">
-      Unknown methods respond <code>404</code>, malformed JSON or non-array args respond <code>400</code>. Malformed paths respond <code>400</code>, paths escaping <code>docsDir</code> respond <code>403</code>, missing files respond <code>404</code>.
-    </p>
+400
+{ "error": { "message": "args must be an array" } }</pre>
 
     <h3><iconify-icon icon="mdi:server-network" noobserver></iconify-icon>docserve:servers:list</h3>
     <pre>{ "result": [
@@ -904,17 +905,37 @@
       </div>
     </div>
 
-    <p class="section-desc">Sidebar, table of contents, collapse, copy, home and servers are built this way.</p>
-    <p>An action is registered once as a command, which gives it a keyboard shortcut and a row in the <code>⌘K</code> palette; a dock button then just names that command id.</p>
-    <p class="section-desc">
-      The sidebar renders pages as <code>list</code>, <code>gallery</code> or <code>tree</code> — the tree groups <code>page.url</code> into folders (folders first, natural name order) and persists which folders are collapsed. In list and gallery, a grouping menu picks <code>none</code>, <code>month</code> or <code>folder</code>; folder grouping makes one section per folder that directly holds pages, root first, without nesting.
-    </p>
-    <p class="section-desc">
-      The table of contents lists headings from the page root (<code>main</code>, <code>article</code>, <code>.container</code> or <code>data-toc-root</code>), levels 2–3 by default, in a floating column on the right. While open it reserves a 260px gutter and shifts the page left; <code>data-toc-outline="deep"</code> expands to 2–6, <code>data-toc-outline="false"</code> disables it, <code>data-toc-ignore</code> excludes a subtree, and <code>data-toc-open</code> starts it open. <code>t</code> toggles it.
-    </p>
-    <p class="section-desc">
-      The collapse plugin adds a toggle to each heading and hides its following content up to the next heading at the same or higher level. Levels default to 2–4; <code>data-collapse-levels="2,6"</code> widens the range, <code>data-collapse="false"</code> disables it, and <code>data-collapse-root</code> / <code>data-collapse-ignore</code> scope it. Collapsed headings persist per page, <code>k</code> toggles every section, <code>Alt+K</code> (or its palette command) enables/disables the plugin, and the table of contents expands hidden ancestors before navigating.
-    </p>
+    <p>An action is registered once as a command — keyboard shortcut plus a <code>⌘K</code> row; a dock button only names that command id.</p>
+
+    <h3><iconify-icon icon="mdi:view-dashboard-outline" noobserver></iconify-icon>Built-ins</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Plugin</th><th>Behavior &amp; options</th><th>Keys</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>sidebar</code></td>
+            <td>Pages as <code>list</code>, <code>gallery</code> or <code>tree</code>. Tree groups by folder (folders first, natural order) and persists collapsed folders; list and gallery group by <code>none</code>, <code>month</code> or <code>folder</code> (one section per directly-holding folder, root first, no nesting).</td>
+            <td><code>[</code> <code>Alt+B</code> toggle<br><code>v</code> view<br><code>m</code> grouping</td>
+          </tr>
+          <tr>
+            <td><code>toc</code></td>
+            <td>Heading outline (levels 2–3) from <code>main</code>, <code>article</code>, <code>.container</code> or <code>data-toc-root</code>, in a floating right column; open reserves a 260px gutter.<br><code>data-toc-outline="deep"</code> → 2–6<br><code>data-toc-outline="false"</code> off · <code>data-toc-ignore</code> · <code>data-toc-open</code></td>
+            <td><code>t</code></td>
+          </tr>
+          <tr>
+            <td><code>collapse</code></td>
+            <td>Per-heading toggle; hides until the next heading at the same or higher level. Collapsed headings persist per page, and the TOC expands hidden ancestors before navigating.<br><code>data-collapse-levels="2,6"</code><br><code>data-collapse="false"</code> off · <code>data-collapse-root</code> · <code>data-collapse-ignore</code></td>
+            <td><code>k</code> all sections<br><code>Alt+K</code> enable/disable</td>
+          </tr>
+          <tr><td><code>copy</code></td><td>Copies the page's absolute path.</td><td><code>c</code></td></tr>
+          <tr><td><code>servers</code></td><td>Running-instance popover; other rows link to their origin.</td><td><code>s</code></td></tr>
+          <tr><td><code>home</code></td><td>Dock link back to the gallery.</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
 
     <h3><iconify-icon icon="mdi:code-braces" noobserver></iconify-icon>Writing a plugin</h3>
 
@@ -927,7 +948,7 @@
       keys: ["h"],
       run: () =&gt; ctx.ui.announce("Hello"),
     })
-    const item = ctx.docks.register({
+    const dock = ctx.docks.register({
       id: "hello",
       title: "Say hello",
       icon: "&lt;svg …&gt;",
@@ -936,7 +957,7 @@
     ctx.ui.style("/__docserve/plugins/hello/hello.css")
     return () =&gt; {
       offCommand()
-      item.dispose()
+      dock.dispose()
     }
   },
 }</pre>
@@ -977,7 +998,7 @@
           <iconify-icon icon="mdi:cloud-download-outline" noobserver></iconify-icon>
           <h4>Update notice</h4>
         </div>
-        <p>Checked at launch and every 12 h — a newer release shows <strong>New version available — vX.Y.Z</strong> and opens the release page.</p>
+        <p>Checked at launch and every 12 h. A newer release adds <strong>New version available — vX.Y.Z</strong> to the menu, and <strong>Check for Updates…</strong> reports the result in a dialog (up to date, or open the release page).</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -998,7 +1019,8 @@ Open Folder...                <span class="c"># starts another instance</span>
 Open Recent                   <span class="c"># submenu: recent folders (max 10)</span>
 Stop All                      <span class="c"># bare docserve stop</span>
 ─────────────────────────────
-New version available — v0.4.0
+New version available — v0.4.0  <span class="c"># only when a newer release exists</span>
+Check for Updates...            <span class="c"># dialog: up to date / open release page</span>
 Quit docserve
 
 ○ Stopped
@@ -1007,6 +1029,7 @@ Open Folder...
 Open Recent
 Stop All                      <span class="c"># disabled — nothing running</span>
 ─────────────────────────────
+Check for Updates...
 Quit docserve</pre>
   </section>
 
