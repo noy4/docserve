@@ -1,5 +1,6 @@
-// Page listing for the widget: /api/files, cached until a change arrives.
+// Page listing for the widget: docserve:pages:list, cached until a change arrives.
 import { decoded, pageUrl } from "./lib/dom.js"
+import { callServer } from "./rpc-client.js"
 
 /**
  * @param {{ rpc: RpcContext }} options
@@ -35,11 +36,7 @@ export function createPages({ rpc }) {
     if (cache) return cache
     if (pending) return pending
 
-    pending = fetch("/api/files", { headers: { accept: "application/json" } })
-      .then((response) => {
-        if (!response.ok) throw new Error(`/api/files: ${response.status}`)
-        return response.json()
-      })
+    pending = callServer("docserve:pages:list")
       .then((data) => {
         const pages = Array.isArray(data) ? data : []
         cache = pages

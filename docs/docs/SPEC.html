@@ -422,8 +422,11 @@
 │   └── src/
 │       ├── node/
 │       │   ├── cli.mjs           <span class="c"># cac commands · start/stop/background</span>
-│       │   ├── app.mjs           <span class="c"># h3 app · request routes</span>
+│       │   ├── app.mjs           <span class="c"># h3 app · POST /__docserve/rpc</span>
 │       │   ├── paths.mjs         <span class="c"># package-root paths</span>
+│       │   ├── rpc/
+│       │   │   ├── index.mjs     <span class="c"># method registry · dispatch</span>
+│       │   │   └── files.mjs     <span class="c"># docserve:pages:list</span>
 │       │   ├── server.mjs        <span class="c"># listen · port fallback · lifecycle</span>
 │       │   ├── routes.mjs        <span class="c"># HTTP handlers</span>
 │       │   ├── assets.mjs        <span class="c"># MIME + widget/plugin files</span>
@@ -432,7 +435,7 @@
 │       │   ├── scan.mjs          <span class="c"># *.html listing · path guards</span>
 │       │   ├── meta.mjs          <span class="c"># title · created_at · favicon</span>
 │       │   ├── dates.mjs         <span class="c"># git created/modified dates</span>
-│       │   ├── files.mjs         <span class="c"># /api/files composition</span>
+│       │   ├── files.mjs         <span class="c"># page metadata composition</span>
 │       │   ├── inject.mjs        <span class="c"># widget tags · idempotent insertion</span>
 │       │   ├── websocket.mjs     <span class="c"># RFC 6455 subset: handshake · frames · ping</span>
 │       │   └── watch.mjs         <span class="c"># fs.watch · 50 ms debounce · broadcast</span>
@@ -444,7 +447,8 @@
 │       │   ├── commands.js       <span class="c"># registry · key matching · palette state</span>
 │       │   ├── palette.js        <span class="c"># ⌘K palette: filter · keyboard · execute</span>
 │       │   ├── styles.js         <span class="c"># stylesheet load wait · cache-busted refetch</span>
-│       │   ├── rpc.js  pages.js  <span class="c"># method bus · /api/files cache</span>
+│       │   ├── rpc.js  pages.js  <span class="c"># method bus · page cache</span>
+│       │   ├── rpc-client.js     <span class="c"># callServer(method, args)</span>
 │       │   ├── live.js  plugins.js
 │       │   ├── lib/              <span class="c"># framework-free: dom.js · events.js · storage.js</span>
 │       │   └── widget.css  palette.css
@@ -493,7 +497,7 @@
         <path class="edge" d="M 420,296 V 336"/>
         <path class="edge" d="M 248,366 H 276"/>
         <text class="alabel" x="470" y="158">WS /__reload</text>
-        <text class="alabel" x="400" y="210">GET / · /api/files</text>
+        <text class="alabel" x="400" y="210">GET / · POST /__docserve/rpc</text>
         <text class="alabel" x="366" y="224">changes</text>
         <text class="alabel" x="156" y="324">spawn · stop</text>
         <text class="alabel" x="428" y="322">writes</text>
@@ -509,7 +513,7 @@
         <rect class="node" x="68" y="140" width="180" height="56" rx="6"/>
         <image href="https://api.iconify.design/mdi/server.svg?height=18&color=%237E8A9E" x="80" y="159" width="18" height="18"/>
         <text class="tt" x="104" y="162">HTTP server</text>
-        <text class="tm" x="104" y="178">static · /api/files</text>
+        <text class="tm" x="104" y="178">static · /__docserve/rpc</text>
 
         <rect class="node" x="268" y="140" width="180" height="56" rx="6"/>
         <image href="https://api.iconify.design/mdi/broadcast.svg?height=18&color=%237E8A9E" x="280" y="159" width="18" height="18"/>
@@ -625,8 +629,8 @@
           <tr><th>URL</th><th>Response</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched from <code>/api/files</code>; <code>docsDir/index.html</code> is excluded</td></tr>
-          <tr><td><code>/api/files</code></td><td>JSON list per <code>*.html</code> — fields below</td></tr>
+          <tr><td><code>/</code>, <code>/index.html</code></td><td>Embedded gallery template. Card list is fetched via <code>docserve:pages:list</code>; <code>docsDir/index.html</code> is excluded</td></tr>
+          <tr><td><code>POST /__docserve/rpc</code></td><td>Method-dispatch endpoint: <code>{ method, args }</code> → <code>{ result }</code> or <code>{ error }</code></td></tr>
           <tr><td><code>/foo.html</code>, <code>/sub/bar.html</code></td><td>Raw file from <code>docsDir</code>; nesting preserved</td></tr>
           <tr><td><code>/sub/</code></td><td>That directory's <code>index.html</code>; <code>/sub</code> redirects here (<code>301</code>) so relative links resolve</td></tr>
           <tr><td>any other path</td><td>Any extension, MIME by extension with <code>application/octet-stream</code> fallback</td></tr>
@@ -634,9 +638,13 @@
       </table>
     </div>
 
-    <h3><iconify-icon icon="mdi:api" noobserver></iconify-icon>GET /api/files</h3>
+    <h3><iconify-icon icon="mdi:api" noobserver></iconify-icon>POST /__docserve/rpc</h3>
 
-    <pre>[
+    <pre>POST /__docserve/rpc
+{ "method": "docserve:pages:list", "args": [] }
+
+200
+{ "result": [
   {
     "title": "Q3 report",             <span class="c">// page &lt;title&gt;, falling back to the file name</span>
     "url": "/foo.html",               <span class="c">// docsDir-relative link</span>
@@ -645,10 +653,13 @@
     "modified": 1758498765,           <span class="c">// unix seconds</span>
     "favicon": "/assets/icon.svg"     <span class="c">// resolved &lt;link rel="icon"&gt; URL, omitted when unset</span>
   }
-]</pre>
+] }
+
+404
+{ "error": { "message": "Unknown RPC method: docserve:missing" } }</pre>
 
     <p class="section-desc">
-      Malformed paths respond <code>400</code>, paths escaping <code>docsDir</code> respond <code>403</code>, missing files respond <code>404</code>.
+      Unknown methods respond <code>404</code>, malformed JSON or non-array args respond <code>400</code>. Malformed paths respond <code>400</code>, paths escaping <code>docsDir</code> respond <code>403</code>, missing files respond <code>404</code>.
     </p>
 
     <div class="grid-2">
@@ -715,7 +726,7 @@
           <iconify-icon icon="mdi:api" noobserver></iconify-icon>
           <h4>Card list</h4>
         </div>
-        <p>Fetched from <code>/api/files</code> on load — sorted by created date, newest first.</p>
+        <p>Fetched via <code>docserve:pages:list</code> on load — sorted by created date, newest first.</p>
       </div>
       <div class="card">
         <div class="card-head">
@@ -807,7 +818,7 @@
         </thead>
         <tbody>
           <tr><td>Page tab</td><td>Its own path appears in <code>pages</code>, or a <code>css</code> message refreshes its stylesheets</td></tr>
-          <tr><td>Dock</td><td>Never reloads the page; it refetches <code>/api/files</code> on <code>change</code> and on reconnect</td></tr>
+          <tr><td>Dock</td><td>Never reloads the page; it refetches <code>docserve:pages:list</code> on <code>change</code> and on reconnect</td></tr>
           <tr><td>Gallery tab</td><td><code>contentSetChanged</code> or <code>templateChanged</code> is <code>true</code></td></tr>
           <tr><td>iframe preview</td><td>Never connects — the <code>window.self !== window.top</code> guard keeps edits from reloading previews</td></tr>
         </tbody>
@@ -892,7 +903,7 @@
           <iconify-icon icon="mdi:file-document-multiple-outline" noobserver></iconify-icon>
           <h4>Page data</h4>
         </div>
-        <p><code>docserve:pages:list</code> and <code>docserve:pages:resolve</code> wrap <code>/api/files</code>.</p>
+        <p><code>docserve:pages:list</code> fetches via <code>/__docserve/rpc</code>; <code>docserve:pages:resolve</code> derives from it.</p>
       </div>
     </div>
 

@@ -20,6 +20,18 @@ const PORT = 20000 + Math.floor(Math.random() * 20000)
 const WS_PATH = "/__reload"
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+async function rpc(port, method, args = []) {
+  const response = await fetch(`http://localhost:${port}/__docserve/rpc`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ method, args }),
+  })
+  const data = await response.json()
+  if (!response.ok || data?.error)
+    throw new Error(data?.error?.message ?? `rpc: ${response.status}`)
+  return data.result
+}
+
 // Resolve once the server reports its bound port via a state file in the dir.
 async function waitForState(stateDir, timeoutMs = 5000) {
   const end = Date.now() + timeoutMs
@@ -30,7 +42,7 @@ async function waitForState(stateDir, timeoutMs = 5000) {
         const state = JSON.parse(readFileSync(join(stateDir, entry), "utf8"))
         if (typeof state.port === "number") return state
       }
-    } catch {}
+    } catch { }
     await delay(100)
   }
   throw new Error("server did not write its state file")
@@ -46,7 +58,7 @@ async function waitForStates(stateDir, count, timeoutMs = 5000) {
         .map((entry) => JSON.parse(readFileSync(join(stateDir, entry), "utf8")))
         .filter((state) => typeof state.port === "number")
       if (states.length >= count) return states
-    } catch {}
+    } catch { }
     await delay(100)
   }
   throw new Error(`expected ${count} state files`)
@@ -164,13 +176,13 @@ describe("docserve server", () => {
     assert.ok(gallery.includes("hsl("), "folder favicon gets a path-derived hue")
   })
 
-  it("lists html files with resolved metadata on /api/files", async () => {
+  it("lists html files with resolved metadata on docserve:pages:list", async () => {
     writeFileSync(join(content, "favicon.svg"), "<svg xmlns='http://www.w3.org/2000/svg'/>")
     writeFileSync(join(content, "fav.html"), '<html><head><link rel="icon" href="favicon.svg"><title>Fav</title></head></html>')
     writeFileSync(join(content, "entities.html"), "<html><head><title>Q&amp;A &lt;draft&gt; &#39;26</title></head></html>")
     writeFileSync(join(content, "escaping.html"), '<html><head><link rel="icon" href="../outside.png"></head></html>')
 
-    const files = await (await fetch(`http://localhost:${port}/api/files`)).json()
+    const files = await rpc(port, "docserve:pages:list")
     assert.ok(Array.isArray(files))
     const page = files.find((f) => f.filePath.endsWith("page.html"))
     assert.ok(page)
@@ -186,6 +198,16 @@ describe("docserve server", () => {
 
     const entities = files.find((f) => f.filePath.endsWith("entities.html"))
     assert.equal(entities.title, "Q&A <draft> '26", "title entities are decoded for the gallery")
+  })
+
+  it("returns 404 for unknown RPC methods", async () => {
+    const response = await fetch(`http://localhost:${port}/__docserve/rpc`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ method: "docserve:missing" }),
+    })
+    assert.equal(response.status, 404)
+    assert.match((await response.json()).error.message, /Unknown RPC method/)
   })
 
   it("answers 403, 400 and 404 for bad paths", async () => {

@@ -315,14 +315,26 @@
     ])
   }
 
+  async function callServer(method, args = []) {
+    const res = await fetch("/__docserve/rpc", {
+      method: "POST",
+      cache: "no-store",
+      headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ method, args }),
+    })
+    const data = await res.json()
+    if (!res.ok || data?.error)
+      throw new Error(data?.error?.message ?? `/__docserve/rpc: ${res.status}`)
+    return data?.result
+  }
+
   async function load() {
     const docsDir = document.getElementById("docs-dir").textContent
     document.getElementById("empty-dir").textContent = docsDir
 
     let files = []
     try {
-      const res = await fetch("/api/files")
-      files = await res.json()
+      files = await callServer("docserve:pages:list")
     } catch {}
     if (!Array.isArray(files)) files = []
 

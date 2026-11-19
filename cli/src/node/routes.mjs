@@ -1,7 +1,6 @@
 // HTTP routing: an ordered table of handlers over one docs static handler.
 // Nothing here knows about listening, signals or sockets.
 import { serveAsset } from "./assets.mjs"
-import { apiFiles } from "./files.mjs"
 import { galleryResponse } from "./gallery.mjs"
 import { injectIntoHtml } from "./inject.mjs"
 import { PLUGINS_SOURCE_DIR, WIDGET_DIST_DIR, WIDGET_SOURCE_DIR } from "./paths.mjs"
@@ -25,7 +24,6 @@ export function createHandler({ docsDir }) {
 
   /** @type {Array<{ match: (pathname: string) => boolean, handle: (request: Request, url: URL) => Promise<Response> }>} */
   const routes = [
-    { match: (pathname) => pathname === "/api/files", handle: serveFiles },
     { match: (pathname) => pathname.startsWith(INTERNAL_PREFIX), handle: serveInternal },
     { match: (pathname) => pathname === "/" || pathname === "/index.html", handle: serveGallery },
     { match: () => true, handle: serveDocs },
@@ -35,18 +33,6 @@ export function createHandler({ docsDir }) {
     const url = new URL(request.url)
     const route = routes.find((candidate) => candidate.match(url.pathname))
     return route.handle(request, url)
-  }
-
-  /**
-   * @returns {Promise<Response>}
-   */
-  async function serveFiles() {
-    try {
-      return Response.json(await apiFiles(docsDir), { headers: { "cache-control": "no-store" } })
-    } catch (err) {
-      console.error(err)
-      return Response.json([], { headers: { "cache-control": "no-store" } })
-    }
   }
 
   /**
