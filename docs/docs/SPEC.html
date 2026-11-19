@@ -421,7 +421,10 @@
 │   ├── dist/                     <span class="c"># built node bundle + widget</span>
 │   └── src/
 │       ├── node/
-│       │   ├── cli.mjs           <span class="c"># cac commands · start/stop/background</span>
+│       │   ├── cli.mjs           <span class="c"># cac commands · start/stop/status</span>
+│       │   ├── cli/
+│       │   │   ├── args.mjs      <span class="c"># argv normalization · port parsing</span>
+│       │   │   └── background.mjs <span class="c"># detached spawn · state wait</span>
 │       │   ├── paths.mjs         <span class="c"># package-root paths</span>
 │       │   ├── http/
 │       │   │   ├── app.mjs       <span class="c"># composition root · h3 app</span>
@@ -598,7 +601,8 @@
   "pid": 12345,                      <span class="c">// server process — stop sends SIGTERM, liveness-checked</span>
   "port": 4242,                      <span class="c">// actually bound port (starts at 4242, +1 on conflict)</span>
   "url": "http://localhost:4242/",
-  "docsDir": "/Users/me/reports"     <span class="c">// absolute path of the serving folder</span>
+  "docsDir": "/Users/me/reports",    <span class="c">// absolute path of the serving folder</span>
+  "startedAt": 1794941135480         <span class="c">// epoch ms — readers list newest first</span>
 }</pre>
   </section>
 
