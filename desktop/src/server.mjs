@@ -108,7 +108,7 @@ export class ServerManager {
 
   stopDir(dir) {
     console.log(`[docserve-desktop] stop: ${dir}`)
-    return this.#runCli([dir, "stop"])
+    return this.#runCli(["stop", dir])
   }
 
   stopSync() {

@@ -65,7 +65,7 @@ function runCli(args: string[]): Promise<void> {
 }
 
 export function stopServer(folder: string): Promise<void> {
-  return runCli([path.resolve(folder), "stop"])
+  return runCli(["stop", path.resolve(folder)])
 }
 
 export function stopAllServers(): Promise<void> {

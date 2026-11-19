@@ -3,7 +3,7 @@ import fs from "node:fs"
 import path from "node:path"
 import cac from "cac"
 import { startBackground } from "./cli/background.mjs"
-import { DEFAULT_PORT, normalizeArgv, parsePort } from "./cli/args.mjs"
+import { DEFAULT_PORT, parsePort } from "./cli/args.mjs"
 import { runServer } from "./http/server.mjs"
 import { findByDir, listLiveStates, removeState } from "./instances/state.mjs"
 import { PACKAGE_JSON } from "./paths.mjs"
@@ -23,7 +23,7 @@ export async function main(argv = process.argv) {
     .version(VERSION)
 
   cli
-    .command("start [dir]", "Serve a folder of HTML files (default: current directory)")
+    .command("[dir]", "Serve a folder of HTML files (default: current directory)")
     .usage("[dir] [options]")
     .example("docserve ~/reports --open")
     .action(async (dir, options) => {
@@ -42,7 +42,7 @@ export async function main(argv = process.argv) {
       showStatus()
     })
 
-  cli.parse(normalizeArgv(argv), { run: false })
+  cli.parse(argv, { run: false })
   await cli.runMatchedCommand()
 }
 

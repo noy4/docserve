@@ -423,7 +423,7 @@
 │       ├── node/
 │       │   ├── cli.mjs           <span class="c"># cac commands · start/stop/status</span>
 │       │   ├── cli/
-│       │   │   ├── args.mjs      <span class="c"># argv normalization · port parsing</span>
+│       │   │   ├── args.mjs      <span class="c"># default port · port parsing</span>
 │       │   │   └── background.mjs <span class="c"># detached spawn · state wait</span>
 │       │   ├── paths.mjs         <span class="c"># package-root paths</span>
 │       │   ├── http/
@@ -609,7 +609,7 @@
   <!-- CLI -->
   <section>
     <h2><iconify-icon icon="mdi:console" width="24" noobserver></iconify-icon>CLI</h2>
-    <p class="section-desc">Syntax: <code>docserve [dir] [command] [options]</code></p>
+    <p class="section-desc">Syntax: <code>docserve [dir] [options]</code> — or <code>docserve stop [dir]</code> / <code>docserve status</code></p>
 
     <div class="table-wrap">
       <table>
@@ -617,9 +617,9 @@
           <tr><th>Argument / Command</th><th>Behavior</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>[dir]</code></td><td>Folder to serve (default: <code>.</code>). Errors with exit 1 if it does not exist</td></tr>
+          <tr><td><code>[dir]</code></td><td>Folder to serve (default: <code>.</code>) — the default command. Errors with exit 1 if it does not exist</td></tr>
           <tr><td><code>(none)</code></td><td>Foreground start. <code>Ctrl+C</code> stops that instance and removes its state file</td></tr>
-          <tr><td><code>stop</code></td><td>Stop the server serving <code>[dir]</code>, or every instance when <code>[dir]</code> is omitted. Stale state (dead pid) is pruned silently</td></tr>
+          <tr><td><code>stop [dir]</code></td><td>Stop the server serving <code>[dir]</code>, or every instance when <code>[dir]</code> is omitted. Stale state (dead pid) is pruned silently</td></tr>
           <tr><td><code>status</code></td><td>List every running instance (<code>url</code> + <code>docsDir</code>); exit 1 when none</td></tr>
           <tr><td><code>--open</code></td><td>Open the gallery in the browser once the port is bound</td></tr>
           <tr><td><code>--port &lt;n&gt;</code></td><td>Port to bind (default <code>4242</code>). On conflict, falls back +1 up to 20 tries and records the bound port in the instance's state file</td></tr>

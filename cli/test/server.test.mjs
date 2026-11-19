@@ -491,7 +491,7 @@ describe("docserve multi-instance", () => {
 
   // Runs last: it stops the remaining server under test.
   it("stops one folder without touching the other, then stops all", async () => {
-    const stop = spawnSync(process.execPath, [CLI, dirA, "stop"], { env, encoding: "utf8" })
+    const stop = spawnSync(process.execPath, [CLI, "stop", dirA], { env, encoding: "utf8" })
     assert.equal(stop.status, 0)
     await assertDown(portA)
     const b = await (await fetch(`http://localhost:${portB}/b.html`)).text()
